@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 using System.Xml.Linq;
 using System.Globalization;
 
-namespace IGtoOBJGen
+namespace VR_Spy_Companion
 {
     internal class IGBoxes
     {

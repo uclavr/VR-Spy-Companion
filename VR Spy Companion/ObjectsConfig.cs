@@ -5,8 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using IGtoOBJGen;
+using VR_Spy_Companion;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
+using System.Net.Http.Headers;
 
 namespace IGtoOBJGen {
     abstract class TypeConfig : ObjectData {
@@ -551,9 +553,60 @@ namespace IGtoOBJGen {
     class GsfElectrons_V3 : TypeConfig { }
     class PATElectrons_V1 : TypeConfig { }
     class ForwardProtons_V1 : TypeConfig { }
-    class Vertices_V1 : TypeConfig { }
-    class PrimaryVertices_V1 : TypeConfig { }
-    class SecondaryVertices_V1 : TypeConfig { }
+    class Vertices_V1 : TypeConfig {
+        private List<Vertex> vertexDatas;
+        private string eventTitle;
+        public Vertices_V1(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            primaryVertexDatas = StaticBoxHandlers.vertexParse(JSON, "Vertices_V1");
+            GenerateVertexOBJ();
+            return JsonConvert.SerializeObject(vertexDatas);
+        }
+        private void GenerateVertexOBJ()
+        {
+            StaticBoxHandlers.GenerateEllipsoidObj($@"{eventTitle}\Vertices_V1.obj", vertexDatas, 3.0);
+        }
+    }
+    class PrimaryVertices_V1 : TypeConfig {
+        private List<Vertex> primaryVertexDatas;
+        private string eventTitle;
+        public PrimaryVertices_V1(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            primaryVertexDatas = StaticBoxHandlers.vertexParse(JSON,"PrimaryVertices_V1");
+            GenerateVertexOBJ();
+            return JsonConvert.SerializeObject(primaryVertexDatas);
+        }
+        private void GenerateVertexOBJ()
+        {
+            StaticBoxHandlers.GenerateEllipsoidObj($@"{eventTitle}\PrimaryVertices_V1.obj", primaryVertexDatas, 3.0);
+        }
+    }
+    class SecondaryVertices_V1 : TypeConfig { 
+        private List<Vertex> secondaryVertexDatas;
+        private string eventTitle;
+        public SecondaryVertices_V1( JObject args, string eventtitle) {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute() {
+            secondaryVertexDatas = StaticBoxHandlers.vertexParse(JSON,"SecondaryVertices_V1");
+            GenerateVertexOBJ();
+            return JsonConvert.SerializeObject(secondaryVertexDatas);
+        }
+        private void GenerateVertexOBJ() {
+            StaticBoxHandlers.GenerateEllipsoidObj($@"{eventTitle}\SecondaryVertices_V1.obj", secondaryVertexDatas, 3.0);
+        }
+    }
     class VertexCompositeCandidates_V1 : TypeConfig { }
     class SimVertices_V1 : TypeConfig { }
 }
