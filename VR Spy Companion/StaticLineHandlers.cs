@@ -11,47 +11,6 @@ namespace IGtoOBJGen
 {
     static class StaticLineHandlers
     {
-        //Constructor
-        public IGTracks(JObject inputData, string name)
-        {
-            data = inputData;
-
-            eventTitle = name;
-
-            if (!Directory.Exists($"{eventTitle}"))
-            {
-                Directory.CreateDirectory($"{eventTitle}");
-            }
-            Execute();
-            SerializeMET();
-        }
-        //Main Class Method
-        public void Execute()
-        {
-            //Jesus christ this is so ugly, desperately need to replace all of these non void functions with void, in place methods
-            var photonlist = photonParse();
-            generatePhotonModels(photonlist);
-
-            trackExtrasData = trackExtrasParse();
-            globalMuonDatas = globalMuonParse();
-            makeGlobalMuons();
-
-            trackerMuonDatas = trackerMuonParse();
-            makeTrackerMuons();
-
-            standaloneMuonDatas = standaloneMuonParse();
-            makeStandaloneMuons();
-
-            var tracklist = tracksParse();
-            removeMuonsFromTracks();
-            makeTracks();
-            trackDatas = trackDataParse();
-
-            electronDatas = electronParse();
-            makeElectrons();
-
-        }
-        //Methods
         static public List<PhotonData> photonParse(JObject data)
         {
             List<PhotonData> dataList = new List<PhotonData>();
