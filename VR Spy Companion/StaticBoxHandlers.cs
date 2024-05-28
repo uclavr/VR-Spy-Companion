@@ -14,50 +14,6 @@ namespace VR_Spy_Companion
 {
         static class StaticBoxHandlers
         {
-            private readonly string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-            private string eventTitle;
-            public string jsonData;
-            private JObject data;
-            // Scaling factors are used to make sure the calorimetry towers and boxes are generated correctly. I don't know why this is. It's just a thing with the way event data is stored. For more info
-            // you'd need to talk to the guy behind iSpy and IG files generally. Electromagnetic calorimetry scales are hard coded for some reason
-            private double EESCALE;
-            private double EBSCALE;
-            private double ESSCALE;
-
-            private double HBSCALE;
-            private double HESCALE;
-            private double HFSCALE;
-            private double HOSCALE;
-
-            public List<CalorimetryTowers> EEData;
-            public List<CalorimetryTowers> EBData;
-            public List<CalorimetryTowers> ESData;
-
-            public List<CalorimetryTowers> HEData;
-            public List<CalorimetryTowers> HBData;
-            public List<CalorimetryTowers> HFData;
-            public List<CalorimetryTowers> HOData;
-
-            public List<JetData> jetDatas;
-            public List<Vertex> vertexDatas;
-            public List<MuonChamberData> muonChamberDatas;
-            public List<SuperCluster> superClusters;
-            public List<List<RecHitFraction>> recHitFractions;
-            public IGBoxes(JObject dataFile, string name)
-            {
-                HBSCALE = 1.0;
-                HESCALE = 1.0;
-                HFSCALE = 1.0;
-                HOSCALE = 1.0;
-                data = dataFile;
-                eventTitle = name;
-                if (!Directory.Exists($"{eventTitle}"))
-                {
-                    Directory.CreateDirectory($"{eventTitle}");
-                }
-                setScales();
-                Execute();
-            }
             public void Execute()
             {
                 makeEBRec();
