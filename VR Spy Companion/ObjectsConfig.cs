@@ -392,11 +392,41 @@ namespace IGtoOBJGen {
     }
     class SuperClusters_V1 : TypeConfig {
         private List<SuperCluster> superClusterData;
+        private List<List<RecHitFraction>> recHits;
+        private List<RecHitFraction> recHitFractionDatas;
+        private string eventTitle;
+        public SuperClusters_V1(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
         public override string Execute()
         {
+            recHitFractionDatas = StaticBoxHandlers.recHitFractionsParse(JSON);
+            assignRecHitFractions();
+            superClusterData = StaticBoxHandlers.superClusterParse(JSON);
+            StaticBoxHandlers.GenerateSuperClusters(recHits, eventTitle);
             return JsonConvert.SerializeObject(superClusterData);
         }
+        private void assignRecHitFractions()
+        {
+            var dataList = new List<List<RecHitFraction>>();
+            var indexer = 0;
+            foreach (var item in JSON["Associations"]["SuperClusterRecHitFractions_V1"])
+            {
+                int index = item[0][1].Value<int>();
+                if (dataList.Count() < index + 1)
+                {
+                    List<RecHitFraction> h = new List<RecHitFraction>();
+                    dataList.Add(h);
+                }
+                dataList[index].Add(recHitFractionDatas[indexer]);
+                indexer++;
+            }
+            recHits = dataList;
+        }
     }
+}
     class EEDigis_V1 : TypeConfig {
 
     }
@@ -534,7 +564,21 @@ namespace IGtoOBJGen {
     class PFMETs_V1 : TypeConfig { }
     class PATMETs_V1 : TypeConfig { }
     class Jets_V1 : TypeConfig { }
-    class PFJets_V1 : TypeConfig { }
+    class PFJets_V1 : TypeConfig {
+        private List<JetData> jetDatas;
+        private string eventTitle;
+        public PFJets_V1(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+
+        public override string Execute()
+        {
+            throw new NotImplementedException();
+        }
+
+    }
     class PFJets_V2 : TypeConfig { }
     class GenJets_V1 : TypeConfig { }
     class PATJets_V1 : TypeConfig { }
@@ -563,7 +607,7 @@ namespace IGtoOBJGen {
         }
         public override string Execute()
         {
-            primaryVertexDatas = StaticBoxHandlers.vertexParse(JSON, "Vertices_V1");
+            vertexDatas = StaticBoxHandlers.vertexParse(JSON, "Vertices_V1");
             GenerateVertexOBJ();
             return JsonConvert.SerializeObject(vertexDatas);
         }
