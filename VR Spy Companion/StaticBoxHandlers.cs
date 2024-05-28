@@ -640,7 +640,7 @@ namespace VR_Spy_Companion
                     }
                 }
             }
-            public List<RecHitFraction> recHitFractionsParse()
+            static public List<RecHitFraction> recHitFractionsParse(JObject data)
             {
                 List<RecHitFraction> dataList = new List<RecHitFraction>();
                 if (data["Collections"]["RecHitFractions_V1"] == null)
@@ -686,7 +686,7 @@ namespace VR_Spy_Companion
                 }
                 return dataList;
             }
-            public List<SuperCluster> superClusterParse()
+            static public List<SuperCluster> superClusterParse(JObject data)
             {
                 List<SuperCluster> dataList = new List<SuperCluster>();
                 int idNumber = 0;
@@ -715,7 +715,7 @@ namespace VR_Spy_Companion
                 }
                 return dataList;
             }
-            public void makeSuperClusters()
+            static public void GenerateSuperClusters(List<List<RecHitFraction>> recHits, string eventTitle)
             {
                 List<string> dataList = new List<string>();
                 List<string> faces = new List<string>();
