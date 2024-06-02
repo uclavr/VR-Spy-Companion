@@ -14,34 +14,8 @@ namespace VR_Spy_Companion
 {
         static class StaticBoxHandlers
         {
-            public void Execute()
-            {
-                makeEBRec();
-                makeEERec();
-                makeESRec();
-                makeHBRec();
-                makeHERec();
-                makeHFRec();
-                makeHORec();
-                muonChamberDatas = muonChamberParse();
-                generateMuonChamberModels(muonChamberDatas);
-                List<JetData> jetList = jetParse();
-                generateJetModels(jetList);
-                superClusters = superClusterParse();
-                var yuh = recHitFractionsParse();
-                recHitFractions = assignRecHitFractions(yuh);
-                makeSuperClusters();
-
-                vertexDatas = vertexParse();
-                int i = 0;
-                foreach (Vertex v in vertexDatas)
-                {
-                    GenerateEllipsoidObj($@"{eventTitle}\vertices.obj", vertexDatas, 3.0);
-                    i += 1;
-                }
-
-            }
-            public List<MuonChamberData> muonChamberParse()
+    
+            static public List<MuonChamberData> muonChamberParse(JObject data)
             {
                 /* 
                  * UGH, I have to work on a way to get the canvases in unity aligned properly with the muon chambers so that we can display 
@@ -105,7 +79,7 @@ namespace VR_Spy_Companion
                 }
                 return dataList;
             }
-            public void generateMuonChamberModels(List<MuonChamberData> data)
+            static public void generateMuonChamberModels(List<MuonChamberData> data, string eventTitle)
             {
                 if (data.Count() == 0) { return; }
 
@@ -145,7 +119,20 @@ namespace VR_Spy_Companion
                 File.WriteAllText($"{eventTitle}\\7_MuonChambers_V1.obj", String.Empty);
                 File.WriteAllLines($"{eventTitle}\\7_MuonChambers_V1.obj", dataStrings);
             }
-            public List<CalorimetryTowers> genericCaloParse(string name, double scale)
+        static public List<CalorimetryTowers> setCaloScale(List<CalorimetryTowers> towers)
+        {
+            double scaler = towers.Select(x => x.energy).Max();
+            List<CalorimetryTowers> result = towers;
+            for(int i = 0;i<towers.Count();i++)
+            {
+                CalorimetryTowers calo = towers[i];
+                calo.scale = towers[i].energy / scaler;
+                towers[i] = calo;
+            }
+
+            return towers;
+        }
+            static public List<CalorimetryTowers> genericCaloParse(JObject data, string name)// double scale)
             {
                 List<CalorimetryTowers> dataList = new List<CalorimetryTowers>();
                 if (data["Collections"][name] == null)
@@ -158,7 +145,7 @@ namespace VR_Spy_Companion
                     var children = item.Children().Values<double>().ToArray();
 
                     caloItem.energy = children[0];
-                    caloItem.scale = caloItem.energy / scale;
+                    //caloItem.scale = caloItem.energy / scale;
                     caloItem.eta = children[1];
                     caloItem.phi = children[2];
                     caloItem.time = children[3];
@@ -262,18 +249,15 @@ namespace VR_Spy_Companion
                 File.WriteAllText($"{eventTitle}\\5_ESRecHits_V2.obj", String.Empty);
                 File.WriteAllLines($"{eventTitle}\\5_ESRecHits_V2.obj", dataList);
             }
-            public List<JetData> jetParse()
+            static public List<JetV1Data> jetV1Parse(JObject data)
             {
                 int idNumber = 0;
-                List<JetData> datalist = new List<JetData>();
-                if (data["Collections"]["PFJets_V1"] == null)
-                {
-                    return datalist;
-                }
+                List<JetV1Data> datalist = new List<JetV1Data>();
+
                 foreach (var item in data["Collections"]["PFJets_V1"])
                 {
 
-                    JetData currentJet = new JetData();
+                    JetV1Data currentJet = new JetV1Data();
                     var children = item.Children().Values<double>().ToArray();
 
                     currentJet.id = idNumber;
@@ -285,11 +269,34 @@ namespace VR_Spy_Companion
                     idNumber++;
                     datalist.Add(currentJet);
                 }
-                jetDatas = datalist;
 
                 return datalist;
             }
-            public void generateJetModels(List<JetData> data)
+        static public List<JetV2Data> jetV2Parse(JObject data)
+        {
+            int idNumber = 0;
+            List<JetV2Data> datalist = new List<JetV2Data>();
+
+            foreach (var item in data["Collections"]["PFJets_V2"])
+            {
+
+                JetV2Data currentJet = new JetV2Data();
+                var children = item.Children().Values<double>().ToArray();
+
+                currentJet.id = idNumber;
+                currentJet.et = children[0];
+                currentJet.eta = children[1];
+                currentJet.theta = children[2];
+                currentJet.phi = children[3];
+                currentJet.vertex = new[] { children[4], children[5], children[6] };
+
+                idNumber++;
+                datalist.Add(currentJet);
+            }
+
+            return datalist;
+        }
+        static public void generateJetModels(List<JetV1Data> data, string eventTitle)
             {
                 double maxZ = 2.25;
                 double maxR = 1.10;
@@ -312,9 +319,34 @@ namespace VR_Spy_Companion
                     dataList = jetGeometry(item, radius, length, numSections, index, dataList);
                     index++;
                 }
-                File.WriteAllLines($"{eventTitle}//0_PFJets.obj", dataList);
+                File.WriteAllLines($"{eventTitle}//0_PFJets_V1.obj", dataList);
             }
-            public List<string> jetGeometry(JetData item, double radius, double length, int sections, int index, List<string> dataList)
+        static public void generateJetModels(List<JetV2Data> data, string eventTitle)
+        {
+            double maxZ = 2.25;
+            double maxR = 1.10;
+            double radius = 0.3 * (1.0 / (1 + 0.001));
+            int numSections = 64;
+            int iterNumber = 0;
+            int index = 0;
+            List<string> dataList = new List<string>();
+
+            foreach (var item in data)
+            {
+                iterNumber++;
+                double ct = Math.Cos(item.theta);
+                double st = Math.Sin(item.theta);
+
+                double length1 = (ct != 0.0) ? maxZ / Math.Abs(ct) : maxZ;
+                double length2 = (st != 0.0) ? maxR / Math.Abs(st) : maxR;
+                double length = length1 < length2 ? length1 : length2;
+
+                dataList = jetGeometry(item, radius, length, numSections, index, dataList);
+                index++;
+            }
+            File.WriteAllLines($"{eventTitle}//0_PFJets_V2.obj", dataList);
+        }
+        static public List<string> jetGeometry(JetV1Data item, double radius, double length, int sections, int index, List<string> dataList)
             {
                 List<string> normals = new List<string>();
                 List<string> normals1 = new List<string>();
@@ -396,7 +428,89 @@ namespace VR_Spy_Companion
                 dataList.AddRange(normals);
                 return dataList;
             }
-            public List<string> generateCalorimetryBoxes(List<CalorimetryTowers> inputData)
+        static public List<string> jetGeometry(JetV2Data item, double radius, double length, int sections, int index, List<string> dataList)
+        {
+            List<string> normals = new List<string>();
+            List<string> normals1 = new List<string>();
+            List<string> normals2 = new List<string>();
+            List<string> section1 = new List<string>();
+            List<string> topsection = new List<string>();
+            List<Vector3D> radialpoints = new List<Vector3D>();
+            var M = Matrix<double>.Build;
+            var V = Vector<double>.Build;
+
+            double[,] xRot =
+                { { 1, 0, 0 },
+                { 0, Math.Cos(item.theta), -1.0 * Math.Sin(item.theta) },
+                { 0, Math.Sin(item.theta), Math.Cos(item.theta) } };
+
+            double[,] zRot =
+                { { Math.Cos(item.phi+Math.PI/2.0), -1.0 * Math.Sin(item.phi+Math.PI/2.0), 0 },
+                { Math.Sin(item.phi+Math.PI/2.0), Math.Cos(item.phi+Math.PI/2.0), 0 },
+                { 0, 0, 1 } };
+
+            var rx = M.DenseOfArray(xRot); //Rotation matrices
+            var rz = M.DenseOfArray(zRot);
+            normals.Add($"o Jets_{index}");
+
+
+            for (double i = 1.0; i <= sections; i++)
+            {
+                double radian = (2.0 * i * Math.PI) / (double)sections;
+
+                string bottompoint = $"v {item.vertex[0]} {item.vertex[1]} {item.vertex[2]}";
+                section1.Add(bottompoint);
+
+                double[] feederArray = { radius * Math.Cos(radian), radius * Math.Sin(radian), length };
+                Vector<double> temptop = Vector<double>.Build.DenseOfArray(feederArray);
+
+                var rotation = rz * rx;
+                var top = rotation * temptop;
+
+                //We can use the toppoint list as the vector list to generate normals with. Make a new for loop to handle this
+                string toppoint = $"v {item.vertex[0]+top[0]} {item.vertex[1]+top[1]} {item.vertex[2]+top[2]}";
+                topsection.Add(toppoint);
+                radialpoints.Add(new Vector3D(item.vertex[0] + top[0], item.vertex[1] + top[1], item.vertex[2] + top[2]));
+            }
+            section1.AddRange(topsection);
+            for (int i = 0; i < radialpoints.Count; i++)
+            {
+                if (i == radialpoints.Count - 1)
+                {
+                    var vector_1 = radialpoints[i];
+                    var vector_2 = radialpoints[0];
+                    Vector3D norm = vector_1.CrossProduct(vector_2);
+                    normals.Add($"vn {norm.X} {norm.Y} {norm.Z}");
+                    normals2.Add($"vn {-norm.X} {-norm.Y} {-norm.Z}");
+                    break;
+                }
+                var vector1 = radialpoints[i];
+                var vector2 = radialpoints[i + 1];
+
+                Vector3D normalresult = vector1.CrossProduct(vector2);
+                normals.Add($"vn {normalresult.X} {normalresult.Y} {normalresult.Z}");
+                normals2.Add($"vn {-normalresult.X} {-normalresult.Y} {-normalresult.Z}");
+            }
+            normals.AddRange(normals2);
+            int n = 1;
+
+            while (n < sections)
+            {
+                string face = $"f {n + (2 * sections * index)}//{n + (2 * sections * index)} {n + sections + (2 * sections * index)}//{n + (2 * sections * index)} {n + 1 + sections + (2 * sections * index)}//{n + (2 * sections * index)} {n + 1 + (2 * sections * index)}//{n + (2 * sections * index)}";
+                //string face = $"f {n} {n + sections} {n + 1 + sections} {n + 1}";
+                string revface = $"f {n + 1 + (2 * sections * index)}//{n + sections + (2 * sections * index)} {n + 1 + sections + (2 * sections * index)}//{n + sections + (2 * sections * index)} {n + sections + (2 * sections * index)}//{n + sections + (2 * sections * index)} {n + (2 * sections * index)}//{n + sections + (2 * sections * index)}";
+                section1.Add(face);
+                section1.Add(revface);
+                n++;
+            }
+
+            section1.Add($"f {2 * sections * index + sections}//{2 * sections * index + sections} {2 * sections * index + 2 * sections}//{2 * sections * index + sections} {2 * sections * index + sections + 1}//{2 * sections * index + sections} {2 * sections * index + 1}//{2 * sections * index + sections}\n" +
+                $"f {2 * sections * index + 1}//{2 * sections * index + 2 * sections} {2 * sections * index + sections + 1}//{2 * sections * index + 2 * sections} {2 * sections * index + 2 * sections}//{2 * sections * index + 2 * sections} {2 * sections * index + sections}//{2 * sections * index + 2 * sections}");
+            normals.AddRange(section1);
+            dataList.AddRange(normals);
+            return dataList;
+        }
+        static public List<string> generateCalorimetryBoxes(List<CalorimetryTowers> inputData)
             {
                 List<string> geometryData = new List<string>();
                 int counter = 1;
@@ -478,7 +592,7 @@ namespace VR_Spy_Companion
                 }
                 return geometryData;
             }
-            public List<string> generateCalorimetryTowers(List<CalorimetryTowers> inputData)
+            static public List<string> generateCalorimetryTowers(List<CalorimetryTowers> inputData)
             {
                 List<string> geometryData = new List<string>();
                 int counter = 1;

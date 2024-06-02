@@ -27,7 +27,6 @@ namespace IGtoOBJGen {
         public TrackerMuonV2(JObject arg, string eventtitle) {
             JSON = arg;
             eventTitle = eventtitle;
-            SetExtras();
         }
         public override string Execute() {
             /*Execution protocol
@@ -39,52 +38,10 @@ namespace IGtoOBJGen {
               5. return JObject of relevant data, to be appended to master JObject DONE
               
              */
-
+            trackerMuonExtras = StaticLineHandlers.setExtras(JSON, "MuonTrackerExtras_V1");
             trackerMuonData = StaticLineHandlers.trackerMuonParse(JSON,2);
             GenerateTrackerMuonOBJ();
             return JsonConvert.SerializeObject(trackerMuonData);
-        }
-        public void SetExtras() {
-            var assocsExtras = JSON["Associations"]["MuonTrackerExtras_V1"];
-            int firstAssoc = assocsExtras[0][1][1].Value<int>();
-            int lastAssoc = assocsExtras.Last()[1][1].Value<int>();
-            var extras = JSON["Collections"]["Extras_V1"].ToArray()[(firstAssoc)..(lastAssoc + 1)];
-            foreach (var extra in extras) {
-                TrackExtrasData currentItem = new TrackExtrasData();
-
-                var children = extra.Children().Values<double>().ToArray();
-
-                currentItem.pos1 = new double[3] { children[0], children[1], children[2] };
-
-                double dir1mag = Math.Sqrt(  //dir1mag and dir2mag are for making sure the direction vectors are normalized
-                    Math.Pow(children[3], 2) +
-                    Math.Pow(children[4], 2) +
-                    Math.Pow(children[5], 2)
-                );
-                currentItem.dir1 = new double[3] { children[3] / dir1mag, children[4] / dir1mag, children[5] / dir1mag };
-
-                currentItem.pos2 = new double[3] { children[6], children[7], children[8] };
-
-                double dir2mag = Math.Sqrt(
-                    Math.Pow(children[9], 2) +
-                    Math.Pow(children[10], 2) +
-                    Math.Pow(children[11], 2)
-                    );
-                currentItem.dir2 = new double[3] { children[9] / dir2mag, children[10] / dir2mag, children[11] / dir2mag };
-
-                double distance = Math.Sqrt(
-                    Math.Pow((currentItem.pos1[0] - currentItem.pos2[0]), 2) +
-                    Math.Pow(currentItem.pos1[1] - currentItem.pos2[1], 2) +
-                    Math.Pow(currentItem.pos1[2] - currentItem.pos2[2], 2)
-                     );
-
-                double scale = distance * 0.25;
-
-                currentItem.pos3 = new double[3] { children[0] + scale * currentItem.dir1[0], children[1] + scale * currentItem.dir1[1], children[2] + scale * currentItem.dir1[2] };
-                currentItem.pos4 = new double[3] { children[6] - scale * currentItem.dir2[0], children[7] - scale * currentItem.dir2[1], children[8] - scale * currentItem.dir2[2] };
-
-                trackerMuonExtras.Add(currentItem);
-            }
         }
         public void GenerateTrackerMuonOBJ() {
             List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(trackerMuonExtras, "TrackerMuons");
@@ -426,67 +383,135 @@ namespace IGtoOBJGen {
             recHits = dataList;
         }
     }
-}
-    class EEDigis_V1 : TypeConfig {
+    /*class EEDigis_V1 : TypeConfig {
 
-    }
-    class EERecHits_V2 : TypeConfig {
+    }*/
+    class EERecHits_V2 : TypeConfig 
+    {
         private List<CalorimetryTowers> caloTowerData;
+        private string eventTitle;
+
+        public EERecHits_V2(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
         public override string Execute()
         {
+            caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "EERecHits_V2");
+            caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
+            List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            File.WriteAllText($"{eventTitle}\\5_EERecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\5_EERecHits_V2.obj", dataList);
             return JsonConvert.SerializeObject(caloTowerData);
         }
 
     }
-	class EBDigis_V1 : TypeConfig {
+    /*class EBDigis_V1 : TypeConfig {
+
         public override string Execute()
         {
             throw new NotImplementedException()
-        }
-    }
+        } 
+    }*/
 	class EBRecHits_V2 : TypeConfig {
         private List<CalorimetryTowers> caloTowerData;
+        private string eventTitle;
+        public EBRecHits_V2(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
         public override string Execute()
         {
+            caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "EBRecHits_V2");
+            caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
+            List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            File.WriteAllText($"{eventTitle}\\5_EBRecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\5_EBRecHits_V2.obj", dataList);
             return JsonConvert.SerializeObject(caloTowerData);
         }
     }
     class ESRecHits_V2 : TypeConfig {
         private List<CalorimetryTowers> caloTowerData;
+        private string eventTitle;
+        public ESRecHits_V2(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
         public override string Execute()
         {
+            caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "ESRecHits_V2");
+            caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
+            List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            File.WriteAllText($"{eventTitle}\\5_ESRecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\5_ESRecHits_V2.obj", dataList);
             return JsonConvert.SerializeObject(caloTowerData);
         }
     }
-	class HGCEERecHits_V1 : TypeConfig {
+	/*class HGCEERecHits_V1 : TypeConfig {
         private List<CalorimetryTowers> caloTowerData;
         public override string Execute()
         {
             return JsonConvert.SerializeObject(caloTowerData);
         }
-    }
+    }*/
 	class HFRecHits_V2 : TypeConfig {
         private List<CalorimetryTowers> caloTowerData;
+        private string eventTitle;
+        public HFRecHits_V2(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
         public override string Execute()
         {
+            caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HFRecHits_V2");
+            caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
+            List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            File.WriteAllText($"{eventTitle}\\5_HFRecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\5_HFRecHits_V2.obj", dataList);
             return JsonConvert.SerializeObject(caloTowerData);
         }
     }
 	class HORecHits_V2 : TypeConfig {
         private List<CalorimetryTowers> caloTowerData;
+        private string eventTitle;
+        public HORecHits_V2(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
         public override string Execute()
         {
+            caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HORecHits_V2");
+            caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
+            List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            File.WriteAllText($"{eventTitle}\\5_HORecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\5_HORecHits_V2.obj", dataList);
             return JsonConvert.SerializeObject(caloTowerData);
         }
     }
     class HBRecHits_V2 : TypeConfig {
         private List<CalorimetryTowers> caloTowerData;
+        private string eventTitle;
+        public HBRecHits_V2(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
         public override string Execute()
         {
+            caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HBRecHits_V2");
+            caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
+            List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            File.WriteAllText($"{eventTitle}\\5_HBRecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\5_HBRecHits_V2.obj", dataList);
             return JsonConvert.SerializeObject(caloTowerData);
         }
     }
-	class HGCHEBRecHits_V1 : TypeConfig {
+	/*class HGCHEBRecHits_V1 : TypeConfig {
         private List<CalorimetryTowers> caloTowerData;
         public override string Execute()
         {
@@ -503,7 +528,7 @@ namespace IGtoOBJGen {
     class TrackDets_V1 : TypeConfig { }
     class TrackingRecHits_V1 : TypeConfig { }
     class SiStripClusters_V1 : TypeConfig { }
-    class SiPixelClusters_V1 : TypeConfig { }
+    class SiPixelClusters_V1 : TypeConfig { }*/
     class Event_V1 : TypeConfig { 
         public Event_V1(JObject args, string eventtitle) {
             JSON = args;
@@ -554,49 +579,153 @@ namespace IGtoOBJGen {
     class CSCSegments_V3 : TypeConfig { }*/
     class MuonChambers_V1 : TypeConfig {
         private List<MuonChamberData> muonChamberData;
+        private string eventTitle;
+        public MuonChambers_V1(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
         public override string Execute()
         {
+            muonChamberData = StaticBoxHandlers.muonChamberParse(JSON);
+            StaticBoxHandlers.generateMuonChamberModels(muonChamberData,eventTitle);
             return JsonConvert.SerializeObject(muonChamberData);
         }
     }
     class CaloTowers_V2 : TypeConfig { }
     class METs_V1 : TypeConfig { }
-    class PFMETs_V1 : TypeConfig { }
-    class PATMETs_V1 : TypeConfig { }
-    class Jets_V1 : TypeConfig { }
+    class PFMETs_V1 : TypeConfig {
+        private METData met;
+        private string eventTitle;
+        public PFMETs_V1(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            met = StaticLineHandlers.METParse(JSON);
+            return JsonConvert.SerializeObject(met);
+        }
+    }
+    /*class PATMETs_V1 : TypeConfig { }
+    class Jets_V1 : TypeConfig { }*/
     class PFJets_V1 : TypeConfig {
-        private List<JetData> jetDatas;
+        private List<JetV1Data> jetDatas;
         private string eventTitle;
         public PFJets_V1(JObject args, string eventtitle)
         {
             JSON = args;
             eventTitle = eventtitle;
         }
+        public override string Execute()
+        {
+            jetDatas = StaticBoxHandlers.jetV1Parse(JSON);
+            StaticBoxHandlers.generateJetModels(jetDatas,eventTitle);
+            return JsonConvert.SerializeObject(jetDatas);
+        }
 
+    }
+    class PFJets_V2 : TypeConfig {
+        private List<JetV2Data> jetDatas;
+        private string eventTitle;
+        public PFJets_V2(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            jetDatas = StaticBoxHandlers.jetV2Parse(JSON);
+            StaticBoxHandlers.generateJetModels(jetDatas, eventTitle);
+            return JsonConvert.SerializeObject(jetDatas);
+        }
+    }
+   /* class GenJets_V1 : TypeConfig { }
+    class PATJets_V1 : TypeConfig { }
+    class Photons_V1 : TypeConfig { }
+    class PATPhotons_V1 : TypeConfig { }*/
+    class GlobalMuons_V1 : TypeConfig {
+        private List<GlobalMuonData> globalMuons;
+        private List<List<double[]>> points;
+        private string eventTitle;
+        private string collection = "MuonGlobalPoints_V1";
+        public GlobalMuons_V1(JObject args, string eventtitle){
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+        public override string Execute() {
+            globalMuons = StaticLineHandlers.globalMuonParse(JSON,1);
+            points = StaticLineHandlers.makeTrackPoints(collection, JSON);
+            StaticLineHandlers.makeGeometryFromPoints(points, "GlobalMuons_V1", "2_globalMuons", eventTitle);
+            return JsonConvert.SerializeObject(globalMuons);
+        }
+    }
+    class GlobalMuons_V2 : TypeConfig {
+        private List<List<double[]>> points;
+        private List<GlobalMuonData> globalMuons;
+        private string assocation = "MuonGlobalPoints_V1";
+        private string eventTitle;
+        public GlobalMuons_V2(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            globalMuons = StaticLineHandlers.globalMuonParse(JSON, 2);
+            points = StaticLineHandlers.makeTrackPoints(assocation, JSON);
+            StaticLineHandlers.makeGeometryFromPoints(points, "GlobalMuons_V1", "2_globalMuons", eventTitle);
+            return JsonConvert.SerializeObject(globalMuons);
+        }
+    }
+    /*class PATGlobalMuons_V1 : TypeConfig {
+        
+    }*/
+    class StandaloneMuons_V1 : TypeConfig {
+        private List<List<double[]>> points;
+        private List<StandaloneMuonData> standaloneMuonData;
+        private string collection = "MuonStandalonePoints_V1";
+        private string eventTitle;
+
+        public StandaloneMuons_V1(JObject arg, string eventtitle)
+        {
+            JSON = arg;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            standaloneMuonData = StaticLineHandlers.standaloneMuonParse(JSON, 1);
+            points = StaticLineHandlers.makeTrackPoints(collection, JSON);
+            StaticLineHandlers.makeGeometryFromPoints(points, "StandaloneMuons_V1", "3_standaloneMuons", eventTitle);
+            return JsonConvert.SerializeObject(standaloneMuonData);
+        }
+    }
+    class StandaloneMuons_V2 : TypeConfig {
+        private List<TrackExtrasData> extras;
+        private string eventTitle;
+        private List<StandaloneMuonData> standaloneMuons;
+        private string association = "MuonTrackExtras_V1";
+    }
+    /*class PATStandaloneMuons_V1 : TypeConfig { }
+    class PATTrackerMuons_V1 : TypeConfig { }
+    class PATTrackerMuons_V2 : TypeConfig { }*/
+    class GsfElectrons_V1 : TypeConfig {
+        private List<GsfElectron> gsfElectrons;
+        private string eventTitle;
+        public GsfElectrons_V1(JObject args, string eventtitle) {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
         public override string Execute()
         {
             throw new NotImplementedException();
         }
-
     }
-    class PFJets_V2 : TypeConfig { }
-    class GenJets_V1 : TypeConfig { }
-    class PATJets_V1 : TypeConfig { }
-    class Photons_V1 : TypeConfig { }
-    class PATPhotons_V1 : TypeConfig { }
-    class GlobalMuons_V1 : TypeConfig { }
-    class GlobalMuons_V2 : TypeConfig { }
-    class PATGlobalMuons_V1 : TypeConfig { }
-    class StandaloneMuons_V1 : TypeConfig { }
-    class StandaloneMuons_V2 : TypeConfig { }
-    class PATStandaloneMuons_V1 : TypeConfig { }
-    class PATTrackerMuons_V1 : TypeConfig { }
-    class PATTrackerMuons_V2 : TypeConfig { }
-    class GsfElectrons_V1 : TypeConfig { }
-    class GsfElectrons_V2 : TypeConfig { }
+    /*class GsfElectrons_V2 : TypeConfig { }
     class GsfElectrons_V3 : TypeConfig { }
     class PATElectrons_V1 : TypeConfig { }
-    class ForwardProtons_V1 : TypeConfig { }
+    class ForwardProtons_V1 : TypeConfig { }*/
     class Vertices_V1 : TypeConfig {
         private List<Vertex> vertexDatas;
         private string eventTitle;
@@ -651,6 +780,6 @@ namespace IGtoOBJGen {
             StaticBoxHandlers.GenerateEllipsoidObj($@"{eventTitle}\SecondaryVertices_V1.obj", secondaryVertexDatas, 3.0);
         }
     }
-    class VertexCompositeCandidates_V1 : TypeConfig { }
-    class SimVertices_V1 : TypeConfig { }
+    /*class VertexCompositeCandidates_V1 : TypeConfig { }
+    class SimVertices_V1 : TypeConfig { }*/
 }

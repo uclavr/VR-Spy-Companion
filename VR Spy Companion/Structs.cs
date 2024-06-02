@@ -55,13 +55,22 @@ struct METData : ObjectData
     public double py;
     public double pz;
 }
-struct JetData : ObjectData
+struct JetV1Data : ObjectData
 {
     public int id;
     public double et;
     public double eta;
     public double theta;
     public double phi;
+}
+struct JetV2Data : ObjectData
+{
+    public int id;
+    public double et;
+    public double eta;
+    public double theta;
+    public double phi;
+    public double[] vertex; 
 }
 struct GlobalMuonData : ObjectData
 {

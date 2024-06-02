@@ -196,19 +196,58 @@ namespace IGtoOBJGen
             }
             return dataList;
         }
-        static public List<GlobalMuonData> globalMuonParse(JObject data)
+        static public List<TrackExtrasData> setExtras(JObject data,string association)
+        {
+            List<TrackExtrasData> dataList = new List<TrackExtrasData>();
+            var assocsExtras = data["Associations"][association];
+            int firstAssoc = assocsExtras[0][1][1].Value<int>();
+            int lastAssoc = assocsExtras.Last()[1][1].Value<int>();
+            var extras = data["Collections"]["Extras_V1"].ToArray()[(firstAssoc)..(lastAssoc + 1)];
+            foreach (var extra in extras)
+            {
+                TrackExtrasData currentItem = new TrackExtrasData();
+
+                var children = extra.Children().Values<double>().ToArray();
+
+                currentItem.pos1 = new double[3] { children[0], children[1], children[2] };
+
+                double dir1mag = Math.Sqrt(  //dir1mag and dir2mag are for making sure the direction vectors are normalized
+                    Math.Pow(children[3], 2) +
+                    Math.Pow(children[4], 2) +
+                    Math.Pow(children[5], 2)
+                );
+                currentItem.dir1 = new double[3] { children[3] / dir1mag, children[4] / dir1mag, children[5] / dir1mag };
+
+                currentItem.pos2 = new double[3] { children[6], children[7], children[8] };
+
+                double dir2mag = Math.Sqrt(
+                    Math.Pow(children[9], 2) +
+                    Math.Pow(children[10], 2) +
+                    Math.Pow(children[11], 2)
+                    );
+                currentItem.dir2 = new double[3] { children[9] / dir2mag, children[10] / dir2mag, children[11] / dir2mag };
+
+                double distance = Math.Sqrt(
+                    Math.Pow((currentItem.pos1[0] - currentItem.pos2[0]), 2) +
+                    Math.Pow(currentItem.pos1[1] - currentItem.pos2[1], 2) +
+                    Math.Pow(currentItem.pos1[2] - currentItem.pos2[2], 2)
+                     );
+
+                double scale = distance * 0.25;
+
+                currentItem.pos3 = new double[3] { children[0] + scale * currentItem.dir1[0], children[1] + scale * currentItem.dir1[1], children[2] + scale * currentItem.dir1[2] };
+                currentItem.pos4 = new double[3] { children[6] - scale * currentItem.dir2[0], children[7] - scale * currentItem.dir2[1], children[8] - scale * currentItem.dir2[2] };
+
+                dataList.Add(currentItem);
+            }
+            return dataList;
+        }
+        static public List<GlobalMuonData> globalMuonParse(JObject data,int version)
         {
             List<GlobalMuonData> dataList = new List<GlobalMuonData>();
             int idNumber = 0;
-
-            var assocs = data["Associations"]["MuonGlobalPoints_V1"];
-
-            if (assocs == null || assocs.HasValues == false)
-            {
-                return dataList;
-            }
-
-            foreach (var item in data["Collections"]["GlobalMuons_V1"])
+            
+            foreach (var item in data["Collections"][$"GlobalMuons_V{version}"])
             {
                 GlobalMuonData muonData = new GlobalMuonData();
                 var children = item.Children().Values<double>().ToArray();
@@ -224,8 +263,6 @@ namespace IGtoOBJGen
                 idNumber++;
                 dataList.Add(muonData);
             }
-            int firstassoc = assocs[0][1][1].Value<int>();
-            //globalMuonPoints = makeTrackPoints(assocs);
 
             return dataList;
         }
@@ -301,7 +338,7 @@ namespace IGtoOBJGen
 
                 makeGeometryFromPoints(trackerMuonPoints, "3_TrackerMuons", "TrackerMuons",eventtitle);
         }
-        static public List<StandaloneMuonData> standaloneMuonParse()
+        static public List<StandaloneMuonData> standaloneMuonParse(JObject data, int version)
         {
             List<StandaloneMuonData> dataList = new List<StandaloneMuonData>();
             int idNumber = 0;
@@ -311,7 +348,7 @@ namespace IGtoOBJGen
             {
                 return dataList;
             }
-            foreach (var item in data["Collections"]["Tracks_V3"])
+            foreach (var item in data["Collections"][$"StandaloneMuons_V{version}"])
             {
                 StandaloneMuonData muon = new StandaloneMuonData();
                 var children = item.Children().Values<double>().ToArray();
@@ -333,7 +370,7 @@ namespace IGtoOBJGen
 
             return dataList;
         }
-        public void makeStandaloneMuons()
+        public void makeStandaloneMuonsV1()
         {
             if (standaloneMuonExtras == null && standaloneMuonPoints == null)
             {
@@ -387,7 +424,7 @@ namespace IGtoOBJGen
             File.WriteAllText($"{eventTitle}\\9_Tracks.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\9_Tracks.obj", dataList);
         }
-        static public List<GsfElectron> electronParse()
+        static public List<GsfElectron> electronParse(JObject data)
         {
             List<GsfElectron> dataList = new List<GsfElectron>();
             int idNumber = 0;
@@ -427,18 +464,13 @@ namespace IGtoOBJGen
             File.WriteAllText($"{eventTitle}\\4_gsfElectrons.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\4_gsfElectrons.obj", dataList);
         }
-        static public METData METParse()
+        static public METData METParse(JObject data)
         {
             METData met = new METData();
             JToken metdata;
-            try
-            {
-                metdata = data["Collections"]["PFMETs_V1"][0];
-            }
-            catch (System.NullReferenceException e)
-            {
-                return met;
-            }
+           
+            metdata = data["Collections"]["PFMETs_V1"][0];
+           
             var children = metdata.Values<double>().ToList();
             met.phi = children[0];
             met.pt = children[1];
@@ -493,10 +525,10 @@ namespace IGtoOBJGen
             }
             return subTrackExtras;
         }
-        static public List<List<double[]>> makeTrackPoints(JToken assoc, JObject data)
+        static public List<List<double[]>> makeTrackPoints(string association, JObject data)
         {
             List<List<double[]>> positions = new List<List<double[]>>();
-            //var assoc = data["Associations"]["MuonGlobalPoints_V1"];
+            var assoc = data["Associations"][association];
             var extras = data["Collections"]["Points_V1"];
 
             if (assoc == null || assoc.HasValues == false || extras.HasValues == false || extras == null)
@@ -516,7 +548,7 @@ namespace IGtoOBJGen
             }
             return positions;
         }
-        static public void makeGeometryFromPoints(List<List<double[]>> points, string path, string name, string eventTitle)
+        static public void makeGeometryFromPoints(List<List<double[]>> points, string name, string path, string eventTitle)
         {
             List<List<string>> dataLists = new List<List<string>>();
             int accountingfactor = 0;
