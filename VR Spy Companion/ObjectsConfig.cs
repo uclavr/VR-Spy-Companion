@@ -592,8 +592,8 @@ namespace IGtoOBJGen {
             return JsonConvert.SerializeObject(muonChamberData);
         }
     }
-    class CaloTowers_V2 : TypeConfig { }
-    class METs_V1 : TypeConfig { }
+    /*class CaloTowers_V2 : TypeConfig { }
+    class METs_V1 : TypeConfig { }*/
     class PFMETs_V1 : TypeConfig {
         private METData met;
         private string eventTitle;
@@ -706,12 +706,32 @@ namespace IGtoOBJGen {
         private string eventTitle;
         private List<StandaloneMuonData> standaloneMuons;
         private string association = "MuonTrackExtras_V1";
+        public StandaloneMuons_V2(JObject arg, string eventtitle)
+        {
+            JSON = arg;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            standaloneMuons = StaticLineHandlers.standaloneMuonParse(JSON, 2);
+            extras = StaticLineHandlers.setExtras(JSON, association);
+            GenerateStandaloneMuonOBJ();
+            return JsonConvert.SerializeObject(standaloneMuons);
+        }
+        public void GenerateStandaloneMuonOBJ()
+        {
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "StandaloneMuons");
+            File.WriteAllText($"{eventTitle}\\2_standaloneMuons.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\2_standaloneMuons.obj", dataList);
+        }
     }
     /*class PATStandaloneMuons_V1 : TypeConfig { }
     class PATTrackerMuons_V1 : TypeConfig { }
     class PATTrackerMuons_V2 : TypeConfig { }*/
     class GsfElectrons_V1 : TypeConfig {
         private List<GsfElectron> gsfElectrons;
+        private List<TrackExtrasData> extras;
+        private string association = "GsfElectronExtras_V1";
         private string eventTitle;
         public GsfElectrons_V1(JObject args, string eventtitle) {
             JSON = args;
@@ -719,12 +739,67 @@ namespace IGtoOBJGen {
         }
         public override string Execute()
         {
-            throw new NotImplementedException();
+            gsfElectrons = StaticLineHandlers.electronParse(JSON, 1);
+            extras = StaticLineHandlers.setExtras(JSON, association);
+            GenerateElectronOBJ();
+            return JsonConvert.SerializeObject(gsfElectrons);
+        }
+        public void GenerateElectronOBJ()
+        {
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "GsfElectrons");
+            File.WriteAllText($"{eventTitle}\\4_gsfElectrons.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\4_gsfElectrons.obj", dataList);
         }
     }
-    /*class GsfElectrons_V2 : TypeConfig { }
-    class GsfElectrons_V3 : TypeConfig { }
-    class PATElectrons_V1 : TypeConfig { }
+    class GsfElectrons_V2 : TypeConfig {
+        private List<GsfElectron> gsfElectrons;
+        private List<TrackExtrasData> extras;
+        private string association = "GsfElectronExtras_V1";
+        private string eventTitle;
+        public GsfElectrons_V2(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            gsfElectrons = StaticLineHandlers.electronParse(JSON, 2);
+            extras = StaticLineHandlers.setExtras(JSON, association);
+            GenerateElectronOBJ();
+            return JsonConvert.SerializeObject(gsfElectrons);
+        }
+        public void GenerateElectronOBJ()
+        {
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "GsfElectrons");
+            File.WriteAllText($"{eventTitle}\\4_gsfElectrons.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\4_gsfElectrons.obj", dataList);
+        }
+    }
+    class GsfElectrons_V3 : TypeConfig {
+        private List<GsfElectron> gsfElectrons;
+        private List<TrackExtrasData> extras;
+        private string association = "GsfElectronExtras_V1";
+        private string eventTitle;
+        public GsfElectrons_V3(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            gsfElectrons = StaticLineHandlers.electronParse(JSON, 3);
+            extras = StaticLineHandlers.setExtras(JSON, association);
+            GenerateElectronOBJ();
+            return JsonConvert.SerializeObject(gsfElectrons);
+        }
+        public void GenerateElectronOBJ()
+        {
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "GsfElectrons");
+            File.WriteAllText($"{eventTitle}\\4_gsfElectrons.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\4_gsfElectrons.obj", dataList);
+        }
+    }
+    /*class PATElectrons_V1 : TypeConfig { }
     class ForwardProtons_V1 : TypeConfig { }*/
     class Vertices_V1 : TypeConfig {
         private List<Vertex> vertexDatas;

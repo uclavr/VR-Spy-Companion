@@ -424,19 +424,12 @@ namespace IGtoOBJGen
             File.WriteAllText($"{eventTitle}\\9_Tracks.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\9_Tracks.obj", dataList);
         }
-        static public List<GsfElectron> electronParse(JObject data)
+        static public List<GsfElectron> electronParse(JObject data,int version)
         {
             List<GsfElectron> dataList = new List<GsfElectron>();
             int idNumber = 0;
-
-            var assocs = data["Associations"]["GsfElectronExtras_V1"];
-
-            if (assocs == null || assocs.HasValues == false)
-            {
-                return dataList;
-            }
-
-            foreach (var item in data["Collections"]["GsfElectrons_V2"])
+        
+            foreach (var item in data["Collections"][$"GsfElectrons_V{version}"])
             {
                 GsfElectron electron = new GsfElectron();
                 var children = item.Children().Values<double>().ToArray();
@@ -452,8 +445,6 @@ namespace IGtoOBJGen
                 idNumber++;
                 dataList.Add(electron);
             }
-            int firstassoc = assocs[0][1][1].Value<int>();
-            electronExtras = trackExtrasData.GetRange(firstassoc, assocs.Last()[1][1].Value<int>() - firstassoc + 1);
 
             return dataList;
         }
