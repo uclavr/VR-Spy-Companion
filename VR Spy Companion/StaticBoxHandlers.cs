@@ -135,15 +135,10 @@ namespace VR_Spy_Companion
             static public List<CalorimetryTowers> genericCaloParse(JObject data, string name)// double scale)
             {
                 List<CalorimetryTowers> dataList = new List<CalorimetryTowers>();
-                if (data["Collections"][name] == null)
-                {
-                    return dataList;
-                }
                 foreach (var item in data["Collections"][name])
                 {
                     CalorimetryTowers caloItem = new CalorimetryTowers();
                     var children = item.Children().Values<double>().ToArray();
-
                     caloItem.energy = children[0];
                     //caloItem.scale = caloItem.energy / scale;
                     caloItem.eta = children[1];
@@ -163,7 +158,7 @@ namespace VR_Spy_Companion
 
                 return dataList;
             }
-            public void makeHFRec()
+            /*public void makeHFRec()
             {
                 HFData = genericCaloParse("HFRecHits_V2", HFSCALE);
                 if (HFData.Count == 0)
@@ -248,7 +243,7 @@ namespace VR_Spy_Companion
                 }
                 File.WriteAllText($"{eventTitle}\\5_ESRecHits_V2.obj", String.Empty);
                 File.WriteAllLines($"{eventTitle}\\5_ESRecHits_V2.obj", dataList);
-            }
+            }*/
             static public List<JetV1Data> jetV1Parse(JObject data)
             {
                 int idNumber = 0;
@@ -663,7 +658,7 @@ namespace VR_Spy_Companion
                 }
                 return geometryData;
             }
-            public void setScales()
+            /*public void setScales()
             {
                 //Hadronic scaling factor is equivalent to the largest energy value in each respective set (HE,HB,HO,HF)
                 List<string> CALSETS = new List<string>() { "HERecHits_V2", "HBRecHits_V2", "HFRecHits_V2", "HORecHits_V2", "EBRecHits_V2", "ESRecHits_V2", "EERecHits_V2" };
@@ -709,7 +704,7 @@ namespace VR_Spy_Companion
                             break;
                     }
                 }
-            }
+            }*/
             static public List<RecHitFraction> recHitFractionsParse(JObject data)
             {
                 List<RecHitFraction> dataList = new List<RecHitFraction>();
@@ -735,7 +730,7 @@ namespace VR_Spy_Companion
                 }
                 return dataList;
             }
-            public List<List<RecHitFraction>> assignRecHitFractions(List<RecHitFraction> extras)
+            /*public List<List<RecHitFraction>> assignRecHitFractions(List<RecHitFraction> extras)
             {
                 List<List<RecHitFraction>> dataList = new List<List<RecHitFraction>>();
                 int indexer = 0;
@@ -755,7 +750,7 @@ namespace VR_Spy_Companion
                     indexer++;
                 }
                 return dataList;
-            }
+            }*/
             static public List<SuperCluster> superClusterParse(JObject data)
             {
                 List<SuperCluster> dataList = new List<SuperCluster>();
@@ -791,7 +786,7 @@ namespace VR_Spy_Companion
                 List<string> faces = new List<string>();
                 int index = 0;
                 int counter = 1;
-                foreach (var item in recHitFractions)
+                foreach (var item in recHits)
                 {
                     dataList.Add($"o SuperCluster_{index}");
 
@@ -820,7 +815,7 @@ namespace VR_Spy_Companion
                 }
                 File.WriteAllLines($"{eventTitle}//$_Superclusters.obj", dataList);
             }
-            static List<Vertex> vertexParse()
+            /*static List<Vertex> vertexParse()
             {
                 List<Vertex> dataList = new List<Vertex>();
                 if (data["Collections"]["Vertices_V1"] == null)
@@ -845,7 +840,7 @@ namespace VR_Spy_Companion
                 }
 
                 return dataList;
-            }
+            }*/
             public static List<Vertex> vertexParse(JObject data, string vertexVersion)
             {
                 List<Vertex> dataList = new List<Vertex>();
@@ -853,7 +848,7 @@ namespace VR_Spy_Companion
                 {
                     return dataList;
                 }
-                foreach (var item in data["Collections"]["Vertices_V1"])
+                foreach (var item in data["Collections"][vertexVersion])
                 {
                     var children = item.Children().Values<double>().ToList();
                     Vertex vertex = new Vertex();
@@ -918,7 +913,6 @@ namespace VR_Spy_Companion
 
                 return dataList;
             }
-
             public static void GenerateOBJ(List<(Point3D center, Point3D width)> ellipsoids, string filePath)
             {
                 using (StreamWriter writer = new StreamWriter(filePath))
@@ -958,8 +952,6 @@ namespace VR_Spy_Companion
                         vertexCount += vertices.Count;
                     }
                 }
-
-                Console.WriteLine("OBJ file generated successfully.");
             }
 
             private static List<Point3D> GenerateEllipsoidVertices(Point3D center, Point3D width)
@@ -1053,5 +1045,3 @@ namespace VR_Spy_Companion
             }
         }
     }
-
-}

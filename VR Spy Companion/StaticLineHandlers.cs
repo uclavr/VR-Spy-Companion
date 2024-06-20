@@ -267,11 +267,11 @@ namespace IGtoOBJGen
             return dataList;
         }
 
-        static public void makeGlobalMuons()
+        /*static public void makeGlobalMuons()
         {
             if (globalMuonPoints == null) { return; }
             makeGeometryFromPoints(globalMuonPoints, "2_globalMuons", "globalMuons");
-        }
+        }*/
         static public List<TrackerMuonData> trackerMuonParse(JObject data,int version)
         {
             List<TrackerMuonData> dataList = new List<TrackerMuonData>();
@@ -306,7 +306,7 @@ namespace IGtoOBJGen
                 idNumber++;
                 dataList.Add(muonData);
             }
-            if (assocsExtras.Count() >= 1)
+            /*if (assocsExtras.Count() >= 1)
             {
                 int firstassoc = assocsExtras[0][1][1].Value<int>();
                 trackerMuonExtras = trackExtrasData.GetRange(firstassoc, assocsExtras.Last()[1][1].Value<int>() - firstassoc + 1);
@@ -319,16 +319,16 @@ namespace IGtoOBJGen
             if (assocsPoints.HasValues)
             {
                 trackerMuonPoints = makeTrackPoints(assocsPoints);
-            }
+            }*/
 
             return dataList;
         }
-        static public List<TrackExtrasData> trackerExtrasParse(JObject data)
+        /*static public List<TrackExtrasData> trackerExtrasParse(JObject data)
         {
             var assocsExtras = data["Associations"]["MuonTrackerExtras_V1"];
             int firstassoc = assocsExtras[0][1][1].Value<int>();
             List<TrackExtrasData> trackerMuonExtras = trackExtrasData.GetRange(firstassoc, assocsExtras.Last()[1][1].Value<int>() - firstassoc + 1);
-        }
+        }*/
         static public void makeTrackerMuons(List<TrackExtrasData> trackerMuonExtras,string eventTitle)
         {
             
@@ -364,20 +364,19 @@ namespace IGtoOBJGen
                 dataList.Add(muon);
 
             }
-            int firstassoc = assocs[0][1][1].Value<int>();
-            standaloneMuonExtras = trackExtrasData.GetRange(firstassoc, assocs.Last()[1][1].Value<int>() - firstassoc + 1);
-            try { standaloneMuonPoints = makeTrackPoints(assocsPoints); } catch (Exception ex) { }
+            //int firstassoc = assocs[0][1][1].Value<int>();
+            //standaloneMuonExtras = trackExtrasData.GetRange(firstassoc, assocs.Last()[1][1].Value<int>() - firstassoc + 1);
+            //try { standaloneMuonPoints = makeTrackPoints(assocsPoints); } catch (Exception ex) { }
 
             return dataList;
         }
-        public void makeStandaloneMuonsV1()
+        /*public void makeStandaloneMuonsV1()
         {
             if (standaloneMuonExtras == null && standaloneMuonPoints == null)
             {
                 File.WriteAllText($"{eventTitle}\\3_standaloneMuons.obj", String.Empty);
                 return;
-            }
-            if (standaloneMuonPoints == null)
+            }            if (standaloneMuonPoints == null)
             {
                 List<string> dataList = trackCubicBezierCurve(standaloneMuonExtras, "standaloneMuons");
                 File.WriteAllText($"{eventTitle}\\3_standaloneMuons.obj", String.Empty);
@@ -423,7 +422,7 @@ namespace IGtoOBJGen
             List<string> dataList = trackCubicBezierCurve(subTrackExtras, "Tracks");
             File.WriteAllText($"{eventTitle}\\9_Tracks.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\9_Tracks.obj", dataList);
-        }
+        }*/
         static public List<GsfElectron> electronParse(JObject data,int version)
         {
             List<GsfElectron> dataList = new List<GsfElectron>();
@@ -447,13 +446,6 @@ namespace IGtoOBJGen
             }
 
             return dataList;
-        }
-        static public void makeElectrons()
-        {
-            if (electronExtras == null) { return; }
-            List<string> dataList = trackCubicBezierCurve(electronExtras, "gsfElectrons");
-            File.WriteAllText($"{eventTitle}\\4_gsfElectrons.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\4_gsfElectrons.obj", dataList);
         }
         static public METData METParse(JObject data)
         {
@@ -498,11 +490,6 @@ namespace IGtoOBJGen
                 n++;
             }
             return dataList;
-        }
-        static public void SerializeMET()
-        {
-            string metdata = JsonConvert.SerializeObject(METParse(), Formatting.Indented);
-            File.WriteAllText($@"{eventTitle}/METData.json", metdata);
         }
         static public List<TrackExtrasData> removeMuonsFromTracks(List<TrackExtrasData> trackerMuonExtras, List<TrackExtrasData> subTrackExtras)
         {

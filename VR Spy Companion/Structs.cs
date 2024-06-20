@@ -1,6 +1,5 @@
-﻿using CsvHelper.Configuration.Attributes;
-using System.Numerics;
-//Wouldn't be the end of the world to replace the double arrays with Vectors
+﻿using System.Numerics;
+//Wouldn't be the end of the world to replace the double arrays with Vector
 interface ObjectData { };
 struct MuonChamberData : ObjectData
 {

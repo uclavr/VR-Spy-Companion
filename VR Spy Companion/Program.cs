@@ -9,7 +9,7 @@ using System.Xml.Linq;
 using System.Runtime.Loader;
 using System;
 using System.Xml;
-
+/*
 class Program
 {
     static void Main(string[] args)
@@ -83,6 +83,8 @@ class Program
             is deleted at the end of the program's execution so that the original file goes unchanged and can 
             still be used with iSpy  */
             //zipper = new Unzip(args[0]);
+
+            /*
             string destination = zipper.currentFile;
             string[] split = destination.Split('\\');
             eventName = split.Last();
@@ -149,3 +151,4 @@ class Program
         Console.WriteLine($"Total Execution Time: {watch.ElapsedMilliseconds} ms"); // See how fast code runs. Code goes brrrrrrr on fancy office pc. It makes me happy. :)
     }
 }
+            */
