@@ -644,9 +644,26 @@ namespace IGtoOBJGen {
     class CSCLCTDigis_V1 : TypeConfig { }
     class CSCCorrelatedLCTDigis_V2 : TypeConfig { }
     class MatchingCSCs_V1 : TypeConfig { }
-    class CSCRecHit2Ds_V2 : TypeConfig { }
-    class CSCSegments_V1 : TypeConfig { }
-    class CSCSegments_V2 : TypeConfig { }
+    class CSCRecHit2Ds_V2 : TypeConfig { }*/
+    class CSCSegments_V1 : TypeConfig {
+        private List<CSCSegment> cscSegments;
+        private string eventTitle;
+        public CSCSegments_V1(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            cscSegments = StaticBoxHandlers.ParseCSCSegmentsV1(JSON);
+            var strings = StaticBoxHandlers.GenerateCSCSegments(cscSegments, 1);
+            File.WriteAllText($"{eventTitle}\\CSCSegments_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\CSCSegments_V1.obj", strings);
+            string data = JsonConvert.SerializeObject(cscSegments);
+            return ("\"CSCSegmentV1Datas\":" + data);
+        }
+    }
+    /*class CSCSegments_V2 : TypeConfig { }
     class CSCSegments_V3 : TypeConfig { }*/
     class MuonChambers_V1 : TypeConfig
     {

@@ -9,6 +9,7 @@ using MathNet.Spatial.Euclidean;
 using Newtonsoft.Json;
 using System.Xml.Linq;
 using System.Globalization;
+using MathNet.Numerics;
 
 namespace VR_Spy_Companion
 {
@@ -364,6 +365,39 @@ namespace VR_Spy_Companion
             }
             return dataList;
         }
+        static public List<CSCSegment> ParseCSCSegmentsV1(JObject data)
+        {
+            var dataList = new List<CSCSegment>();
+            foreach(var item in data["Collections"]["CSCSegments_V1"])
+            {
+                var newItem = new CSCSegment();
+
+                var children = item.Children().Values<double>().ToArray();
+                newItem.detid = (int)children[0];
+                newItem.pos1 = children[1..4];
+                newItem.pos2 = children[4..7];
+
+                dataList.Add(newItem);
+            }
+            return dataList;
+        }
+        static public List<string> GenerateCSCSegments(List<CSCSegment> data, int version)
+        {
+            var dataList = new List<string>();
+            int counter = 0;
+            foreach(var seg in data)
+            {
+                dataList.Add($"o CSCSegments_V{version}_{counter}");
+                dataList.Add($"v {seg.pos1[0]} {seg.pos1[1]} {seg.pos1[2]}");
+                dataList.Add($"v {seg.pos1[0]} {seg.pos1[1] + 0.001} {seg.pos1[2]}");
+                dataList.Add($"v {seg.pos2[0]} {seg.pos2[1]} {seg.pos2[2]}");
+                dataList.Add($"v {seg.pos2[0]} {seg.pos2[1] + 0.001} {seg.pos2[2]}");
+                dataList.Add($"f {4*counter + 1} {4 * counter + 2} {4 * counter + 3} {4 * counter + 4}");
+                dataList.Add($"f {4 * counter + 4} {4 * counter + 3} {4 * counter + 2} {4 * counter + 1}");
+                counter++;
+            }
+            return dataList;
+        }
         static public List<string> GenerateRPCRecHits(List<RPCRecHit> data)
         {
             var dataList = new List<string>();
@@ -383,14 +417,14 @@ namespace VR_Spy_Companion
                 dataList.Add($"v {hit.w1[0]} {hit.w1[1] + 0.001} {hit.w1[2]}");
                 dataList.Add("v "+String.Join(' ',hit.w2));
                 dataList.Add($"v {hit.w2[0]} {hit.w2[1] + 0.001} {hit.w2[2]}");
-                dataList.Add($"f {counter + 1} {counter + 2} {counter + 3} {counter + 4}");
-                dataList.Add($"f {counter + 4} {counter + 3} {counter + 2} {counter + 1}");
-                dataList.Add($"f {counter + 5} {counter + 6} {counter + 7} {counter + 8}");
-                dataList.Add($"f {counter + 8} {counter + 7} {counter + 6} {counter + 5}");
-                dataList.Add($"f {counter + 9} {counter + 10} {counter + 11} {counter + 12}");
-                dataList.Add($"f {counter + 12} {counter + 11} {counter + 10} {counter + 9}");
+                dataList.Add($"f {12*counter + 1} {12 * counter + 2} {12 * counter + 3} {12 * counter + 4}");
+                dataList.Add($"f {12 * counter + 4} {12 * counter + 3} {12 * counter + 2} {12 * counter + 1}");
+                dataList.Add($"f {12 * counter + 5} {12 * counter + 6} {12 * counter + 7} {12 * counter + 8}");
+                dataList.Add($"f {12 * counter + 8} {12 * counter + 7} {12 * counter + 6} {12 * counter + 5}");
+                dataList.Add($"f {12 * counter + 9} {12 * counter + 10} {12 * counter + 11} {12 * counter + 12}");
+                dataList.Add($"f {12 * counter + 12} {12 * counter + 11} {12 * counter + 10} {12 * counter + 9}");
 
-                counter += 12;
+                counter++;
             }
             return dataList;
         }
