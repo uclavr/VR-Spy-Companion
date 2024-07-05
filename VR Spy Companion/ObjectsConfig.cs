@@ -45,9 +45,9 @@ namespace IGtoOBJGen {
             return ("\"trackerMuonDatas\": "+data);
         }
         public void GenerateTrackerMuonOBJ() {
-            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(trackerMuonExtras, "TrackerMuons");
-            File.WriteAllText($"{eventTitle}\\1_TrackerMuons.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\1_TrackerMuons.obj", dataList);
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(trackerMuonExtras, "TrackerMuons_V2");
+            File.WriteAllText($"{eventTitle}\\TrackerMuons_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\TrackerMuons_V2.obj", dataList);
         }
     }
     class TrackerMuonV1 : TypeConfig
@@ -80,7 +80,7 @@ namespace IGtoOBJGen {
 
              */
             trackerMuonData = StaticLineHandlers.trackerMuonParse(JSON, 1);
-            StaticLineHandlers.makeGeometryFromPoints(trackerMuonPoints, "3_TrackerMuons", "TrackerMuons", eventTitle); 
+            StaticLineHandlers.makeGeometryFromPoints(trackerMuonPoints, "TrackerMuons_V1", "TrackerMuons_V1", eventTitle); 
             string data = JsonConvert.SerializeObject(trackerMuonData);
             return ("\"trackerMuonDatas\": " + data);
         }
@@ -150,9 +150,9 @@ namespace IGtoOBJGen {
         }
         private void GenerateTrackOBJ()
         {
-            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(trackExtras, "Tracks");
-            File.WriteAllText($"{eventTitle}\\9_Tracks.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\9_Tracks.obj", dataList);
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(trackExtras, "Tracks_V1");
+            File.WriteAllText($"{eventTitle}\\Tracks_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\Tracks_V1.obj", dataList);
         }
     }
     class TracksV2 : TypeConfig
@@ -220,8 +220,8 @@ namespace IGtoOBJGen {
         private void GenerateTrackOBJ()
         {
             List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(trackExtras, "Tracks");
-            File.WriteAllText($"{eventTitle}\\9_Tracks.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\9_Tracks.obj", dataList);
+            File.WriteAllText($"{eventTitle}\\Tracks_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\Tracks_V2.obj", dataList);
         }
     }
     class TracksV3 : TypeConfig
@@ -288,9 +288,9 @@ namespace IGtoOBJGen {
         }
         private void GenerateTrackOBJ()
         {
-            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(trackExtras, "Tracks");
-            File.WriteAllText($"{eventTitle}\\9_Tracks.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\9_Tracks.obj", dataList);
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(trackExtras, "Tracks_V3");
+            File.WriteAllText($"{eventTitle}\\Tracks_V3.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\Tracks_V3.obj", dataList);
         }
     }
     class TracksV4 : TypeConfig
@@ -357,9 +357,9 @@ namespace IGtoOBJGen {
         }
         private void GenerateTrackOBJ()
         {
-            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(trackExtras, "Tracks");
-            File.WriteAllText($"{eventTitle}\\9_Tracks.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\9_Tracks.obj", dataList);
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(trackExtras, "Tracks_V4");
+            File.WriteAllText($"{eventTitle}\\Tracks_V4.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\Tracks_V4.obj", dataList);
         }
     }
     class SuperClusters_V1 : TypeConfig
@@ -418,8 +418,8 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "EERecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
-            File.WriteAllText($"{eventTitle}\\5_EERecHits_V2.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\5_EERecHits_V2.obj", dataList);
+            File.WriteAllText($"{eventTitle}\\EERecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\EERecHits_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(caloTowerData);
             return ("\"eeHitDatas\":" + data);
             //return JsonConvert.SerializeObject(caloTowerData);
@@ -447,8 +447,8 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "EBRecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
-            File.WriteAllText($"{eventTitle}\\5_EBRecHits_V2.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\5_EBRecHits_V2.obj", dataList);
+            File.WriteAllText($"{eventTitle}\\EBRecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\EBRecHits_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(caloTowerData);
             return ("\"ebHitDatas\":" + data);
         }
@@ -467,8 +467,8 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "ESRecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
-            File.WriteAllText($"{eventTitle}\\5_ESRecHits_V2.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\5_ESRecHits_V2.obj", dataList);
+            File.WriteAllText($"{eventTitle}\\ESRecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\ESRecHits_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(caloTowerData);
             return ("\"esHitDatas\":" + data);
         }
@@ -494,8 +494,8 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HFRecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
-            File.WriteAllText($"{eventTitle}\\5_HFRecHits_V2.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\5_HFRecHits_V2.obj", dataList);
+            File.WriteAllText($"{eventTitle}\\HFRecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\HFRecHits_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(caloTowerData);
             return ("\"hfHitDatas\":" + data);
         }
@@ -514,8 +514,8 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HERecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
-            File.WriteAllText($"{eventTitle}\\5_HERecHits_V2.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\5_HERecHits_V2.obj", dataList);
+            File.WriteAllText($"{eventTitle}\\HERecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\HERecHits_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(caloTowerData);
             return ("\"heHitDatas\":" + data);
         }
@@ -534,8 +534,8 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HORecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
-            File.WriteAllText($"{eventTitle}\\5_HORecHits_V2.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\5_HORecHits_V2.obj", dataList);
+            File.WriteAllText($"{eventTitle}\\HORecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\HORecHits_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(caloTowerData);
             return ("\"hoHitDatas\":" + data);
         }
@@ -554,8 +554,8 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HBRecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
-            File.WriteAllText($"{eventTitle}\\5_HBRecHits_V2.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\5_HBRecHits_V2.obj", dataList);
+            File.WriteAllText($"{eventTitle}\\HBRecHits_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\HBRecHits_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(caloTowerData);
             return ("\"hbHitDatas\":" + data);
         }
@@ -612,9 +612,26 @@ namespace IGtoOBJGen {
         }
     }
     /*class DTRecHits_V1 : TypeConfig { }
-    class DTRecSegment4D_V1 : TypeConfig { }
-    class RPCRecHits_V1 : TypeConfig { }
-    class MatchingGEMs_V1 : TypeConfig { }
+    class DTRecSegment4D_V1 : TypeConfig { }*/
+    class RPCRecHits_V1 : TypeConfig {
+        private List<RPCRecHit> rpcRecHits;
+        private string eventTitle;
+        public RPCRecHits_V1(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            rpcRecHits = StaticBoxHandlers.RPCRecHitParse(JSON);
+            List<string> dataList = StaticBoxHandlers.GenerateRPCRecHits(rpcRecHits);
+            File.WriteAllText($"{eventTitle}\\RPCRecHits_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\RPCRecHits_V1.obj", dataList);
+            string data = JsonConvert.SerializeObject(rpcRecHits);
+            return ("\"RPCRecHitDatas\":" + data);
+        }
+    }
+    /*class MatchingGEMs_V1 : TypeConfig { }
     class GEMDigis_V2 : TypeConfig { }
     class GEMRecHits_V2 : TypeConfig { }
     class GEMSegments_V1 : TypeConfig { }
@@ -685,7 +702,6 @@ namespace IGtoOBJGen {
             return ("\"jetDatas\":" + data);
             //return JsonConvert.SerializeObject(jetDatas);
         }
-
     }
     class PFJets_V2 : TypeConfig
     {
@@ -705,9 +721,21 @@ namespace IGtoOBJGen {
         }
     }
     /* class GenJets_V1 : TypeConfig { }
-     class PATJets_V1 : TypeConfig { }
-     class Photons_V1 : TypeConfig { }
-     class PATPhotons_V1 : TypeConfig { }*/
+     class PATJets_V1 : TypeConfig { }*/
+     class Photons_V1 : TypeConfig {
+        private List<PhotonData> photons;
+        private string eventTitle;
+        public Photons_V1(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            return " ";
+        }
+    }
+    //class PATPhotons_V1 : TypeConfig { }
     class GlobalMuons_V1 : TypeConfig
     {
         private List<GlobalMuonData> globalMuons;
@@ -723,7 +751,7 @@ namespace IGtoOBJGen {
         {
             globalMuons = StaticLineHandlers.globalMuonParse(JSON, 1);
             points = StaticLineHandlers.makeTrackPoints(collection, JSON);
-            StaticLineHandlers.makeGeometryFromPoints(points, "GlobalMuons_V1", "2_globalMuons", eventTitle);
+            StaticLineHandlers.makeGeometryFromPoints(points, "GlobalMuons_V1", "GlobalMuons_V1", eventTitle);
             string data = JsonConvert.SerializeObject(globalMuons);
             return ("\"globalMuonDatas\":" + data);
             //return JsonConvert.SerializeObject(globalMuons);
@@ -744,7 +772,7 @@ namespace IGtoOBJGen {
         {
             globalMuons = StaticLineHandlers.globalMuonParse(JSON, 2);
             points = StaticLineHandlers.makeTrackPoints(assocation, JSON);
-            StaticLineHandlers.makeGeometryFromPoints(points, "GlobalMuons_V1", "2_globalMuons", eventTitle);
+            StaticLineHandlers.makeGeometryFromPoints(points, "GlobalMuons_V2", "GlobalMuons_V2", eventTitle);
             string data = JsonConvert.SerializeObject(globalMuons);
             return ("\"globalMuonDatas\":" + data);
         }
@@ -768,7 +796,7 @@ namespace IGtoOBJGen {
         {
             standaloneMuonData = StaticLineHandlers.standaloneMuonParse(JSON, 1);
             points = StaticLineHandlers.makeTrackPoints(collection, JSON);
-            StaticLineHandlers.makeGeometryFromPoints(points, "StandaloneMuons_V1", "3_standaloneMuons", eventTitle);
+            StaticLineHandlers.makeGeometryFromPoints(points, "StandaloneMuons_V1", "StandaloneMuons_V1", eventTitle);
             string data = JsonConvert.SerializeObject(standaloneMuonData);
             return ("\"standaloneMuonDatas\":" + data);
             //return JsonConvert.SerializeObject(standaloneMuonData);
@@ -796,8 +824,8 @@ namespace IGtoOBJGen {
         public void GenerateStandaloneMuonOBJ()
         {
             List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "StandaloneMuons");
-            File.WriteAllText($"{eventTitle}\\2_standaloneMuons.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\2_standaloneMuons.obj", dataList);
+            File.WriteAllText($"{eventTitle}\\StandaloneMuons_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\StandaloneMuons_V2.obj", dataList);
         }
     }
     /*class PATStandaloneMuons_V1 : TypeConfig { }
@@ -821,13 +849,12 @@ namespace IGtoOBJGen {
             GenerateElectronOBJ();
             string data = JsonConvert.SerializeObject(gsfElectrons);
             return ("\"electronDatas\":" + data);
-            //return JsonConvert.SerializeObject(gsfElectrons);
         }
         public void GenerateElectronOBJ()
         {
             List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "GsfElectrons");
-            File.WriteAllText($"{eventTitle}\\4_gsfElectrons.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\4_gsfElectrons.obj", dataList);
+            File.WriteAllText($"{eventTitle}\\GsfElectrons_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\GsfElectrons_V1.obj", dataList);
         }
     }
     class GsfElectrons_V2 : TypeConfig
@@ -848,13 +875,12 @@ namespace IGtoOBJGen {
             GenerateElectronOBJ();
             string data = JsonConvert.SerializeObject(gsfElectrons);
             return ("\"electronDatas\":" + data);
-            //return JsonConvert.SerializeObject(gsfElectrons);
         }
         public void GenerateElectronOBJ()
         {
             List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "GsfElectrons");
-            File.WriteAllText($"{eventTitle}\\4_gsfElectrons.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\4_gsfElectrons.obj", dataList);
+            File.WriteAllText($"{eventTitle}\\GsfElectrons_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\GsfElectrons_V2.obj", dataList);
         }
     }
     class GsfElectrons_V3 : TypeConfig
@@ -875,13 +901,12 @@ namespace IGtoOBJGen {
             GenerateElectronOBJ();
             string data = JsonConvert.SerializeObject(gsfElectrons);
             return ("\"electronDatas\":" + data);
-            //return JsonConvert.SerializeObject(gsfElectrons);
         }
         public void GenerateElectronOBJ()
         {
             List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "GsfElectrons");
-            File.WriteAllText($"{eventTitle}\\4_gsfElectrons.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\4_gsfElectrons.obj", dataList);
+            File.WriteAllText($"{eventTitle}\\GsfElectrons_V3.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\GsfElectrons_V3.obj", dataList);
         }
     }
     /*class PATElectrons_V1 : TypeConfig { }
@@ -901,7 +926,6 @@ namespace IGtoOBJGen {
             GenerateVertexOBJ();
             string data = JsonConvert.SerializeObject(vertexDatas);
             return ("\"vertexDatas\":" + data);
-            return JsonConvert.SerializeObject(vertexDatas);
         }
         private void GenerateVertexOBJ()
         {

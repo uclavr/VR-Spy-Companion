@@ -100,13 +100,7 @@ namespace VR_Spy_Companion
                     dataStrings.Add($"v {String.Join(' ', chamber.back_2)}");
                     dataStrings.Add($"v {String.Join(' ', chamber.back_3)}");
                     dataStrings.Add($"v {String.Join(' ', chamber.back_4)}");
-                    Vector3D f1_1 = (new Vector3D(chamber.front_1[0], chamber.front_1[1], chamber.front_1[2])) - (new Vector3D(chamber.front_2[0], chamber.front_2[1], chamber.front_2[2]));
-                    Vector3D f1_2 = (new Vector3D(chamber.front_1[0], chamber.front_1[1], chamber.front_1[2])) - (new Vector3D(chamber.front_3[0], chamber.front_3[1], chamber.front_3[2]));
-                    Vector3D normal2_1 = (new Vector3D(chamber.front_1[0], chamber.front_1[1], chamber.front_1[2])) - (new Vector3D(chamber.back_1[0], chamber.back_1[1], chamber.back_1[2]));
-                    Vector3D normal2_2 = (new Vector3D(chamber.back_1[0], chamber.back_1[1], chamber.back_1[2])) - (new Vector3D(chamber.back_2[0], chamber.back_2[1], chamber.back_2[2]));
-                    Vector3D normal;
-                    Vector3D norm1 = f1_1.CrossProduct(f1_2);
-
+                  
                     dataStrings.Add($"f {counter + 3} {counter + 2} {counter + 1} {counter}");
                     dataStrings.Add($"f {counter + 4} {counter + 5} {counter + 6} {counter + 7}");
                     dataStrings.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}");
@@ -116,8 +110,8 @@ namespace VR_Spy_Companion
                     index++;
                     counter += 8;
                 }
-                File.WriteAllText($"{eventTitle}\\7_MuonChambers_V1.obj", String.Empty);
-                File.WriteAllLines($"{eventTitle}\\7_MuonChambers_V1.obj", dataStrings);
+                File.WriteAllText($"{eventTitle}\\MuonChambers_V1.obj", String.Empty);
+                File.WriteAllLines($"{eventTitle}\\MuonChambers_V1.obj", dataStrings);
             }
         static public List<CalorimetryTowers> setCaloScale(List<CalorimetryTowers> towers)
         {
@@ -314,7 +308,7 @@ namespace VR_Spy_Companion
                     dataList = jetGeometry(item, radius, length, numSections, index, dataList);
                     index++;
                 }
-                File.WriteAllLines($"{eventTitle}//0_PFJets_V1.obj", dataList);
+                File.WriteAllLines($"{eventTitle}//PFJets.obj", dataList);
             }
         static public void generateJetModels(List<JetV2Data> data, string eventTitle)
         {
@@ -340,6 +334,65 @@ namespace VR_Spy_Companion
                 index++;
             }
             File.WriteAllLines($"{eventTitle}//0_PFJets_V2.obj", dataList);
+        }
+        static public List<RPCRecHit> RPCRecHitParse(JObject data)
+        {
+            var inputData = data["Collections"]["RPCRecHits_V1"];
+            var dataList = new List<RPCRecHit>();
+            foreach(var item in inputData)
+            {
+                var newItem = new RPCRecHit();
+
+                var children = item.Children().Values<double>().ToArray();
+
+                newItem.u1 = children[0..3];
+                newItem.u2 = children[3..6];
+                newItem.v1 = children[6..9];
+                newItem.v2 = children[9..12];
+                newItem.w1 = children[12..15];
+                newItem.w2 = children[15..18];
+                newItem.region = (int)children[18];
+                newItem.ring = (int)children[19];
+                newItem.sector = (int)children[20];
+                newItem.station = (int)children[21];
+                newItem.layer = (int)children[22];
+                newItem.subsector = (int)children[23];
+                newItem.roll = (int)children[24];
+                newItem.detid = (int)children[25];
+
+                dataList.Add(newItem);
+            }
+            return dataList;
+        }
+        static public List<string> GenerateRPCRecHits(List<RPCRecHit> data)
+        {
+            var dataList = new List<string>();
+            int counter = 0;
+            foreach(var hit in data)
+            {
+                dataList.Add($"o RPCRecHits_V1_{counter}");
+                dataList.Add("v "+String.Join(' ',hit.u1));
+                dataList.Add($"v {hit.u1[0]} {hit.u1[1]+0.001} {hit.u1[2]}");
+                dataList.Add("v " + String.Join(' ', hit.u2));
+                dataList.Add($"v {hit.u2[0]} {hit.u2[1] + 0.001} {hit.u2[2]}");
+                dataList.Add("v "+String.Join(' ',hit.v1));
+                dataList.Add($"v {hit.v1[0]} {hit.v1[1] + 0.001} {hit.v1[2]}");
+                dataList.Add("v "+String.Join(' ',hit.v2));
+                dataList.Add($"v {hit.v2[0]} {hit.v2[1] + 0.001} {hit.v2[2]}");
+                dataList.Add("v "+String.Join(' ',hit.w1));
+                dataList.Add($"v {hit.w1[0]} {hit.w1[1] + 0.001} {hit.w1[2]}");
+                dataList.Add("v "+String.Join(' ',hit.w2));
+                dataList.Add($"v {hit.w2[0]} {hit.w2[1] + 0.001} {hit.w2[2]}");
+                dataList.Add($"f {counter + 1} {counter + 2} {counter + 3} {counter + 4}");
+                dataList.Add($"f {counter + 4} {counter + 3} {counter + 2} {counter + 1}");
+                dataList.Add($"f {counter + 5} {counter + 6} {counter + 7} {counter + 8}");
+                dataList.Add($"f {counter + 8} {counter + 7} {counter + 6} {counter + 5}");
+                dataList.Add($"f {counter + 9} {counter + 10} {counter + 11} {counter + 12}");
+                dataList.Add($"f {counter + 12} {counter + 11} {counter + 10} {counter + 9}");
+
+                counter += 12;
+            }
+            return dataList;
         }
         static public List<string> jetGeometry(JetV1Data item, double radius, double length, int sections, int index, List<string> dataList)
             {
@@ -813,7 +866,7 @@ namespace VR_Spy_Companion
                     faces.Clear();
                     index++;
                 }
-                File.WriteAllLines($"{eventTitle}//$_Superclusters.obj", dataList);
+                File.WriteAllLines($"{eventTitle}//SuperClusters_V1.obj", dataList);
             }
             /*static List<Vertex> vertexParse()
             {

@@ -1,6 +1,23 @@
 ﻿using System.Numerics;
 //Wouldn't be the end of the world to replace the double arrays with Vector
 interface ObjectData { };
+struct RPCRecHit
+{
+    public double[] u1;
+    public double[] u2;
+    public double[] v1;
+    public double[] v2;
+    public double[] w1;
+    public double[] w2;
+    public int region;
+    public int ring;
+    public int sector;
+    public int station;
+    public int layer;
+    public int subsector;
+    public int roll;
+    public int detid;
+}
 struct MuonChamberData : ObjectData
 {
     public string name;
