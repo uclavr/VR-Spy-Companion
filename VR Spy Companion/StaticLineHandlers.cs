@@ -38,7 +38,7 @@ namespace IGtoOBJGen
             }
             return dataList;
         }
-        static private string makePhoton(PhotonData inputData)
+        static public string makePhoton(PhotonData inputData)
         {
             double lEB = 3.0; //half-length of ECAL barrel in meters
             double rEB = 1.24; //radius of ECAL barrel in meters

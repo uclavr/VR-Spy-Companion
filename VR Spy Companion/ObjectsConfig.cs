@@ -9,6 +9,7 @@ using VR_Spy_Companion;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json;
 using System.Net.Http.Headers;
+using Microsoft.VisualBasic;
 
 namespace IGtoOBJGen {
     abstract class TypeConfig : ObjectData {
@@ -493,7 +494,7 @@ namespace IGtoOBJGen {
         {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HFRecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
-            List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            List<string> dataList = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
             File.WriteAllText($"{eventTitle}\\HFRecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\HFRecHits_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(caloTowerData);
@@ -513,7 +514,7 @@ namespace IGtoOBJGen {
         {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HERecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
-            List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            List<string> dataList = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
             File.WriteAllText($"{eventTitle}\\HERecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\HERecHits_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(caloTowerData);
@@ -533,7 +534,7 @@ namespace IGtoOBJGen {
         {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HORecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
-            List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            List<string> dataList = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
             File.WriteAllText($"{eventTitle}\\HORecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\HORecHits_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(caloTowerData);
@@ -553,7 +554,7 @@ namespace IGtoOBJGen {
         {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HBRecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
-            List<string> dataList = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            List<string> dataList = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
             File.WriteAllText($"{eventTitle}\\HBRecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\HBRecHits_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(caloTowerData);
@@ -749,7 +750,16 @@ namespace IGtoOBJGen {
         }
         public override string Execute()
         {
-            return " ";
+            photons = StaticLineHandlers.photonParse(JSON);
+            List<string> dataList = new List<string>();
+            foreach(var item in photons)
+            {
+                dataList.Add(StaticLineHandlers.makePhoton(item));
+            }
+            File.WriteAllText($"{eventTitle}\\Photons_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\Photons_V1.obj", dataList);
+            string data = JsonConvert.SerializeObject(photons);
+            return ("\"photonDatas\":" + data);
         }
     }
     //class PATPhotons_V1 : TypeConfig { }
