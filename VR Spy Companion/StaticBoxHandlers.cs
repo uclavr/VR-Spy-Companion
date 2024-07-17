@@ -10,7 +10,6 @@ using Newtonsoft.Json;
 using System.Xml.Linq;
 using System.Globalization;
 using MathNet.Numerics;
-
 namespace VR_Spy_Companion
 {
         static class StaticBoxHandlers
@@ -592,17 +591,18 @@ namespace VR_Spy_Companion
             dataList.AddRange(normals);
             return dataList;
         }
-        static public List<string> generateCalorimetryBoxes(List<CalorimetryTowers> inputData)
+        static public (List<string>,List<CalorimetryTowers>) generateCalorimetryBoxes(List<CalorimetryTowers> inputData)
             {
                 List<string> geometryData = new List<string>();
                 int counter = 1;
-
+                List<CalorimetryTowers> deltas = new List<CalorimetryTowers>();
                 geometryData.Add("vn -1.0000 -0.0000 -0.0000\nvn -0.0000 -0.0000 -1.0000\nvn 1.0000 -0.0000 -0.0000\nvn -0.0000 -0.0000 1.0000\nvn -0.0000 -1.0000 -0.0000\nvn -0.0000 1.0000 -0.0000");
 
                 var V = Vector<double>.Build;
 
-                foreach (CalorimetryTowers box in inputData)
+                for(int i = 0; i<=inputData.Count-1;i++)
                 {
+                    var box = inputData[i];
                     double scale = box.scale;
 
                     var v0 = V.DenseOfArray(box.front_1);
@@ -613,6 +613,9 @@ namespace VR_Spy_Companion
                     var v5 = V.DenseOfArray(box.back_2);
                     var v6 = V.DenseOfArray(box.back_3);
                     var v7 = V.DenseOfArray(box.back_4);
+                    var xVector = V.DenseOfArray(new[] { 1.0, 0.0, 0.0 });
+                    var yVector = V.DenseOfArray(new[] { 0.0, 1.0, 0.0 });
+                    var zVector = V.DenseOfArray(new[] { 0.0, 0.0, 1.0 });
 
                     var center = v0 + v1;
                     center += v2;
@@ -670,21 +673,39 @@ namespace VR_Spy_Companion
                     geometryData.Add($"f {counter + 1}//6 {counter}//6 {counter + 4}//6 {counter + 5}//6");
                     geometryData.Add($"f {counter + 5}//6 {counter + 4}//6 {counter}//6 {counter + 1}//6");
 
+                    v1 /= v1.L2Norm();
+                    v2 /= v2.L2Norm();
+                    v4 /= v4.L2Norm();
+                double deltaPhi = 1.0;
+                double deltaTheta = 1.0;
+                if ((v1 - v2).DotProduct(xVector) < 0.5)
+                {
+                    deltaPhi = Math.Acos(v1.DotProduct(v2));
+                    deltaTheta = Math.Acos(v1.DotProduct(v4));
+                }else if ((v1 - v4).DotProduct(xVector) < 0.5)
+                {
+                    deltaPhi = Math.Acos(v1.DotProduct(v4));
+                    deltaTheta = Math.Acos(v1.DotProduct(v2));
+                }
+                box.deltaPhi = deltaPhi;
+                box.deltaTheta = deltaTheta;
+                deltas.Add(box);
                     counter += 8;
                 }
-                return geometryData;
+                return (geometryData,deltas);
             }
-            static public List<string> generateCalorimetryTowers(List<CalorimetryTowers> inputData)
+            static public (List<string>, List<CalorimetryTowers>) generateCalorimetryTowers(List<CalorimetryTowers> inputData)
             {
                 List<string> geometryData = new List<string>();
                 int counter = 1;
-
+            List<CalorimetryTowers> deltas = new List<CalorimetryTowers>();
                 geometryData.Add("vn -1.0000 -0.0000 -0.0000\nvn -0.0000 -0.0000 -1.0000\nvn 1.0000 -0.0000 -0.0000\nvn -0.0000 -0.0000 1.0000\nvn -0.0000 -1.0000 -0.0000\nvn -0.0000 1.0000 -0.0000");
 
                 var V = Vector<double>.Build;
 
-                foreach (CalorimetryTowers box in inputData)
+                for (int i =0; i<inputData.Count;i++)
                 {
+                var box = inputData[i];
                     var v0 = V.DenseOfArray(box.front_1);
                     var v1 = V.DenseOfArray(box.front_2);
                     var v2 = V.DenseOfArray(box.front_3);
@@ -741,9 +762,31 @@ namespace VR_Spy_Companion
                     geometryData.Add($"f {counter + 1}//6 {counter}//6 {counter + 4}//6 {counter + 5}//6");
                     geometryData.Add($"f {counter + 5}//6 {counter + 4}//6 {counter}//6 {counter + 1}//6");
 
-                    counter += 8;
+                v1 /= v1.L2Norm();
+                v2 /= v2.L2Norm();
+                v4 /= v4.L2Norm();
+
+                var xVector = V.DenseOfArray(new[] { 1.0, 0.0, 0.0 });
+                double deltaPhi = 1.0;
+                double deltaTheta = 1.0;
+
+                if ((v1 - v2).DotProduct(xVector) < 0.5)
+                {
+                    deltaPhi = Math.Acos(v1.DotProduct(v2));
+                    deltaTheta = Math.Acos(v1.DotProduct(v4));
                 }
-                return geometryData;
+                else if ((v1 - v4).DotProduct(xVector) < 0.5)
+                {
+                    deltaPhi = Math.Acos(v1.DotProduct(v4));
+                    deltaTheta = Math.Acos(v1.DotProduct(v2));
+                }
+                box.deltaPhi = deltaPhi;
+                box.deltaTheta = deltaTheta;
+                deltas.Add(box);
+
+                counter += 8;
+                }
+                return (geometryData,deltas);
             }
             /*public void setScales()
             {
@@ -1000,71 +1043,6 @@ namespace VR_Spy_Companion
 
                 return dataList;
             }
-            public static void GenerateOBJ(List<(Point3D center, Point3D width)> ellipsoids, string filePath)
-            {
-                using (StreamWriter writer = new StreamWriter(filePath))
-                {
-                    int vertexCount = 1;
-                    int objectCount = 1;
-                    int current = 0;
-
-                    foreach (var ellipsoid in ellipsoids)
-                    {
-                        writer.WriteLine($"o Object{objectCount++}");
-
-                        // Generate vertices
-                        List<Point3D> vertices = GenerateEllipsoidVertices(ellipsoid.center, ellipsoid.width);
-
-                        // Write vertices
-                        foreach (var vertex in vertices)
-                        {
-                            writer.WriteLine($"v {vertex.X} {vertex.Y} {vertex.Z}");
-                        }
-
-                        // Write faces
-                        int n = (int)Math.Sqrt(vertices.Count); // Assuming square grid
-                        for (int i = 0; i < n - 1; i++)
-                        {
-                            for (int j = 0; j < n - 1; j++)
-                            {
-                                int currentIndex = i * n + j + vertexCount;
-                                int nextIndex = currentIndex + 1;
-                                int bottomIndex = currentIndex + n;
-                                int nextBottomIndex = nextIndex + n;
-
-                                writer.WriteLine($"f {currentIndex} {nextIndex} {nextBottomIndex} {bottomIndex}");
-                            }
-
-                        }
-                        vertexCount += vertices.Count;
-                    }
-                }
-            }
-
-            private static List<Point3D> GenerateEllipsoidVertices(Point3D center, Point3D width)
-            {
-                List<Point3D> vertices = new List<Point3D>();
-
-                int segments = 20; // Adjust as needed for smoother ellipsoids
-                double thetaStep = 2 * Math.PI / segments;
-                double phiStep = Math.PI / segments;
-
-                for (int i = 0; i <= segments; i++)
-                {
-                    double theta = i * thetaStep;
-                    for (int j = 0; j <= segments; j++)
-                    {
-                        double phi = j * phiStep;
-                        double x = center.X + width.X * Math.Sin(phi) * Math.Cos(theta);
-                        double y = center.Y + width.Y * Math.Sin(phi) * Math.Sin(theta);
-                        double z = center.Z + width.Z * Math.Cos(phi);
-                        vertices.Add(new Point3D(x, y, z));
-                    }
-                }
-
-                return vertices;
-            }
-
             public static void GenerateEllipsoidObj(string filePath, List<Vertex> vertexList, double sigmaFactor)
             {
                 int vertexNumber = 0;
@@ -1118,17 +1096,4 @@ namespace VR_Spy_Companion
 
             }
     }
-        struct Point3D
-        {
-            public double X;
-            public double Y;
-            public double Z;
-
-            public Point3D(double x, double y, double z)
-            {
-                X = x;
-                Y = y;
-                Z = z;
-            }
-        }
-    }
+}
