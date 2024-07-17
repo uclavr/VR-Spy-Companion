@@ -190,6 +190,8 @@ namespace IGtoOBJGen
                         case "DTRecSegment4D_V1":
                             break;
                         case "RPCRecHits_V1":
+                            RPCRecHits_V1 rpc = new RPCRecHits_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(rpc);
                             break;
                         case "MatchingGEMS_V!":
                             break;
@@ -219,13 +221,17 @@ namespace IGtoOBJGen
                             break;
                         case "CSCRecHit2Ds_V2": 
                             break;
-                        case "CSCSegments_V1": 
+                        case "CSCSegments_V1":
+                            CSCSegments_V1 cscseg1 = new CSCSegments_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(cscseg1);
                             break;
                         case "CSCSegments_V2": 
                             break;
                         case "CSCSegments_V3": 
                             break;
-                        case "MuonChambers_V1": 
+                        case "MuonChambers_V1":
+                            MuonChambers_V1 muonchambers = new MuonChambers_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(muonchambers);
                             break;
                         case "CaloTowers_V2": 
                             break;

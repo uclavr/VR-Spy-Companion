@@ -388,10 +388,10 @@ namespace VR_Spy_Companion
             foreach(var seg in data)
             {
                 dataList.Add($"o CSCSegments_V{version}_{counter}");
-                dataList.Add($"v {seg.pos1[0]} {seg.pos1[1]} {seg.pos1[2]}");
-                dataList.Add($"v {seg.pos1[0]} {seg.pos1[1] + 0.001} {seg.pos1[2]}");
-                dataList.Add($"v {seg.pos2[0]} {seg.pos2[1]} {seg.pos2[2]}");
-                dataList.Add($"v {seg.pos2[0]} {seg.pos2[1] + 0.001} {seg.pos2[2]}");
+                dataList.Add($"v {seg.pos1[0]} {seg.pos1[1]-0.005} {seg.pos1[2]}");
+                dataList.Add($"v {seg.pos1[0]} {seg.pos1[1] + 0.005} {seg.pos1[2]}");
+                dataList.Add($"v {seg.pos2[0]} {seg.pos2[1] - 0.005} {seg.pos2[2]}");
+                dataList.Add($"v {seg.pos2[0]} {seg.pos2[1] + 0.005} {seg.pos2[2]}");
                 dataList.Add($"f {4*counter + 1} {4 * counter + 2} {4 * counter + 3} {4 * counter + 4}");
                 dataList.Add($"f {4 * counter + 4} {4 * counter + 3} {4 * counter + 2} {4 * counter + 1}");
                 counter++;
@@ -406,17 +406,17 @@ namespace VR_Spy_Companion
             {
                 dataList.Add($"o RPCRecHits_V1_{counter}");
                 dataList.Add("v "+String.Join(' ',hit.u1));
-                dataList.Add($"v {hit.u1[0]} {hit.u1[1]+0.001} {hit.u1[2]}");
+                dataList.Add($"v {hit.u1[0]} {hit.u1[1]+0.01} {hit.u1[2]}");
                 dataList.Add("v " + String.Join(' ', hit.u2));
-                dataList.Add($"v {hit.u2[0]} {hit.u2[1] + 0.001} {hit.u2[2]}");
+                dataList.Add($"v {hit.u2[0]} {hit.u2[1] + 0.01} {hit.u2[2]}");
                 dataList.Add("v "+String.Join(' ',hit.v1));
-                dataList.Add($"v {hit.v1[0]} {hit.v1[1] + 0.001} {hit.v1[2]}");
+                dataList.Add($"v {hit.v1[0]} {hit.v1[1] + 0.01} {hit.v1[2]}");
                 dataList.Add("v "+String.Join(' ',hit.v2));
-                dataList.Add($"v {hit.v2[0]} {hit.v2[1] + 0.001} {hit.v2[2]}");
+                dataList.Add($"v {hit.v2[0]} {hit.v2[1] + 0.01} {hit.v2[2]}");
                 dataList.Add("v "+String.Join(' ',hit.w1));
-                dataList.Add($"v {hit.w1[0]} {hit.w1[1] + 0.001} {hit.w1[2]}");
+                dataList.Add($"v {hit.w1[0]} {hit.w1[1] + 0.01} {hit.w1[2]}");
                 dataList.Add("v "+String.Join(' ',hit.w2));
-                dataList.Add($"v {hit.w2[0]} {hit.w2[1] + 0.001} {hit.w2[2]}");
+                dataList.Add($"v {hit.w2[0]} {hit.w2[1] + 0.01} {hit.w2[2]}");
                 dataList.Add($"f {12*counter + 1} {12 * counter + 2} {12 * counter + 3} {12 * counter + 4}");
                 dataList.Add($"f {12 * counter + 4} {12 * counter + 3} {12 * counter + 2} {12 * counter + 1}");
                 dataList.Add($"f {12 * counter + 5} {12 * counter + 6} {12 * counter + 7} {12 * counter + 8}");

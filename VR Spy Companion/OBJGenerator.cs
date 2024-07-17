@@ -2,6 +2,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using IGtoOBJGen;
+using System.Reflection;
 
 class OBJGenerator {
     static void Main(string[] args) {
@@ -13,7 +14,8 @@ class OBJGenerator {
         JsonTextReader reader;
         JObject o2;
         List<string> fileNames = new List<string>();
-        string adbPath = Directory.GetCurrentDirectory() + "/platform-tools/adb";
+        string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/platform-tools/adb.exe";
+
         inputState = args.Length == 0;
         
         if (args.Count() > 1) {
@@ -64,7 +66,8 @@ class OBJGenerator {
             eventName = split.Last();
 
             string text = File.ReadAllText($"{destination}");
-            string newText = text.Replace("nan,", "null,");
+            string newText = text.Replace("nan,", "null,").Replace('(','[').Replace(')',']');
+
 
             File.WriteAllText($"{args[0]}.tmp", newText);
             file = File.OpenText($"{args[0]}.tmp");
@@ -90,14 +93,14 @@ class OBJGenerator {
 
         zipper.destroyStorage();
 
-        try{
+        
             Console.WriteLine(targetPath);
             Console.ReadLine();
             Communicate bridge = new Communicate(adbPath);
             bridge.UploadFiles(targetPath);
             Directory.Delete(temp_Folder, true);
-        }
-        catch (Exception e) {
+        
+        /*catch (Exception e) {
             if (e is System.ArgumentOutOfRangeException) {
                 Console.WriteLine("System.ArgumentOutOfRangeException thrown while trying to locate ADB.\nPlease check that ADB is installed and the proper path has been provided. The default path for Windows is C:\\Users\\[user]\\adbPath\\Local\\Android\\sdk\\platform-tools\n");
             }
@@ -106,7 +109,7 @@ class OBJGenerator {
             }
             Directory.Delete(temp_Folder, true);
             Environment.Exit(1);
-        }
+        }*/
         Console.WriteLine($"Total Execution Time: {watch.ElapsedMilliseconds} ms"); // See how fast code runs. Code goes brrrrrrr on fancy office pc. It makes me happy. :)
     }
 }

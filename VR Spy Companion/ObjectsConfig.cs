@@ -164,6 +164,7 @@ namespace IGtoOBJGen {
         {
             JSON = arg;
             eventTitle = eventtitle;
+            trackExtras = new List<TrackExtrasData>();
             SetExtras();
         }
         private void SetExtras()
@@ -206,7 +207,7 @@ namespace IGtoOBJGen {
 
                 currentItem.pos3 = new double[3] { children[0] + scale * currentItem.dir1[0], children[1] + scale * currentItem.dir1[1], children[2] + scale * currentItem.dir1[2] };
                 currentItem.pos4 = new double[3] { children[6] - scale * currentItem.dir2[0], children[7] - scale * currentItem.dir2[1], children[8] - scale * currentItem.dir2[2] };
-
+                
                 trackExtras.Add(currentItem);
             }
         }
@@ -624,6 +625,7 @@ namespace IGtoOBJGen {
         public override string Execute()
         {
             rpcRecHits = StaticBoxHandlers.RPCRecHitParse(JSON);
+            
             List<string> dataList = StaticBoxHandlers.GenerateRPCRecHits(rpcRecHits);
             File.WriteAllText($"{eventTitle}\\RPCRecHits_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\RPCRecHits_V1.obj", dataList);
