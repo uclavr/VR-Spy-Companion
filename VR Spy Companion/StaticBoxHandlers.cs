@@ -113,7 +113,7 @@ namespace VR_Spy_Companion
                 File.WriteAllText($"{eventTitle}\\MuonChambers_V1.obj", String.Empty);
                 File.WriteAllLines($"{eventTitle}\\MuonChambers_V1.obj", dataStrings);
             }
-        static public List<CalorimetryTowers> setCaloScale(List<CalorimetryTowers> towers)
+            static public List<CalorimetryTowers> setCaloScale(List<CalorimetryTowers> towers)
         {
             double scaler = towers.Select(x => x.energy).Max();
             List<CalorimetryTowers> result = towers;
@@ -261,31 +261,56 @@ namespace VR_Spy_Companion
 
                 return datalist;
             }
-        static public List<JetV2Data> jetV2Parse(JObject data)
-        {
-            int idNumber = 0;
-            List<JetV2Data> datalist = new List<JetV2Data>();
-
-            foreach (var item in data["Collections"]["PFJets_V2"])
+            static public List<JetV2Data> jetV2Parse(JObject data)
             {
+                int idNumber = 0;
+                List<JetV2Data> datalist = new List<JetV2Data>();
 
-                JetV2Data currentJet = new JetV2Data();
-                var children = item.Children().Values<double>().ToArray();
+                foreach (var item in data["Collections"]["PFJets_V2"])
+                {
 
-                currentJet.id = idNumber;
-                currentJet.et = children[0];
-                currentJet.eta = children[1];
-                currentJet.theta = children[2];
-                currentJet.phi = children[3];
-                currentJet.vertex = new[] { children[4], children[5], children[6] };
+                    JetV2Data currentJet = new JetV2Data();
+                    var children = item.Children().Values<double>().ToArray();
 
-                idNumber++;
-                datalist.Add(currentJet);
+                    currentJet.id = idNumber;
+                    currentJet.et = children[0];
+                    currentJet.eta = children[1];
+                    currentJet.theta = children[2];
+                    currentJet.phi = children[3];
+                    currentJet.vertex = new[] { children[4], children[5], children[6] };
+
+                    idNumber++;
+                    datalist.Add(currentJet);
+                }
+
+                return datalist;
             }
+            static public void generateJetModels(List<JetV1Data> data, string eventTitle)
+                {
+                    double maxZ = 2.25;
+                    double maxR = 1.10;
+                    double radius = 0.3 * (1.0 / (1 + 0.001));
+                    int numSections = 64;
+                    int iterNumber = 0;
+                    int index = 0;
+                    List<string> dataList = new List<string>();
 
-            return datalist;
-        }
-        static public void generateJetModels(List<JetV1Data> data, string eventTitle)
+                    foreach (var item in data)
+                    {
+                        iterNumber++;
+                        double ct = Math.Cos(item.theta);
+                        double st = Math.Sin(item.theta);
+
+                        double length1 = (ct != 0.0) ? maxZ / Math.Abs(ct) : maxZ;
+                        double length2 = (st != 0.0) ? maxR / Math.Abs(st) : maxR;
+                        double length = length1 < length2 ? length1 : length2;
+
+                        dataList = jetGeometry(item, radius, length, numSections, index, dataList);
+                        index++;
+                    }
+                    File.WriteAllLines($"{eventTitle}//PFJets.obj", dataList);
+                }
+            static public void generateJetModels(List<JetV2Data> data, string eventTitle)
             {
                 double maxZ = 2.25;
                 double maxR = 1.10;
@@ -308,126 +333,183 @@ namespace VR_Spy_Companion
                     dataList = jetGeometry(item, radius, length, numSections, index, dataList);
                     index++;
                 }
-                File.WriteAllLines($"{eventTitle}//PFJets.obj", dataList);
+                File.WriteAllLines($"{eventTitle}//0_PFJets_V2.obj", dataList);
             }
-        static public void generateJetModels(List<JetV2Data> data, string eventTitle)
-        {
-            double maxZ = 2.25;
-            double maxR = 1.10;
-            double radius = 0.3 * (1.0 / (1 + 0.001));
-            int numSections = 64;
-            int iterNumber = 0;
-            int index = 0;
-            List<string> dataList = new List<string>();
-
-            foreach (var item in data)
+            static public List<RPCRecHit> RPCRecHitParse(JObject data)
             {
-                iterNumber++;
-                double ct = Math.Cos(item.theta);
-                double st = Math.Sin(item.theta);
+                var inputData = data["Collections"]["RPCRecHits_V1"];
+                var dataList = new List<RPCRecHit>();
+                foreach(var item in inputData)
+                {
+                    var newItem = new RPCRecHit();
 
-                double length1 = (ct != 0.0) ? maxZ / Math.Abs(ct) : maxZ;
-                double length2 = (st != 0.0) ? maxR / Math.Abs(st) : maxR;
-                double length = length1 < length2 ? length1 : length2;
+                    var children = item.Children().Values<double>().ToArray();
 
-                dataList = jetGeometry(item, radius, length, numSections, index, dataList);
-                index++;
+                    newItem.u1 = children[0..3];
+                    newItem.u2 = children[3..6];
+                    newItem.v1 = children[6..9];
+                    newItem.v2 = children[9..12];
+                    newItem.w1 = children[12..15];
+                    newItem.w2 = children[15..18];
+                    newItem.region = (int)children[18];
+                    newItem.ring = (int)children[19];
+                    newItem.sector = (int)children[20];
+                    newItem.station = (int)children[21];
+                    newItem.layer = (int)children[22];
+                    newItem.subsector = (int)children[23];
+                    newItem.roll = (int)children[24];
+                    newItem.detid = (int)children[25];
+
+                    dataList.Add(newItem);
+                }
+                return dataList;
             }
-            File.WriteAllLines($"{eventTitle}//0_PFJets_V2.obj", dataList);
-        }
-        static public List<RPCRecHit> RPCRecHitParse(JObject data)
-        {
-            var inputData = data["Collections"]["RPCRecHits_V1"];
-            var dataList = new List<RPCRecHit>();
-            foreach(var item in inputData)
+            static public List<CSCSegment> ParseCSCSegmentsV1(JObject data)
             {
-                var newItem = new RPCRecHit();
+                var dataList = new List<CSCSegment>();
+                foreach(var item in data["Collections"]["CSCSegments_V1"])
+                {
+                    var newItem = new CSCSegment();
 
-                var children = item.Children().Values<double>().ToArray();
+                    var children = item.Children().Values<double>().ToArray();
+                    newItem.detid = (int)children[0];
+                    newItem.pos1 = children[1..4];
+                    newItem.pos2 = children[4..7];
 
-                newItem.u1 = children[0..3];
-                newItem.u2 = children[3..6];
-                newItem.v1 = children[6..9];
-                newItem.v2 = children[9..12];
-                newItem.w1 = children[12..15];
-                newItem.w2 = children[15..18];
-                newItem.region = (int)children[18];
-                newItem.ring = (int)children[19];
-                newItem.sector = (int)children[20];
-                newItem.station = (int)children[21];
-                newItem.layer = (int)children[22];
-                newItem.subsector = (int)children[23];
-                newItem.roll = (int)children[24];
-                newItem.detid = (int)children[25];
-
-                dataList.Add(newItem);
+                    dataList.Add(newItem);
+                }
+                return dataList;
             }
-            return dataList;
-        }
-        static public List<CSCSegment> ParseCSCSegmentsV1(JObject data)
-        {
-            var dataList = new List<CSCSegment>();
-            foreach(var item in data["Collections"]["CSCSegments_V1"])
+            static public List<string> GenerateCSCSegments(List<CSCSegment> data, int version)
             {
-                var newItem = new CSCSegment();
-
-                var children = item.Children().Values<double>().ToArray();
-                newItem.detid = (int)children[0];
-                newItem.pos1 = children[1..4];
-                newItem.pos2 = children[4..7];
-
-                dataList.Add(newItem);
+                var dataList = new List<string>();
+                int counter = 0;
+                foreach(var seg in data)
+                {
+                    dataList.Add($"o CSCSegments_V{version}_{counter}");
+                    dataList.Add($"v {seg.pos1[0]} {seg.pos1[1]-0.005} {seg.pos1[2]}");
+                    dataList.Add($"v {seg.pos1[0]} {seg.pos1[1] + 0.005} {seg.pos1[2]}");
+                    dataList.Add($"v {seg.pos2[0]} {seg.pos2[1] - 0.005} {seg.pos2[2]}");
+                    dataList.Add($"v {seg.pos2[0]} {seg.pos2[1] + 0.005} {seg.pos2[2]}");
+                    dataList.Add($"f {4*counter + 1} {4 * counter + 2} {4 * counter + 3} {4 * counter + 4}");
+                    dataList.Add($"f {4 * counter + 4} {4 * counter + 3} {4 * counter + 2} {4 * counter + 1}");
+                    counter++;
+                }
+                return dataList;
             }
-            return dataList;
-        }
-        static public List<string> GenerateCSCSegments(List<CSCSegment> data, int version)
-        {
-            var dataList = new List<string>();
-            int counter = 0;
-            foreach(var seg in data)
+            static public List<string> GenerateRPCRecHits(List<RPCRecHit> data)
             {
-                dataList.Add($"o CSCSegments_V{version}_{counter}");
-                dataList.Add($"v {seg.pos1[0]} {seg.pos1[1]-0.005} {seg.pos1[2]}");
-                dataList.Add($"v {seg.pos1[0]} {seg.pos1[1] + 0.005} {seg.pos1[2]}");
-                dataList.Add($"v {seg.pos2[0]} {seg.pos2[1] - 0.005} {seg.pos2[2]}");
-                dataList.Add($"v {seg.pos2[0]} {seg.pos2[1] + 0.005} {seg.pos2[2]}");
-                dataList.Add($"f {4*counter + 1} {4 * counter + 2} {4 * counter + 3} {4 * counter + 4}");
-                dataList.Add($"f {4 * counter + 4} {4 * counter + 3} {4 * counter + 2} {4 * counter + 1}");
-                counter++;
-            }
-            return dataList;
-        }
-        static public List<string> GenerateRPCRecHits(List<RPCRecHit> data)
-        {
-            var dataList = new List<string>();
-            int counter = 0;
-            foreach(var hit in data)
-            {
-                dataList.Add($"o RPCRecHits_V1_{counter}");
-                dataList.Add("v "+String.Join(' ',hit.u1));
-                dataList.Add($"v {hit.u1[0]} {hit.u1[1]+0.01} {hit.u1[2]}");
-                dataList.Add("v " + String.Join(' ', hit.u2));
-                dataList.Add($"v {hit.u2[0]} {hit.u2[1] + 0.01} {hit.u2[2]}");
-                dataList.Add("v "+String.Join(' ',hit.v1));
-                dataList.Add($"v {hit.v1[0]} {hit.v1[1] + 0.01} {hit.v1[2]}");
-                dataList.Add("v "+String.Join(' ',hit.v2));
-                dataList.Add($"v {hit.v2[0]} {hit.v2[1] + 0.01} {hit.v2[2]}");
-                dataList.Add("v "+String.Join(' ',hit.w1));
-                dataList.Add($"v {hit.w1[0]} {hit.w1[1] + 0.01} {hit.w1[2]}");
-                dataList.Add("v "+String.Join(' ',hit.w2));
-                dataList.Add($"v {hit.w2[0]} {hit.w2[1] + 0.01} {hit.w2[2]}");
-                dataList.Add($"f {12*counter + 1} {12 * counter + 2} {12 * counter + 3} {12 * counter + 4}");
-                dataList.Add($"f {12 * counter + 4} {12 * counter + 3} {12 * counter + 2} {12 * counter + 1}");
-                dataList.Add($"f {12 * counter + 5} {12 * counter + 6} {12 * counter + 7} {12 * counter + 8}");
-                dataList.Add($"f {12 * counter + 8} {12 * counter + 7} {12 * counter + 6} {12 * counter + 5}");
-                dataList.Add($"f {12 * counter + 9} {12 * counter + 10} {12 * counter + 11} {12 * counter + 12}");
-                dataList.Add($"f {12 * counter + 12} {12 * counter + 11} {12 * counter + 10} {12 * counter + 9}");
+                var dataList = new List<string>();
+                int counter = 0;
+                foreach(var hit in data)
+                {
+                    dataList.Add($"o RPCRecHits_V1_{counter}");
+                    dataList.Add("v "+String.Join(' ',hit.u1));
+                    dataList.Add($"v {hit.u1[0]} {hit.u1[1]+0.01} {hit.u1[2]}");
+                    dataList.Add("v " + String.Join(' ', hit.u2));
+                    dataList.Add($"v {hit.u2[0]} {hit.u2[1] + 0.01} {hit.u2[2]}");
+                    dataList.Add("v "+String.Join(' ',hit.v1));
+                    dataList.Add($"v {hit.v1[0]} {hit.v1[1] + 0.01} {hit.v1[2]}");
+                    dataList.Add("v "+String.Join(' ',hit.v2));
+                    dataList.Add($"v {hit.v2[0]} {hit.v2[1] + 0.01} {hit.v2[2]}");
+                    dataList.Add("v "+String.Join(' ',hit.w1));
+                    dataList.Add($"v {hit.w1[0]} {hit.w1[1] + 0.01} {hit.w1[2]}");
+                    dataList.Add("v "+String.Join(' ',hit.w2));
+                    dataList.Add($"v {hit.w2[0]} {hit.w2[1] + 0.01} {hit.w2[2]}");
+                    dataList.Add($"f {12*counter + 1} {12 * counter + 2} {12 * counter + 3} {12 * counter + 4}");
+                    dataList.Add($"f {12 * counter + 4} {12 * counter + 3} {12 * counter + 2} {12 * counter + 1}");
+                    dataList.Add($"f {12 * counter + 5} {12 * counter + 6} {12 * counter + 7} {12 * counter + 8}");
+                    dataList.Add($"f {12 * counter + 8} {12 * counter + 7} {12 * counter + 6} {12 * counter + 5}");
+                    dataList.Add($"f {12 * counter + 9} {12 * counter + 10} {12 * counter + 11} {12 * counter + 12}");
+                    dataList.Add($"f {12 * counter + 12} {12 * counter + 11} {12 * counter + 10} {12 * counter + 9}");
 
-                counter++;
+                    counter++;
+                }
+                return dataList;
             }
-            return dataList;
-        }
-        static public List<string> jetGeometry(JetV1Data item, double radius, double length, int sections, int index, List<string> dataList)
+            static public List<string> jetGeometry(JetV1Data item, double radius, double length, int sections, int index, List<string> dataList)
+                {
+                    List<string> normals = new List<string>();
+                    List<string> normals1 = new List<string>();
+                    List<string> normals2 = new List<string>();
+                    List<string> section1 = new List<string>();
+                    List<string> topsection = new List<string>();
+                    List<Vector3D> radialpoints = new List<Vector3D>();
+                    var M = Matrix<double>.Build;
+                    var V = Vector<double>.Build;
+
+                    double[,] xRot =
+                        { { 1, 0, 0 },
+                    { 0, Math.Cos(item.theta), -1.0 * Math.Sin(item.theta) },
+                    { 0, Math.Sin(item.theta), Math.Cos(item.theta) } };
+
+                    double[,] zRot =
+                        { { Math.Cos(item.phi+Math.PI/2.0), -1.0 * Math.Sin(item.phi+Math.PI/2.0), 0 },
+                    { Math.Sin(item.phi+Math.PI/2.0), Math.Cos(item.phi+Math.PI/2.0), 0 },
+                    { 0, 0, 1 } };
+
+                    var rx = M.DenseOfArray(xRot); //Rotation matrices
+                    var rz = M.DenseOfArray(zRot);
+                    normals.Add($"o Jets_{index}");
+
+
+                    for (double i = 1.0; i <= sections; i++)
+                    {
+                        double radian = (2.0 * i * Math.PI) / (double)sections;
+
+                        string bottompoint = "v 0 0 0";
+                        section1.Add(bottompoint);
+
+                        double[] feederArray = { radius * Math.Cos(radian), radius * Math.Sin(radian), length };
+                        Vector<double> temptop = Vector<double>.Build.DenseOfArray(feederArray);
+
+                        var rotation = rz * rx;
+                        var top = rotation * temptop;
+
+                        //We can use the toppoint list as the vector list to generate normals with. Make a new for loop to handle this
+                        string toppoint = $"v {top[0]} {top[1]} {top[2]}";
+                        topsection.Add(toppoint);
+                        radialpoints.Add(new Vector3D(top[0], top[1], top[2]));
+                    }
+                    section1.AddRange(topsection);
+                    for (int i = 0; i < radialpoints.Count; i++)
+                    {
+                        if (i == radialpoints.Count - 1)
+                        {
+                            var vector_1 = radialpoints[i];
+                            var vector_2 = radialpoints[0];
+                            Vector3D norm = vector_1.CrossProduct(vector_2);
+                            normals.Add($"vn {norm.X} {norm.Y} {norm.Z}");
+                            normals2.Add($"vn {-norm.X} {-norm.Y} {-norm.Z}");
+                            break;
+                        }
+                        var vector1 = radialpoints[i];
+                        var vector2 = radialpoints[i + 1];
+
+                        Vector3D normalresult = vector1.CrossProduct(vector2);
+                        normals.Add($"vn {normalresult.X} {normalresult.Y} {normalresult.Z}");
+                        normals2.Add($"vn {-normalresult.X} {-normalresult.Y} {-normalresult.Z}");
+                    }
+                    normals.AddRange(normals2);
+                    int n = 1;
+
+                    while (n < sections)
+                    {
+                        string face = $"f {n + (2 * sections * index)}//{n + (2 * sections * index)} {n + sections + (2 * sections * index)}//{n + (2 * sections * index)} {n + 1 + sections + (2 * sections * index)}//{n + (2 * sections * index)} {n + 1 + (2 * sections * index)}//{n + (2 * sections * index)}";
+                        //string face = $"f {n} {n + sections} {n + 1 + sections} {n + 1}";
+                        string revface = $"f {n + 1 + (2 * sections * index)}//{n + sections + (2 * sections * index)} {n + 1 + sections + (2 * sections * index)}//{n + sections + (2 * sections * index)} {n + sections + (2 * sections * index)}//{n + sections + (2 * sections * index)} {n + (2 * sections * index)}//{n + sections + (2 * sections * index)}";
+                        section1.Add(face);
+                        section1.Add(revface);
+                        n++;
+                    }
+
+                    section1.Add($"f {2 * sections * index + sections}//{2 * sections * index + sections} {2 * sections * index + 2 * sections}//{2 * sections * index + sections} {2 * sections * index + sections + 1}//{2 * sections * index + sections} {2 * sections * index + 1}//{2 * sections * index + sections}\n" +
+                        $"f {2 * sections * index + 1}//{2 * sections * index + 2 * sections} {2 * sections * index + sections + 1}//{2 * sections * index + 2 * sections} {2 * sections * index + 2 * sections}//{2 * sections * index + 2 * sections} {2 * sections * index + sections}//{2 * sections * index + 2 * sections}");
+                    normals.AddRange(section1);
+                    dataList.AddRange(normals);
+                    return dataList;
+                }
+            static public List<string> jetGeometry(JetV2Data item, double radius, double length, int sections, int index, List<string> dataList)
             {
                 List<string> normals = new List<string>();
                 List<string> normals1 = new List<string>();
@@ -440,13 +522,13 @@ namespace VR_Spy_Companion
 
                 double[,] xRot =
                     { { 1, 0, 0 },
-                { 0, Math.Cos(item.theta), -1.0 * Math.Sin(item.theta) },
-                { 0, Math.Sin(item.theta), Math.Cos(item.theta) } };
+                    { 0, Math.Cos(item.theta), -1.0 * Math.Sin(item.theta) },
+                    { 0, Math.Sin(item.theta), Math.Cos(item.theta) } };
 
                 double[,] zRot =
                     { { Math.Cos(item.phi+Math.PI/2.0), -1.0 * Math.Sin(item.phi+Math.PI/2.0), 0 },
-                { Math.Sin(item.phi+Math.PI/2.0), Math.Cos(item.phi+Math.PI/2.0), 0 },
-                { 0, 0, 1 } };
+                    { Math.Sin(item.phi+Math.PI/2.0), Math.Cos(item.phi+Math.PI/2.0), 0 },
+                    { 0, 0, 1 } };
 
                 var rx = M.DenseOfArray(xRot); //Rotation matrices
                 var rz = M.DenseOfArray(zRot);
@@ -457,7 +539,7 @@ namespace VR_Spy_Companion
                 {
                     double radian = (2.0 * i * Math.PI) / (double)sections;
 
-                    string bottompoint = "v 0 0 0";
+                    string bottompoint = $"v {item.vertex[0]} {item.vertex[1]} {item.vertex[2]}";
                     section1.Add(bottompoint);
 
                     double[] feederArray = { radius * Math.Cos(radian), radius * Math.Sin(radian), length };
@@ -467,9 +549,9 @@ namespace VR_Spy_Companion
                     var top = rotation * temptop;
 
                     //We can use the toppoint list as the vector list to generate normals with. Make a new for loop to handle this
-                    string toppoint = $"v {top[0]} {top[1]} {top[2]}";
+                    string toppoint = $"v {item.vertex[0]+top[0]} {item.vertex[1]+top[1]} {item.vertex[2]+top[2]}";
                     topsection.Add(toppoint);
-                    radialpoints.Add(new Vector3D(top[0], top[1], top[2]));
+                    radialpoints.Add(new Vector3D(item.vertex[0] + top[0], item.vertex[1] + top[1], item.vertex[2] + top[2]));
                 }
                 section1.AddRange(topsection);
                 for (int i = 0; i < radialpoints.Count; i++)
@@ -509,191 +591,109 @@ namespace VR_Spy_Companion
                 dataList.AddRange(normals);
                 return dataList;
             }
-        static public List<string> jetGeometry(JetV2Data item, double radius, double length, int sections, int index, List<string> dataList)
-        {
-            List<string> normals = new List<string>();
-            List<string> normals1 = new List<string>();
-            List<string> normals2 = new List<string>();
-            List<string> section1 = new List<string>();
-            List<string> topsection = new List<string>();
-            List<Vector3D> radialpoints = new List<Vector3D>();
-            var M = Matrix<double>.Build;
-            var V = Vector<double>.Build;
-
-            double[,] xRot =
-                { { 1, 0, 0 },
-                { 0, Math.Cos(item.theta), -1.0 * Math.Sin(item.theta) },
-                { 0, Math.Sin(item.theta), Math.Cos(item.theta) } };
-
-            double[,] zRot =
-                { { Math.Cos(item.phi+Math.PI/2.0), -1.0 * Math.Sin(item.phi+Math.PI/2.0), 0 },
-                { Math.Sin(item.phi+Math.PI/2.0), Math.Cos(item.phi+Math.PI/2.0), 0 },
-                { 0, 0, 1 } };
-
-            var rx = M.DenseOfArray(xRot); //Rotation matrices
-            var rz = M.DenseOfArray(zRot);
-            normals.Add($"o Jets_{index}");
-
-
-            for (double i = 1.0; i <= sections; i++)
-            {
-                double radian = (2.0 * i * Math.PI) / (double)sections;
-
-                string bottompoint = $"v {item.vertex[0]} {item.vertex[1]} {item.vertex[2]}";
-                section1.Add(bottompoint);
-
-                double[] feederArray = { radius * Math.Cos(radian), radius * Math.Sin(radian), length };
-                Vector<double> temptop = Vector<double>.Build.DenseOfArray(feederArray);
-
-                var rotation = rz * rx;
-                var top = rotation * temptop;
-
-                //We can use the toppoint list as the vector list to generate normals with. Make a new for loop to handle this
-                string toppoint = $"v {item.vertex[0]+top[0]} {item.vertex[1]+top[1]} {item.vertex[2]+top[2]}";
-                topsection.Add(toppoint);
-                radialpoints.Add(new Vector3D(item.vertex[0] + top[0], item.vertex[1] + top[1], item.vertex[2] + top[2]));
-            }
-            section1.AddRange(topsection);
-            for (int i = 0; i < radialpoints.Count; i++)
-            {
-                if (i == radialpoints.Count - 1)
+            static public (List<string>,List<CalorimetryTowers>) generateCalorimetryBoxes(List<CalorimetryTowers> inputData)
                 {
-                    var vector_1 = radialpoints[i];
-                    var vector_2 = radialpoints[0];
-                    Vector3D norm = vector_1.CrossProduct(vector_2);
-                    normals.Add($"vn {norm.X} {norm.Y} {norm.Z}");
-                    normals2.Add($"vn {-norm.X} {-norm.Y} {-norm.Z}");
-                    break;
+                    List<string> geometryData = new List<string>();
+                    int counter = 1;
+                    List<CalorimetryTowers> deltas = new List<CalorimetryTowers>();
+                    geometryData.Add("vn -1.0000 -0.0000 -0.0000\nvn -0.0000 -0.0000 -1.0000\nvn 1.0000 -0.0000 -0.0000\nvn -0.0000 -0.0000 1.0000\nvn -0.0000 -1.0000 -0.0000\nvn -0.0000 1.0000 -0.0000");
+
+                    var V = Vector<double>.Build;
+
+                    for(int i = 0; i<=inputData.Count-1;i++)
+                    {
+                        var box = inputData[i];
+                        double scale = box.scale;
+
+                        var v0 = V.DenseOfArray(box.front_1);
+                        var v1 = V.DenseOfArray(box.front_2);
+                        var v2 = V.DenseOfArray(box.front_3);
+                        var v3 = V.DenseOfArray(box.front_4);
+                        var v4 = V.DenseOfArray(box.back_1);
+                        var v5 = V.DenseOfArray(box.back_2);
+                        var v6 = V.DenseOfArray(box.back_3);
+                        var v7 = V.DenseOfArray(box.back_4);
+                        var xVector = V.DenseOfArray(new[] { 1.0, 0.0, 0.0 });
+                        var yVector = V.DenseOfArray(new[] { 0.0, 1.0, 0.0 });
+                        var zVector = V.DenseOfArray(new[] { 0.0, 0.0, 1.0 });
+
+                        var center = v0 + v1;
+                        center += v2;
+                        center += v3;
+                        center += v4;
+                        center += v5;
+                        center += v6;
+                        center += v7;
+                        center /= 8.0;
+
+                        v0 -= center;
+                        v0 *= scale;
+                        v0 += center;
+                        v1 -= center;
+                        v1 *= scale;
+                        v1 += center;
+                        v2 -= center;
+                        v2 *= scale;
+                        v2 += center;
+                        v3 -= center;
+                        v3 *= scale;
+                        v3 += center;
+                        v4 -= center;
+                        v4 *= scale;
+                        v4 += center;
+                        v5 -= center;
+                        v5 *= scale;
+                        v5 += center;
+                        v6 -= center;
+                        v6 *= scale;
+                        v6 += center;
+                        v7 -= center;
+                        v7 *= scale;
+                        v7 += center;
+
+                        geometryData.Add($"v {String.Join(' ', v0)}");
+                        geometryData.Add($"v {String.Join(' ', v1)}");
+                        geometryData.Add($"v {String.Join(' ', v2)}");
+                        geometryData.Add($"v {String.Join(' ', v3)}");
+                        geometryData.Add($"v {String.Join(' ', v4)}");
+                        geometryData.Add($"v {String.Join(' ', v5)}");
+                        geometryData.Add($"v {String.Join(' ', v6)}");
+                        geometryData.Add($"v {String.Join(' ', v7)}");
+
+                        geometryData.Add($"f {counter}//1 {counter + 1}//1 {counter + 2}//1 {counter + 3}//1");
+                        geometryData.Add($"f {counter + 3}//1 {counter + 2}//1 {counter + 1}//1 {counter}//1");
+                        geometryData.Add($"f {counter + 4}//2 {counter + 5}//2 {counter + 6}//2 {counter + 7}//2");
+                        geometryData.Add($"f {counter + 7}//2 {counter + 6}//2 {counter + 5}//2 {counter + 4}//2");
+                        geometryData.Add($"f {counter}//3 {counter + 3}//3 {counter + 7}//3 {counter + 4}//3");
+                        geometryData.Add($"f {counter + 4}//3 {counter + 7}//3 {counter + 3}//3 {counter}//3");
+                        geometryData.Add($"f {counter + 1}//4 {counter + 2}//4 {counter + 6}//4 {counter + 5}//4");
+                        geometryData.Add($"f {counter + 5}//4 {counter + 6}//4 {counter + 2}//4 {counter + 1}//4");
+                        geometryData.Add($"f {counter + 3}//5 {counter + 2}//5 {counter + 6}//5 {counter + 7}//5");
+                        geometryData.Add($"f {counter + 7}//5 {counter + 6}//5 {counter + 2}//5 {counter + 3}//5");
+                        geometryData.Add($"f {counter + 1}//6 {counter}//6 {counter + 4}//6 {counter + 5}//6");
+                        geometryData.Add($"f {counter + 5}//6 {counter + 4}//6 {counter}//6 {counter + 1}//6");
+
+                        v1 /= v1.L2Norm();
+                        v2 /= v2.L2Norm();
+                        v4 /= v4.L2Norm();
+                    double deltaPhi = 1.0;
+                    double deltaTheta = 1.0;
+                    if ((v1 - v2).DotProduct(xVector) < 0.5)
+                    {
+                        deltaPhi = Math.Acos(v1.DotProduct(v2));
+                        deltaTheta = Math.Acos(v1.DotProduct(v4));
+                    }else if ((v1 - v4).DotProduct(xVector) < 0.5)
+                    {
+                        deltaPhi = Math.Acos(v1.DotProduct(v4));
+                        deltaTheta = Math.Acos(v1.DotProduct(v2));
+                    }
+                    box.deltaPhi = deltaPhi;
+                    box.deltaTheta = deltaTheta;
+                    deltas.Add(box);
+                        counter += 8;
+                    }
+                    return (geometryData,deltas);
                 }
-                var vector1 = radialpoints[i];
-                var vector2 = radialpoints[i + 1];
-
-                Vector3D normalresult = vector1.CrossProduct(vector2);
-                normals.Add($"vn {normalresult.X} {normalresult.Y} {normalresult.Z}");
-                normals2.Add($"vn {-normalresult.X} {-normalresult.Y} {-normalresult.Z}");
-            }
-            normals.AddRange(normals2);
-            int n = 1;
-
-            while (n < sections)
-            {
-                string face = $"f {n + (2 * sections * index)}//{n + (2 * sections * index)} {n + sections + (2 * sections * index)}//{n + (2 * sections * index)} {n + 1 + sections + (2 * sections * index)}//{n + (2 * sections * index)} {n + 1 + (2 * sections * index)}//{n + (2 * sections * index)}";
-                //string face = $"f {n} {n + sections} {n + 1 + sections} {n + 1}";
-                string revface = $"f {n + 1 + (2 * sections * index)}//{n + sections + (2 * sections * index)} {n + 1 + sections + (2 * sections * index)}//{n + sections + (2 * sections * index)} {n + sections + (2 * sections * index)}//{n + sections + (2 * sections * index)} {n + (2 * sections * index)}//{n + sections + (2 * sections * index)}";
-                section1.Add(face);
-                section1.Add(revface);
-                n++;
-            }
-
-            section1.Add($"f {2 * sections * index + sections}//{2 * sections * index + sections} {2 * sections * index + 2 * sections}//{2 * sections * index + sections} {2 * sections * index + sections + 1}//{2 * sections * index + sections} {2 * sections * index + 1}//{2 * sections * index + sections}\n" +
-                $"f {2 * sections * index + 1}//{2 * sections * index + 2 * sections} {2 * sections * index + sections + 1}//{2 * sections * index + 2 * sections} {2 * sections * index + 2 * sections}//{2 * sections * index + 2 * sections} {2 * sections * index + sections}//{2 * sections * index + 2 * sections}");
-            normals.AddRange(section1);
-            dataList.AddRange(normals);
-            return dataList;
-        }
-        static public (List<string>,List<CalorimetryTowers>) generateCalorimetryBoxes(List<CalorimetryTowers> inputData)
-            {
-                List<string> geometryData = new List<string>();
-                int counter = 1;
-                List<CalorimetryTowers> deltas = new List<CalorimetryTowers>();
-                geometryData.Add("vn -1.0000 -0.0000 -0.0000\nvn -0.0000 -0.0000 -1.0000\nvn 1.0000 -0.0000 -0.0000\nvn -0.0000 -0.0000 1.0000\nvn -0.0000 -1.0000 -0.0000\nvn -0.0000 1.0000 -0.0000");
-
-                var V = Vector<double>.Build;
-
-                for(int i = 0; i<=inputData.Count-1;i++)
-                {
-                    var box = inputData[i];
-                    double scale = box.scale;
-
-                    var v0 = V.DenseOfArray(box.front_1);
-                    var v1 = V.DenseOfArray(box.front_2);
-                    var v2 = V.DenseOfArray(box.front_3);
-                    var v3 = V.DenseOfArray(box.front_4);
-                    var v4 = V.DenseOfArray(box.back_1);
-                    var v5 = V.DenseOfArray(box.back_2);
-                    var v6 = V.DenseOfArray(box.back_3);
-                    var v7 = V.DenseOfArray(box.back_4);
-                    var xVector = V.DenseOfArray(new[] { 1.0, 0.0, 0.0 });
-                    var yVector = V.DenseOfArray(new[] { 0.0, 1.0, 0.0 });
-                    var zVector = V.DenseOfArray(new[] { 0.0, 0.0, 1.0 });
-
-                    var center = v0 + v1;
-                    center += v2;
-                    center += v3;
-                    center += v4;
-                    center += v5;
-                    center += v6;
-                    center += v7;
-                    center /= 8.0;
-
-                    v0 -= center;
-                    v0 *= scale;
-                    v0 += center;
-                    v1 -= center;
-                    v1 *= scale;
-                    v1 += center;
-                    v2 -= center;
-                    v2 *= scale;
-                    v2 += center;
-                    v3 -= center;
-                    v3 *= scale;
-                    v3 += center;
-                    v4 -= center;
-                    v4 *= scale;
-                    v4 += center;
-                    v5 -= center;
-                    v5 *= scale;
-                    v5 += center;
-                    v6 -= center;
-                    v6 *= scale;
-                    v6 += center;
-                    v7 -= center;
-                    v7 *= scale;
-                    v7 += center;
-
-                    geometryData.Add($"v {String.Join(' ', v0)}");
-                    geometryData.Add($"v {String.Join(' ', v1)}");
-                    geometryData.Add($"v {String.Join(' ', v2)}");
-                    geometryData.Add($"v {String.Join(' ', v3)}");
-                    geometryData.Add($"v {String.Join(' ', v4)}");
-                    geometryData.Add($"v {String.Join(' ', v5)}");
-                    geometryData.Add($"v {String.Join(' ', v6)}");
-                    geometryData.Add($"v {String.Join(' ', v7)}");
-
-                    geometryData.Add($"f {counter}//1 {counter + 1}//1 {counter + 2}//1 {counter + 3}//1");
-                    geometryData.Add($"f {counter + 3}//1 {counter + 2}//1 {counter + 1}//1 {counter}//1");
-                    geometryData.Add($"f {counter + 4}//2 {counter + 5}//2 {counter + 6}//2 {counter + 7}//2");
-                    geometryData.Add($"f {counter + 7}//2 {counter + 6}//2 {counter + 5}//2 {counter + 4}//2");
-                    geometryData.Add($"f {counter}//3 {counter + 3}//3 {counter + 7}//3 {counter + 4}//3");
-                    geometryData.Add($"f {counter + 4}//3 {counter + 7}//3 {counter + 3}//3 {counter}//3");
-                    geometryData.Add($"f {counter + 1}//4 {counter + 2}//4 {counter + 6}//4 {counter + 5}//4");
-                    geometryData.Add($"f {counter + 5}//4 {counter + 6}//4 {counter + 2}//4 {counter + 1}//4");
-                    geometryData.Add($"f {counter + 3}//5 {counter + 2}//5 {counter + 6}//5 {counter + 7}//5");
-                    geometryData.Add($"f {counter + 7}//5 {counter + 6}//5 {counter + 2}//5 {counter + 3}//5");
-                    geometryData.Add($"f {counter + 1}//6 {counter}//6 {counter + 4}//6 {counter + 5}//6");
-                    geometryData.Add($"f {counter + 5}//6 {counter + 4}//6 {counter}//6 {counter + 1}//6");
-
-                    v1 /= v1.L2Norm();
-                    v2 /= v2.L2Norm();
-                    v4 /= v4.L2Norm();
-                double deltaPhi = 1.0;
-                double deltaTheta = 1.0;
-                if ((v1 - v2).DotProduct(xVector) < 0.5)
-                {
-                    deltaPhi = Math.Acos(v1.DotProduct(v2));
-                    deltaTheta = Math.Acos(v1.DotProduct(v4));
-                }else if ((v1 - v4).DotProduct(xVector) < 0.5)
-                {
-                    deltaPhi = Math.Acos(v1.DotProduct(v4));
-                    deltaTheta = Math.Acos(v1.DotProduct(v2));
-                }
-                box.deltaPhi = deltaPhi;
-                box.deltaTheta = deltaTheta;
-                deltas.Add(box);
-                    counter += 8;
-                }
-                return (geometryData,deltas);
-            }
             static public (List<string>, List<CalorimetryTowers>) generateCalorimetryTowers(List<CalorimetryTowers> inputData)
             {
                 List<string> geometryData = new List<string>();
@@ -997,7 +997,7 @@ namespace VR_Spy_Companion
 
                 return dataList;
             }
-        public static List<Vertex> primaryVertexParse(JObject data)
+            public static List<Vertex> primaryVertexParse(JObject data)
             {
                 List<Vertex> dataList = new List<Vertex>();
              
@@ -1094,6 +1094,99 @@ namespace VR_Spy_Companion
                     }
                 }
 
+            }
+            static public List<TrackerPieceData> trackerPieceParse(JObject data, string name)
+            {
+                List<TrackerPieceData> dataList = new List<TrackerPieceData>();
+                foreach (var item in data["Collections"][name])
+                {
+                    TrackerPieceData TrackerPieceData = new TrackerPieceData();
+                    var children = item.Children().Values<double>().ToArray();
+                    TrackerPieceData.detid = (int)children[0];
+                    TrackerPieceData.front_1 = new double[] { children[1], children[2], children[3] };
+                    TrackerPieceData.front_2 = new double[] { children[4], children[5], children[6] };
+                    TrackerPieceData.front_3 = new double[] { children[7], children[8], children[9] };
+                    TrackerPieceData.front_4 = new double[] { children[10], children[11], children[12] };
+                    TrackerPieceData.back_1 = new double[] { children[13], children[14], children[15] };
+                    TrackerPieceData.back_2 = new double[] { children[16], children[17], children[18] };
+                    TrackerPieceData.back_3 = new double[] { children[19], children[20], children[21] };
+                    TrackerPieceData.back_4 = new double[] { children[22], children[23], children[24] };
+                    dataList.Add(TrackerPieceData);
+                }
+                return dataList;
+            }
+            static public List<string> generateTrackerPiece(List<TrackerPieceData> inputData)
+            {
+                List<string> geometryData = new List<string>();
+                int counter = 1;
+                foreach (TrackerPieceData box in inputData)
+                {
+
+                    geometryData.Add($"v {box.front_1[0]} {box.front_1[1]} {box.front_1[2]}");
+                    geometryData.Add($"v {box.front_2[0]} {box.front_2[1]} {box.front_2[2]}");
+                    geometryData.Add($"v {box.front_3[0]} {box.front_3[1]} {box.front_3[2]}");
+                    geometryData.Add($"v {box.front_4[0]} {box.front_4[1]} {box.front_4[2]}");
+
+                    geometryData.Add($"v {box.back_1[0]} {box.back_1[1]} {box.back_1[2]}");
+                    geometryData.Add($"v {box.back_2[0]} {box.back_2[1]} {box.back_2[2]}");
+                    geometryData.Add($"v {box.back_3[0]} {box.back_3[1]} {box.back_3[2]}");
+                    geometryData.Add($"v {box.back_4[0]} {box.back_4[1]} {box.back_4[2]}");
+
+                    geometryData.Add($"f {counter} {counter + 1} {counter + 5} {counter + 4}"); // Side 1
+                    geometryData.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}"); // Side 2
+                    geometryData.Add($"f {counter + 2} {counter + 3} {counter + 7} {counter + 6}"); // Side 3
+                    geometryData.Add($"f {counter + 3} {counter} {counter + 4} {counter + 7}"); // Side 4
+
+                    counter += 8;
+                }
+                return geometryData;
+            }
+
+            static public List<matchingCSC> matchingCSCParse(JObject data, string name)
+            {
+                List<matchingCSC> dataList = new List<matchingCSC>();
+                foreach (var item in data["Collections"][name])
+                {
+                    matchingCSC matchingCSC = new matchingCSC();
+                    var children = item.Children().Values<double>().ToArray();
+                    matchingCSC.detid = (int)children[0];
+                    matchingCSC.front_1 = new double[] { children[1], children[2], children[3] };
+                    matchingCSC.front_2 = new double[] { children[4], children[5], children[6] };
+                    matchingCSC.front_3 = new double[] { children[7], children[8], children[9] };
+                    matchingCSC.front_4 = new double[] { children[10], children[11], children[12] };
+                    matchingCSC.back_1 = new double[] { children[13], children[14], children[15] };
+                    matchingCSC.back_2 = new double[] { children[16], children[17], children[18] };
+                    matchingCSC.back_3 = new double[] { children[19], children[20], children[21] };
+                    matchingCSC.back_4 = new double[] { children[22], children[23], children[24] };
+                    dataList.Add(matchingCSC);
+                }
+                return dataList;
+            }
+            static public List<string> generateMatchingCSC(List<matchingCSC> inputData)
+            {
+                List<string> geometryData = new List<string>();
+                int counter = 1;
+                foreach (matchingCSC box in inputData)
+                {
+
+                    geometryData.Add($"v {box.front_1[0]} {box.front_1[1]} {box.front_1[2]}");
+                    geometryData.Add($"v {box.front_2[0]} {box.front_2[1]} {box.front_2[2]}");
+                    geometryData.Add($"v {box.front_3[0]} {box.front_3[1]} {box.front_3[2]}");
+                    geometryData.Add($"v {box.front_4[0]} {box.front_4[1]} {box.front_4[2]}");
+
+                    geometryData.Add($"v {box.back_1[0]} {box.back_1[1]} {box.back_1[2]}");
+                    geometryData.Add($"v {box.back_2[0]} {box.back_2[1]} {box.back_2[2]}");
+                    geometryData.Add($"v {box.back_3[0]} {box.back_3[1]} {box.back_3[2]}");
+                    geometryData.Add($"v {box.back_4[0]} {box.back_4[1]} {box.back_4[2]}");
+
+                    geometryData.Add($"f {counter} {counter + 1} {counter + 5} {counter + 4}"); // Side 1
+                    geometryData.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}"); // Side 2
+                    geometryData.Add($"f {counter + 2} {counter + 3} {counter + 7} {counter + 6}"); // Side 3
+                    geometryData.Add($"f {counter + 3} {counter} {counter + 4} {counter + 7}"); // Side 4
+
+                    counter += 8;
+                }
+                return geometryData;
             }
     }
 }

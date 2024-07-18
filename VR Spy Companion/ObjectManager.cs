@@ -178,12 +178,20 @@ namespace IGtoOBJGen
                             eventObjects.Add(tracksv4);
                             break;
                         case "TrackDets_V1":
+                            TrackDets_V1 trackdetsv1 = new TrackDets_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(trackdetsv1);
                             break;
                         case "TrackingRecHits_V1":
+                            TrackingRecHits_V1 trackingrechitsv1 = new TrackingRecHits_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(trackingrechitsv1);
                             break;
                         case "SiStripClusters_V1":
+                            SiStripClusters_V1 sistripclustersv1 = new SiStripClusters_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(sistripclustersv1);
                             break;
                         case "SiPixelClusters_V1":
+                            SiPixelClusters_V1 sipixelclustersv1 = new SiPixelClusters_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(sipixelclustersv1);
                             break;
                         case "DTRecHits_V1":
                             break;
@@ -217,7 +225,9 @@ namespace IGtoOBJGen
                             break;
                         case "CSCCorrelatedLCTDigis_V2": 
                             break;
-                        case "MatchingCSCs_V1": 
+                        case "MatchingCSCs_V1":
+                            MatchingCSCs_V1 matchingcsvsv1 = new MatchingCSCs_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(matchingcsvsv1);
                             break;
                         case "CSCRecHit2Ds_V2": 
                             break;
@@ -225,7 +235,9 @@ namespace IGtoOBJGen
                             CSCSegments_V1 cscseg1 = new CSCSegments_V1(INPUTJSON, EVENTPATH);
                             eventObjects.Add(cscseg1);
                             break;
-                        case "CSCSegments_V2": 
+                        case "CSCSegments_V2":
+                            CSCSegments_V2 cscsegmentsv2 = new CSCSegments_V2(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(cscsegmentsv2);
                             break;
                         case "CSCSegments_V3": 
                             break;
