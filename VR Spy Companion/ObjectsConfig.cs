@@ -502,7 +502,7 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HFRecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = new List<string>();
-            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
+            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;
             File.WriteAllText($"{eventTitle}\\HFRecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\HFRecHits_V2.obj", dataList);
@@ -524,7 +524,7 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HERecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = new List<string>();
-            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
+            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;
             File.WriteAllText($"{eventTitle}\\HERecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\HERecHits_V2.obj", dataList);
@@ -546,7 +546,7 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HORecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = new List<string>();
-            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
+            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;
             File.WriteAllText($"{eventTitle}\\HORecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\HORecHits_V2.obj", dataList);
@@ -568,7 +568,7 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HBRecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = new List<string>();
-            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
+            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;
             File.WriteAllText($"{eventTitle}\\HBRecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\HBRecHits_V2.obj", dataList);
