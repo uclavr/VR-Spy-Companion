@@ -561,5 +561,90 @@ namespace IGtoOBJGen
             }
             File.WriteAllLines(@$"{eventTitle}\{path}.obj", strings);
         }
+        static public List<trackingPoint> trackingpointParse(JObject data, string name, int index)
+        {
+            List<trackingPoint> dataList = new List<trackingPoint>();
+            foreach (var item in data["Collections"][name])
+            {
+
+                var children = item.Children().Values<double>().ToArray();
+                trackingPoint trackingPoint = new trackingPoint();
+                if (index == 1)
+                {
+                    trackingPoint.detid = (int)children[0];
+                }
+                trackingPoint.X = children[index];
+                trackingPoint.Y = children[index + 1];
+                trackingPoint.Z = children[index + 2];
+                dataList.Add(trackingPoint);
+            }
+            return dataList;
+        }
+        static public List<string> generatetrackingPoints(List<trackingPoint> inputData)
+        {
+            List<string> geometryData = new List<string>();
+            double boxLength = 0.000125;
+            foreach (trackingPoint point in inputData)
+            {
+                double halfLength = boxLength / 2.0;
+                // Define the eight vertices of the cube
+                double[][] vertices = new double[8][];
+                vertices[0] = new double[] { point.X - halfLength, point.Y - halfLength, point.Z - halfLength };
+                vertices[1] = new double[] { point.X + halfLength, point.Y - halfLength, point.Z - halfLength };
+                vertices[2] = new double[] { point.X + halfLength, point.Y + halfLength, point.Z - halfLength };
+                vertices[3] = new double[] { point.X - halfLength, point.Y + halfLength, point.Z - halfLength };
+                vertices[4] = new double[] { point.X - halfLength, point.Y - halfLength, point.Z + halfLength };
+                vertices[5] = new double[] { point.X + halfLength, point.Y - halfLength, point.Z + halfLength };
+                vertices[6] = new double[] { point.X + halfLength, point.Y + halfLength, point.Z + halfLength };
+                vertices[7] = new double[] { point.X - halfLength, point.Y + halfLength, point.Z + halfLength };
+
+                // Add vertices to geometry data
+                foreach (var vertex in vertices)
+                {
+                    geometryData.Add($"v {vertex[0]} {vertex[1]} {vertex[2]}");
+                }
+
+                // Define the faces using the vertices (each face is a quadrilateral defined by four vertices)
+                geometryData.Add("f -8 -7 -6 -5"); // Face 1
+                geometryData.Add("f -4 -3 -2 -1"); // Face 2
+                geometryData.Add("f -8 -5 -1 -4"); // Face 3
+                geometryData.Add("f -7 -6 -2 -3"); // Face 4
+                geometryData.Add("f -8 -7 -3 -4"); // Face 5
+                geometryData.Add("f -5 -6 -2 -1"); // Face 6
+            }
+            return geometryData;
+        }
+
+        static public List<cscSegmentV2> cscSegmentParse(JObject data, string name)
+        {
+            List<cscSegmentV2> dataList = new List<cscSegmentV2>();
+            foreach (var item in data["Collections"][name])
+            {
+
+                var children = item.Children().Values<double>().ToArray();
+                cscSegmentV2 cscSegmentV2 = new cscSegmentV2();
+
+                cscSegmentV2.detid = (int)children[0];
+                cscSegmentV2.pos_1 = new double[] { children[1], children[2], children[3] };
+                cscSegmentV2.pos_2 = new double[] { children[4], children[5], children[6] };
+                dataList.Add(cscSegmentV2);
+            }
+            return dataList;
+        }
+        static public List<string> generateCSCSegment(List<cscSegmentV2> inputData)
+        {
+            List<string> geometryData = new List<string>();
+            int vertexIndex = 1;
+
+            foreach (cscSegmentV2 point in inputData)
+            {
+                geometryData.Add($"v {point.pos_1[0]} {point.pos_1[1]} {point.pos_1[2]}");
+                geometryData.Add($"v {point.pos_2[0]} {point.pos_2[1]} {point.pos_2[2]}");
+
+                geometryData.Add($"l {vertexIndex} {vertexIndex + 1}");
+                vertexIndex += 2;
+            }
+            return geometryData;
+        }
     }
 }

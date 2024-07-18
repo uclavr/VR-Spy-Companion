@@ -192,3 +192,45 @@ struct RecHitFraction : ObjectData
     public double[] back_3;
     public double[] back_4;
 }
+struct TrackerPieceData : ObjectData
+{
+    public string name;
+    public int detid;
+    public double[] front_1;
+    public double[] front_2;
+    public double[] front_3;
+    public double[] front_4;
+    public double[] back_1;
+    public double[] back_2;
+    public double[] back_3;
+    public double[] back_4;
+}
+struct trackingPoint
+{
+    public string name;
+    public int detid;
+    public double X;
+    public double Y;
+    public double Z;
+}
+struct matchingCSC : ObjectData
+{
+    public string name;
+    public int detid;
+    public double[] front_1;
+    public double[] front_2;
+    public double[] front_3;
+    public double[] front_4;
+    public double[] back_1;
+    public double[] back_2;
+    public double[] back_3;
+    public double[] back_4;
+}
+
+struct cscSegmentV2 : ObjectData
+{
+    public string name;
+    public int detid;
+    public double[] pos_1;
+    public double[] pos_2;
+}
