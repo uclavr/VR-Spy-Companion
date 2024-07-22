@@ -675,27 +675,25 @@ namespace VR_Spy_Companion
                         geometryData.Add($"f {counter + 1}//6 {counter}//6 {counter + 4}//6 {counter + 5}//6");
                         geometryData.Add($"f {counter + 5}//6 {counter + 4}//6 {counter}//6 {counter + 1}//6");
 
-                        v1 /= v1.L2Norm();
-                        v2 /= v2.L2Norm();
-                        v4 /= v4.L2Norm();
-                    double deltaPhi = 1.0;
-                    double deltaTheta = 1.0;
-                    if ((v1 - v2).DotProduct(xVector) < 0.5)
-                    {
-                        deltaPhi = Math.Acos(v1.DotProduct(v2));
-                        deltaTheta = Math.Acos(v1.DotProduct(v4));
-                    }else if ((v1 - v4).DotProduct(xVector) < 0.5)
-                    {
-                        deltaPhi = Math.Acos(v1.DotProduct(v4));
-                        deltaTheta = Math.Acos(v1.DotProduct(v2));
-                    }
-                    box.deltaPhi = deltaPhi;
-                    box.deltaTheta = deltaTheta;
-                    deltas.Add(box);
-                        counter += 8;
-                    }
-                    return (geometryData,deltas);
+                    
+                //double deltaPhi = 1.0;
+                //double deltaEta = 1.0;
+
+                double sin_theta1 = Math.Sqrt(Math.Pow(v0[0], 2) + Math.Pow(v0[1], 2)) / v0.L2Norm();
+                double cos_theta1 = v0[2] / v0.L2Norm();
+                double sin_theta4 = Math.Sqrt(Math.Pow(v3[0], 2) + Math.Pow(v3[1], 2)) / v3.L2Norm();
+                double cos_theta4 = v3[2] / v3.L2Norm();
+                double deltaEta = Math.Log(((1 - cos_theta4) / (1 - cos_theta1)) * (sin_theta1 / sin_theta4));
+                Console.WriteLine(deltaEta);
+
+
+                //box.deltaPhi = deltaPhi;
+                box.deltaEta = deltaEta;
+                deltas.Add(box);
+                    counter += 8;
                 }
+                return (geometryData,deltas);
+            }
             static public (List<string>, List<CalorimetryTowers>) generateCalorimetryTowers(List<CalorimetryTowers> inputData)
             {
                 List<string> geometryData = new List<string>();
@@ -769,21 +767,18 @@ namespace VR_Spy_Companion
                 v4 /= v4.L2Norm();
 
                 var xVector = V.DenseOfArray(new[] { 1.0, 0.0, 0.0 });
-                double deltaPhi = 1.0;
-                double deltaTheta = 1.0;
+                //double deltaPhi = 1.0;
+                //double deltaEta = 1.0;
 
-                if ((v1 - v2).DotProduct(xVector) < 0.5)
-                {
-                    deltaPhi = Math.Acos(v1.DotProduct(v2));
-                    deltaTheta = Math.Acos(v1.DotProduct(v4));
-                }
-                else if ((v1 - v4).DotProduct(xVector) < 0.5)
-                {
-                    deltaPhi = Math.Acos(v1.DotProduct(v4));
-                    deltaTheta = Math.Acos(v1.DotProduct(v2));
-                }
-                box.deltaPhi = deltaPhi;
-                box.deltaTheta = deltaTheta;
+                double sin_theta1 = Math.Sqrt(Math.Pow(v0[0], 2) + Math.Pow(v0[1], 2)) / v0.L2Norm();
+                double cos_theta1 = v0[2] / v0.L2Norm();
+                double sin_theta4 = Math.Sqrt(Math.Pow(v3[0], 2) + Math.Pow(v3[1], 2)) / v3.L2Norm();
+                double cos_theta4 = v3[2] / v3.L2Norm();
+                double deltaEta = Math.Log(((1 - cos_theta4) / (1 - cos_theta1)) * (sin_theta1 / sin_theta4));
+                
+
+                //box.deltaPhi = deltaPhi;
+                box.deltaEta = deltaEta;
                 deltas.Add(box);
 
                 counter += 8;

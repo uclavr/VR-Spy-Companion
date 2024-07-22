@@ -69,7 +69,7 @@ struct CalorimetryTowers : ObjectData
     public double[] back_4;
     public double scale;
     public double deltaPhi;
-    public double deltaTheta;
+    public double deltaEta;
 }
 struct METData : ObjectData
 {
