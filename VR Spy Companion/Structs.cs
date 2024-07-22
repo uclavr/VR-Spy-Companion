@@ -233,4 +233,34 @@ struct cscSegmentV2 : ObjectData
     public int detid;
     public double[] pos_1;
     public double[] pos_2;
+    public int endcap;
+    public int station;
+    public int ring;
+    public int chamber;
+    public int layer;
+}
+
+struct dtRecHitsV1 : ObjectData
+{
+    public string name;
+    public int wireId;
+    public int layerId;
+    public int superLayerId;
+    public int sectorId;
+    public int stationId;
+    public int wheelId;
+    public double digitime;
+    public double[] wirePos;
+    public double[] lPlusGlobalPos;
+    public double[] lMinusGlobalPos;
+    public double[] rPlusGlobalPos;
+    public double[] rMinusGlobalPos;
+    public double[] lGlobalPos;
+    public double[] rGlobalPos;
+    public double[] axis;
+    public double angle;
+    public double cellWidth;
+    public double cellLength;
+    public double cellHeight;
+
 }

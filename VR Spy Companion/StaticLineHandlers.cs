@@ -583,11 +583,11 @@ namespace IGtoOBJGen
         static public List<string> generatetrackingPoints(List<trackingPoint> inputData)
         {
             List<string> geometryData = new List<string>();
-            double boxLength = 0.000125;
+            double boxLength = 0.00025;
+            int counter = 1;
             foreach (trackingPoint point in inputData)
             {
                 double halfLength = boxLength / 2.0;
-                // Define the eight vertices of the cube
                 double[][] vertices = new double[8][];
                 vertices[0] = new double[] { point.X - halfLength, point.Y - halfLength, point.Z - halfLength };
                 vertices[1] = new double[] { point.X + halfLength, point.Y - halfLength, point.Z - halfLength };
@@ -598,23 +598,21 @@ namespace IGtoOBJGen
                 vertices[6] = new double[] { point.X + halfLength, point.Y + halfLength, point.Z + halfLength };
                 vertices[7] = new double[] { point.X - halfLength, point.Y + halfLength, point.Z + halfLength };
 
-                // Add vertices to geometry data
                 foreach (var vertex in vertices)
                 {
                     geometryData.Add($"v {vertex[0]} {vertex[1]} {vertex[2]}");
                 }
+                geometryData.Add($"f {counter} {counter + 1} {counter + 5} {counter + 4}"); // Side 1 (Front)
+                geometryData.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}"); // Side 2 (Right)
+                geometryData.Add($"f {counter + 2} {counter + 3} {counter + 7} {counter + 6}"); // Side 3 (Back)
+                geometryData.Add($"f {counter + 3} {counter} {counter + 4} {counter + 7}"); // Side 4 (Left)
+                geometryData.Add($"f {counter + 4} {counter + 5} {counter + 6} {counter + 7}"); // Top
+                geometryData.Add($"f {counter} {counter + 3} {counter + 2} {counter + 1}"); // Bottom
+                counter += 8;
 
-                // Define the faces using the vertices (each face is a quadrilateral defined by four vertices)
-                geometryData.Add("f -8 -7 -6 -5"); // Face 1
-                geometryData.Add("f -4 -3 -2 -1"); // Face 2
-                geometryData.Add("f -8 -5 -1 -4"); // Face 3
-                geometryData.Add("f -7 -6 -2 -3"); // Face 4
-                geometryData.Add("f -8 -7 -3 -4"); // Face 5
-                geometryData.Add("f -5 -6 -2 -1"); // Face 6
             }
             return geometryData;
         }
-
         static public List<cscSegmentV2> cscSegmentParse(JObject data, string name)
         {
             List<cscSegmentV2> dataList = new List<cscSegmentV2>();
@@ -627,6 +625,11 @@ namespace IGtoOBJGen
                 cscSegmentV2.detid = (int)children[0];
                 cscSegmentV2.pos_1 = new double[] { children[1], children[2], children[3] };
                 cscSegmentV2.pos_2 = new double[] { children[4], children[5], children[6] };
+                cscSegmentV2.endcap = (int)children[7];
+                cscSegmentV2.station = (int)children[8];
+                cscSegmentV2.ring = (int)children[9];
+                cscSegmentV2.chamber = (int)children[10];
+                cscSegmentV2.layer = (int)children[11];
                 dataList.Add(cscSegmentV2);
             }
             return dataList;
