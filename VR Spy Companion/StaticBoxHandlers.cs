@@ -126,7 +126,7 @@ namespace VR_Spy_Companion
 
             return towers;
         }
-            static public List<CalorimetryTowers> genericCaloParse(JObject data, string name)// double scale)
+        static public List<CalorimetryTowers> genericCaloParse(JObject data, string name)// double scale)
             {
                 List<CalorimetryTowers> dataList = new List<CalorimetryTowers>();
                 foreach (var item in data["Collections"][name])
@@ -651,7 +651,19 @@ namespace VR_Spy_Companion
                         v7 *= scale;
                         v7 += center;
 
-                        geometryData.Add($"v {String.Join(' ', v0)}");
+                box.geometricVertices = new List<double[]>();
+                box.geometricVertices.Add(v0.ToArray());
+                box.geometricVertices.Add(v1.ToArray());
+                box.geometricVertices.Add(v2.ToArray());
+                box.geometricVertices.Add(v3.ToArray());
+                box.geometricVertices.Add(v4.ToArray());
+                box.geometricVertices.Add(v5.ToArray());
+                box.geometricVertices.Add(v6.ToArray());
+                box.geometricVertices.Add(v7.ToArray());
+               
+
+
+                geometryData.Add($"v {String.Join(' ', v0)}");
                         geometryData.Add($"v {String.Join(' ', v1)}");
                         geometryData.Add($"v {String.Join(' ', v2)}");
                         geometryData.Add($"v {String.Join(' ', v3)}");
@@ -738,7 +750,17 @@ namespace VR_Spy_Companion
                     v6 += v2;
                     v7 += v3;
 
-                    geometryData.Add($"v {String.Join(' ', v0)}");
+                box.geometricVertices = new List<double[]>();
+                box.geometricVertices.Add(v0.ToArray());
+                box.geometricVertices.Add(v1.ToArray());
+                box.geometricVertices.Add(v2.ToArray());
+                box.geometricVertices.Add(v3.ToArray());
+                box.geometricVertices.Add(v4.ToArray());
+                box.geometricVertices.Add(v5.ToArray());
+                box.geometricVertices.Add(v6.ToArray());
+                box.geometricVertices.Add(v7.ToArray());
+
+                geometryData.Add($"v {String.Join(' ', v0)}");
                     geometryData.Add($"v {String.Join(' ', v1)}");
                     geometryData.Add($"v {String.Join(' ', v2)}");
                     geometryData.Add($"v {String.Join(' ', v3)}");
@@ -770,8 +792,8 @@ namespace VR_Spy_Companion
 
                 double sin_theta1 = Math.Sqrt(Math.Pow(v0[0], 2) + Math.Pow(v0[1], 2)) / v0.L2Norm();
                 double cos_theta1 = v0[2] / v0.L2Norm();
-                double sin_theta4 = Math.Sqrt(Math.Pow(v3[0], 2) + Math.Pow(v3[1], 2)) / v3.L2Norm();
-                double cos_theta4 = v3[2] / v3.L2Norm();
+                double sin_theta4 = Math.Sqrt(Math.Pow(v1[0], 2) + Math.Pow(v1[1], 2)) / v1.L2Norm();
+                double cos_theta4 = v1[2] / v1.L2Norm();
                 double deltaEta = Math.Log(((1 - cos_theta4) / (1 - cos_theta1)) * (sin_theta1 / sin_theta4));
                 
 
