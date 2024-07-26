@@ -380,8 +380,8 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}\\TrackDets_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\TrackDets_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(trackerPieceData);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "TrackDets_V1.obj"), dataList);
+            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            File.WriteAllLines(Path.Combine(downloadsPath, "TrackDets_V1.obj"), dataList);
             return ("\"trackDetsV1Data\":" + data);
         }
     }
@@ -446,6 +446,27 @@ namespace IGtoOBJGen {
             string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
             File.WriteAllLines(Path.Combine(downloadsPath, "SiPixelClusters_V1.obj"), dataList);
             return ("\"SiPixelClusters_V1Data\":" + data);
+        }
+    }
+    class DTRecHits_V1 : TypeConfig
+    {
+        private List<dtRecHitsV1> dtrechitdata;
+        private string eventTitle;
+        public DTRecHits_V1(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            dtrechitdata = StaticBoxHandlers.dtRecHitParse(JSON, "DTRecHits_V1");
+            List<string> dataList = StaticBoxHandlers.generateDTRecHit(dtrechitdata);
+            File.WriteAllText($"{eventTitle}\\DTRecHits_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\DTRecHits_V1", dataList);
+            string data = JsonConvert.SerializeObject(dtrechitdata);
+            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            File.WriteAllLines(Path.Combine(downloadsPath, "DTRecHits_V1.obj"), dataList);
+            return ("\"DTRecHits_V1Data\":" + data);
         }
     }
     class SuperClusters_V1 : TypeConfig
@@ -676,11 +697,7 @@ namespace IGtoOBJGen {
      {
          return JsonConvert.SerializeObject(caloTowerData);
      }
- }
- class TrackDets_V1 : TypeConfig { }
- class TrackingRecHits_V1 : TypeConfig { }
- class SiStripClusters_V1 : TypeConfig { }
- class SiPixelClusters_V1 : TypeConfig { }*/
+ }*/
     class Event_V1 : TypeConfig
     {
         public Event_V1(JObject args, string eventtitle)
@@ -693,7 +710,7 @@ namespace IGtoOBJGen {
         }
     }
     class Event_V2 : TypeConfig
-    {
+    { 
         public Event_V2(JObject args, string eventtitle)
         {
             JSON = args;
@@ -714,8 +731,8 @@ namespace IGtoOBJGen {
             return JsonConvert.SerializeObject(JSON["Collections"]["Event_V3"]);
         }
     }
-    /*class DTRecHits_V1 : TypeConfig { }
-    class DTRecSegment4D_V1 : TypeConfig { }*/
+
+    //class DTRecSegment4D_V1 : TypeConfig { }
     class RPCRecHits_V1 : TypeConfig {
         private List<RPCRecHit> rpcRecHits;
         private string eventTitle;
@@ -763,8 +780,8 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}\\MatchingCSCs_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\MatchingCSCs_V1", dataList);
             string data = JsonConvert.SerializeObject(matchingCSCData);
-            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            File.WriteAllLines(Path.Combine(downloadsPath, "MatchingCSCs_V1.obj"), dataList);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "MatchingCSCs_V1.obj"), dataList);
             return ("\"MatchingCSCs_V1\":" + data);
         }
     }
@@ -803,8 +820,8 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}\\CSCSegments_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\CSCSegments_V2", dataList);
             string data = JsonConvert.SerializeObject(cscSegmentData);
-            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            File.WriteAllLines(Path.Combine(downloadsPath, "CSCSegments_V2.obj"), dataList);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "CSCSegments_V2.obj"), dataList);
             return ("\"CSCSegments_V2\":" + data);
         }
     }

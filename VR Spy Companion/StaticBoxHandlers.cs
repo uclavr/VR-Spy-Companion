@@ -10,6 +10,8 @@ using Newtonsoft.Json;
 using System.Xml.Linq;
 using System.Globalization;
 using MathNet.Numerics;
+using IGtoOBJGen;
+
 namespace VR_Spy_Companion
 {
         static class StaticBoxHandlers
@@ -1158,7 +1160,6 @@ namespace VR_Spy_Companion
                 }
                 return geometryData;
             }
-
             static public List<matchingCSC> matchingCSCParse(JObject data, string name)
             {
                 List<matchingCSC> dataList = new List<matchingCSC>();
@@ -1202,6 +1203,127 @@ namespace VR_Spy_Companion
                     geometryData.Add($"f {counter + 3} {counter} {counter + 4} {counter + 7}"); // Side 4
 
                     counter += 8;
+                }
+                return geometryData;
+            }
+            static public List<dtRecHitsV1> dtRecHitParse(JObject data, string name)
+            {
+                List<dtRecHitsV1> dataList = new List<dtRecHitsV1>();
+                foreach (var item in data["Collections"][name])
+                {
+                    dtRecHitsV1 dtRecHit = new dtRecHitsV1();
+                    var children = item.Children().Values<double>().ToArray();
+                    dtRecHit.wireId = (int)children[0];
+                    dtRecHit.layerId = (int)children[1];
+                    dtRecHit.superLayerId = (int)children[2];
+                    dtRecHit.sectorId = (int)children[3];
+                    dtRecHit.stationId = (int)children[4];
+                    dtRecHit.wheelId = (int)children[5];
+                    dtRecHit.digitime = (int)children[6];
+                    dtRecHit.wirePos = new double[] { children[7], children[8], children[9] };
+                    dtRecHit.lPlusGlobalPos = new double[] { children[10], children[11], children[12] };
+                    dtRecHit.lMinusGlobalPos = new double[] { children[13], children[14], children[15] };
+                    dtRecHit.rPlusGlobalPos = new double[] { children[16], children[17], children[18] };
+                    dtRecHit.rMinusGlobalPos = new double[] { children[19], children[20], children[21] };
+                    dtRecHit.lGlobalPos = new double[] { children[22], children[23], children[24] };
+                    dtRecHit.rGlobalPos = new double[] { children[25], children[26], children[27] };
+                    dtRecHit.axis = new double[] { children[28], children[29], children[30] };
+                    dtRecHit.angle = (double)children[31];
+                    dtRecHit.cellWidth = (double)children[32];
+                    dtRecHit.cellLength = (double)children[33];
+                    dtRecHit.cellHeight = (double)children[34];
+                    dataList.Add(dtRecHit);
+                }
+                return dataList;
+            }
+            static public List<string> generateDTRecHit(List<dtRecHitsV1> inputData)
+            {
+                List<string> geometryData = new List<string>();
+                int counter = 1;
+                foreach (dtRecHitsV1 box in inputData)
+                {
+                    double[] pos = box.wirePos;
+                    double[] axis = box.axis;
+                    double angle = box.angle;
+                    double w = box.cellWidth*0.5;
+                    double h = box.cellLength*0.5;
+                    double d = box.cellHeight*0.5;
+                    double[,] vertices = new double[,]
+                    {
+                        {-w,  h, -d},
+                        { w,  h, -d},
+                        { w,  h,  d},
+                        {-w,  h,  d},
+                        {-w, -h,  d},
+                        { w, -h,  d},
+                        { w, -h, -d},
+                        {-w, -h, -d}
+                    };
+                    //normalize axis
+                    double axisLength = Math.Sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
+                    axis[0] /= axisLength;
+                    axis[1] /= axisLength;
+                    axis[2] /= axisLength;
+                    double cosTheta = Math.Cos(angle);
+                    double sinTheta = Math.Sin(angle);
+                    double oneMinusCosTheta = 1 - cosTheta;
+                    double[,] rotationMatrix = new double[,]
+                    {
+                        {
+                            cosTheta + axis[0] * axis[0] * oneMinusCosTheta,
+                            axis[0] * axis[1] * oneMinusCosTheta - axis[2] * sinTheta,
+                            axis[0] * axis[2] * oneMinusCosTheta + axis[1] * sinTheta
+                        },
+                        {
+                            axis[1] * axis[0] * oneMinusCosTheta + axis[2] * sinTheta,
+                            cosTheta + axis[1] * axis[1] * oneMinusCosTheta,
+                            axis[1] * axis[2] * oneMinusCosTheta - axis[0] * sinTheta
+                        },
+                        {
+                            axis[2] * axis[0] * oneMinusCosTheta - axis[1] * sinTheta,
+                            axis[2] * axis[1] * oneMinusCosTheta + axis[0] * sinTheta,
+                            cosTheta + axis[2] * axis[2] * oneMinusCosTheta
+                        }
+                    };
+                    double[] MultiplyMatrix(double[] vector, double[,] matrix)
+                    {
+                        return new double[]
+                        {
+                            vector[0] * matrix[0, 0] + vector[1] * matrix[0, 1] + vector[2] * matrix[0, 2],
+                            vector[0] * matrix[1, 0] + vector[1] * matrix[1, 1] + vector[2] * matrix[1, 2],
+                            vector[0] * matrix[2, 0] + vector[1] * matrix[2, 1] + vector[2] * matrix[2, 2]
+                        };
+                    }
+
+
+                    for (int i = 0; i < vertices.GetLength(0); i++)
+                    {
+                        double[] vertex = { vertices[i, 0], vertices[i, 1], vertices[i, 2] };
+
+                        // Apply rotation
+                        vertex = MultiplyMatrix(vertex, rotationMatrix);
+                        geometryData.Add($"v {vertices[i, 0]} {vertices[i, 1]} {vertices[i, 2]}");
+                    }
+                    // Generate the faces using the counter
+                    geometryData.Add($"f {counter} {counter + 1} {counter + 2}");
+                    geometryData.Add($"f {counter + 2} {counter + 3} {counter}");
+
+                    geometryData.Add($"f {counter + 4} {counter + 5} {counter + 6}");
+                    geometryData.Add($"f {counter + 6} {counter + 7} {counter + 4}");
+
+                    geometryData.Add($"f {counter + 4} {counter + 5} {counter + 1}");
+                    geometryData.Add($"f {counter + 1} {counter} {counter + 4}");
+
+                    geometryData.Add($"f {counter + 7} {counter + 6} {counter + 2}");
+                    geometryData.Add($"f {counter + 2} {counter + 3} {counter + 7}");
+
+                    geometryData.Add($"f {counter} {counter + 3} {counter + 7}");
+                    geometryData.Add($"f {counter + 7} {counter + 4} {counter}");
+
+                    geometryData.Add($"f {counter + 1} {counter + 5} {counter + 6}");
+                    geometryData.Add($"f {counter + 6} {counter + 2} {counter + 1}");
+                    counter += 8;
+
                 }
                 return geometryData;
             }
