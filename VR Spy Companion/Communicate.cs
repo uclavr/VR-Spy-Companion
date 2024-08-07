@@ -40,6 +40,11 @@ namespace IGtoOBJGen
 
             
         }
+        public void ClearFiles()
+        {
+            var receiver = new ConsoleOutputReceiver();
+            client.ExecuteRemoteCommand("rm /data/local/tmp/obj/*", oculusDevice, receiver);
+        }
         public void DownloadFiles(string fileName)
         {
             using (SyncService service = new SyncService(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), oculusDevice))
