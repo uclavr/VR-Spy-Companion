@@ -380,8 +380,8 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}\\TrackDets_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\TrackDets_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(trackerPieceData);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "TrackDets_V1.obj"), dataList);
+            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            File.WriteAllLines(Path.Combine(downloadsPath, "TrackDets_V1.obj"), dataList);
             return ("\"trackDetsV1Data\":" + data);
         }
     }
@@ -450,6 +450,27 @@ namespace IGtoOBJGen {
             return ("\"SiPixelClusters_V1Data\":" + data);
         }
     }
+    class DTRecHits_V1 : TypeConfig
+    {
+        private List<dtRecHitsV1> dtrechitdata;
+        private string eventTitle;
+        public DTRecHits_V1(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            dtrechitdata = StaticBoxHandlers.dtRecHitParse(JSON, "DTRecHits_V1");
+            List<string> dataList = StaticBoxHandlers.generateDTRecHit(dtrechitdata);
+            File.WriteAllText($"{eventTitle}\\DTRecHits_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\DTRecHits_V1", dataList);
+            string data = JsonConvert.SerializeObject(dtrechitdata);
+            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            File.WriteAllLines(Path.Combine(downloadsPath, "DTRecHits_V1.obj"), dataList);
+            return ("\"DTRecHits_V1Data\":" + data);
+        }
+    }
     class SuperClusters_V1 : TypeConfig
     {
         private List<SuperCluster> superClusterData;
@@ -495,6 +516,7 @@ namespace IGtoOBJGen {
     {
         private List<CalorimetryTowers> caloTowerData;
         private string eventTitle;
+        private double scale = 0.01;
 
         public EERecHits_V2(JObject args, string eventtitle)
         {
@@ -527,6 +549,7 @@ namespace IGtoOBJGen {
     {
         private List<CalorimetryTowers> caloTowerData;
         private string eventTitle;
+        private double scale = 0.01;
         public EBRecHits_V2(JObject args, string eventtitle)
         {
             eventTitle = eventtitle;
@@ -549,6 +572,7 @@ namespace IGtoOBJGen {
     {
         private List<CalorimetryTowers> caloTowerData;
         private string eventTitle;
+        private double scale; 
         public ESRecHits_V2(JObject args, string eventtitle)
         {
             eventTitle = eventtitle;
@@ -557,7 +581,7 @@ namespace IGtoOBJGen {
         public override string Execute()
         {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "ESRecHits_V2");
-            caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData); 
+            caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData,scale); 
             List<string> dataList;
             (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;
@@ -675,11 +699,7 @@ namespace IGtoOBJGen {
      {
          return JsonConvert.SerializeObject(caloTowerData);
      }
- }
- class TrackDets_V1 : TypeConfig { }
- class TrackingRecHits_V1 : TypeConfig { }
- class SiStripClusters_V1 : TypeConfig { }
- class SiPixelClusters_V1 : TypeConfig { }*/
+ }*/
     class Event_V1 : TypeConfig
     {
         public Event_V1(JObject args, string eventtitle)
@@ -692,7 +712,7 @@ namespace IGtoOBJGen {
         }
     }
     class Event_V2 : TypeConfig
-    {
+    { 
         public Event_V2(JObject args, string eventtitle)
         {
             JSON = args;
@@ -713,8 +733,8 @@ namespace IGtoOBJGen {
             return JsonConvert.SerializeObject(JSON["Collections"]["Event_V3"]);
         }
     }
-    /*class DTRecHits_V1 : TypeConfig { }
-    class DTRecSegment4D_V1 : TypeConfig { }*/
+
+    //class DTRecSegment4D_V1 : TypeConfig { }
     class RPCRecHits_V1 : TypeConfig {
         private List<RPCRecHit> rpcRecHits;
         private string eventTitle;
@@ -802,8 +822,8 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}\\CSCSegments_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\CSCSegments_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(cscSegmentData);
-            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            File.WriteAllLines(Path.Combine(downloadsPath, "CSCSegments_V2.obj"), dataList);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "CSCSegments_V2.obj"), dataList);
             return ("\"CSCSegments_V2\":" + data);
         }
     }
