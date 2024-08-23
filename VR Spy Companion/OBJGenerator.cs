@@ -94,11 +94,11 @@ class OBJGenerator {
         zipper.destroyStorage();
 
         
-            Console.WriteLine(targetPath);
-            Console.ReadLine();
-            Communicate bridge = new Communicate(adbPath);
-            bridge.UploadFiles(targetPath);
-            Directory.Delete(temp_Folder, true);
+        Console.WriteLine(targetPath);
+        Communicate bridge = new Communicate(adbPath);
+        bridge.ClearFiles();
+        bridge.UploadFiles(targetPath);
+        Directory.Delete(temp_Folder, true);
         
         /*catch (Exception e) {
             if (e is System.ArgumentOutOfRangeException) {

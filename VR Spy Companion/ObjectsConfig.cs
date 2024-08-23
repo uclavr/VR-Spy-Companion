@@ -24,7 +24,7 @@ namespace IGtoOBJGen {
         public JObject item;
         private List<TrackerMuonData> trackerMuonData;
         private string collection = "MuonTrackerExtras_V1";
-        private string name = "TrackerMuons_V2";
+        private string nam = "TrackerMuons_V2";
         private string eventTitle;
 
         public TrackerMuonV2(JObject arg, string eventtitle) {
@@ -399,10 +399,10 @@ namespace IGtoOBJGen {
             trackingRecHitData = StaticLineHandlers.trackingpointParse(JSON, "TrackingRecHits_V1", 0);
             List<string> dataList = StaticLineHandlers.generatetrackingPoints(trackingRecHitData);
             File.WriteAllText($"{eventTitle}\\TrackingRecHits_V1.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\TrackingRecHits_V1", dataList);
+            File.WriteAllLines($"{eventTitle}\\TrackingRecHits_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(trackingRecHitData);
-            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            File.WriteAllLines(Path.Combine(downloadsPath, "TrackingRecHits_V1.obj"), dataList);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "TrackingRecHits_V1.obj"), dataList);
             return ("\"TrackingRecHits_V1Data\":" + data);
         }
     }
@@ -420,10 +420,10 @@ namespace IGtoOBJGen {
             sistripClusterData = StaticLineHandlers.trackingpointParse(JSON, "SiStripClusters_V1", 1);
             List<string> dataList = StaticLineHandlers.generatetrackingPoints(sistripClusterData);
             File.WriteAllText($"{eventTitle}\\SiStripClusters_V1.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\SiStripClusters_V1", dataList);
+            File.WriteAllLines($"{eventTitle}\\SiStripClusters_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(sistripClusterData);
-            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            File.WriteAllLines(Path.Combine(downloadsPath, "SiStripClusters_V1.obj"), dataList);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "SiStripClusters_V1.obj"), dataList);
             return ("\"SiStripClusters_V1Data\":" + data);
         }
     }
@@ -441,10 +441,12 @@ namespace IGtoOBJGen {
             sipixelClusterData = StaticLineHandlers.trackingpointParse(JSON, "SiPixelClusters_V1", 1);
             List<string> dataList = StaticLineHandlers.generatetrackingPoints(sipixelClusterData);
             File.WriteAllText($"{eventTitle}\\SiPixelClusters_V1.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\SiPixelClusters_V1", dataList);
+            File.WriteAllLines($"{eventTitle}\\SiPixelClusters_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(sipixelClusterData);
-            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            File.WriteAllLines(Path.Combine(downloadsPath, "SiPixelClusters_V1.obj"), dataList);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "SiPixelClusters_V1.obj"), dataList);
+            //File.WriteAllText($"{eventTitle}\\EERecHits_V2.obj", String.Empty);
+            //File.WriteAllLines($"{eventTitle}\\EERecHits_V2.obj", dataList);
             return ("\"SiPixelClusters_V1Data\":" + data);
         }
     }
@@ -778,7 +780,7 @@ namespace IGtoOBJGen {
             matchingCSCData = StaticBoxHandlers.matchingCSCParse(JSON, "MatchingCSCs_V1");
             List<string> dataList = StaticBoxHandlers.generateMatchingCSC(matchingCSCData);
             File.WriteAllText($"{eventTitle}\\MatchingCSCs_V1.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\MatchingCSCs_V1", dataList);
+            File.WriteAllLines($"{eventTitle}\\MatchingCSCs_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(matchingCSCData);
             //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
             //File.WriteAllLines(Path.Combine(downloadsPath, "MatchingCSCs_V1.obj"), dataList);
@@ -818,7 +820,7 @@ namespace IGtoOBJGen {
             cscSegmentData = StaticLineHandlers.cscSegmentParse(JSON, "CSCSegments_V2");
             List<string> dataList = StaticLineHandlers.generateCSCSegment(cscSegmentData);
             File.WriteAllText($"{eventTitle}\\CSCSegments_V2.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\CSCSegments_V2", dataList);
+            File.WriteAllLines($"{eventTitle}\\CSCSegments_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(cscSegmentData);
             //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
             //File.WriteAllLines(Path.Combine(downloadsPath, "CSCSegments_V2.obj"), dataList);

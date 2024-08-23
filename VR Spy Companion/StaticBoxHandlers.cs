@@ -1151,10 +1151,14 @@ namespace VR_Spy_Companion
                     geometryData.Add($"v {box.back_3[0]} {box.back_3[1]} {box.back_3[2]}");
                     geometryData.Add($"v {box.back_4[0]} {box.back_4[1]} {box.back_4[2]}");
 
-                    geometryData.Add($"f {counter} {counter + 1} {counter + 5} {counter + 4}"); // Side 1
-                    geometryData.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}"); // Side 2
-                    geometryData.Add($"f {counter + 2} {counter + 3} {counter + 7} {counter + 6}"); // Side 3
-                    geometryData.Add($"f {counter + 3} {counter} {counter + 4} {counter + 7}"); // Side 4
+                    geometryData.Add($"f {counter} {counter + 1} {counter + 5} {counter + 4}"); 
+                    geometryData.Add($"f {counter+4} {counter + 5} {counter + 1} {counter}"); 
+                    geometryData.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}"); 
+                    geometryData.Add($"f {counter + 5} {counter + 6} {counter + 2} {counter + 1}"); 
+                    geometryData.Add($"f {counter + 2} {counter + 3} {counter + 7} {counter + 6}"); 
+                    geometryData.Add($"f {counter + 6} {counter + 7} {counter + 3} {counter + 2}"); 
+                    geometryData.Add($"f {counter + 3} {counter} {counter + 4} {counter + 7}");
+                    geometryData.Add($"f {counter + 7} {counter+4} {counter} {counter + 3}"); 
 
                     counter += 8;
                 }
