@@ -450,7 +450,7 @@ namespace IGtoOBJGen {
     }
     class DTRecHits_V1 : TypeConfig
     {
-        private List<dtRecHitsV1> dtrechitdata;
+        private List<DTRecHitsV1> dtrechitdata;
         private string eventTitle;
         public DTRecHits_V1(JObject args, string eventtitle)
         {
@@ -579,7 +579,7 @@ namespace IGtoOBJGen {
         public override string Execute()
         {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "ESRecHits_V2");
-            caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData,scale); 
+            caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData); 
             List<string> dataList;
             (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;

@@ -241,7 +241,7 @@ struct cscSegmentV2 : ObjectData
     public int layer;
 }
 
-struct dtRecHitsV1 : ObjectData
+struct DTRecHitsV1 : ObjectData
 {
     public string name;
     public int wireId;

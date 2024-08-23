@@ -1206,12 +1206,12 @@ namespace VR_Spy_Companion
                 }
                 return geometryData;
             }
-            static public List<dtRecHitsV1> dtRecHitParse(JObject data, string name)
+            static public List<DTRecHitsV1> dtRecHitParse(JObject data, string name)
             {
-                List<dtRecHitsV1> dataList = new List<dtRecHitsV1>();
+                List<DTRecHitsV1> dataList = new List<DTRecHitsV1>();
                 foreach (var item in data["Collections"][name])
                 {
-                    dtRecHitsV1 dtRecHit = new dtRecHitsV1();
+                    DTRecHitsV1 dtRecHit = new DTRecHitsV1();
                     var children = item.Children().Values<double>().ToArray();
                     dtRecHit.wireId = (int)children[0];
                     dtRecHit.layerId = (int)children[1];
@@ -1236,11 +1236,11 @@ namespace VR_Spy_Companion
                 }
                 return dataList;
             }
-            static public List<string> generateDTRecHit(List<dtRecHitsV1> inputData)
+            static public List<string> generateDTRecHit(List<DTRecHitsV1> inputData)
             {
                 List<string> geometryData = new List<string>();
                 int counter = 1;
-                foreach (dtRecHitsV1 box in inputData)
+                foreach (DTRecHitsV1 box in inputData)
                 {
                     double[] pos = box.wirePos;
                     double[] axis = box.axis;
