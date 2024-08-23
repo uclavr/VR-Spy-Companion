@@ -337,6 +337,7 @@ namespace VR_Spy_Companion
                 }
                 File.WriteAllLines($"{eventTitle}//0_PFJets_V2.obj", dataList);
             }
+        // Fix RPCRecHit Assignment
             static public List<RPCRecHit> RPCRecHitParse(JObject data)
             {
                 var inputData = data["Collections"]["RPCRecHits_V1"];
@@ -360,7 +361,7 @@ namespace VR_Spy_Companion
                     newItem.layer = (int)children[22];
                     newItem.subsector = (int)children[23];
                     newItem.roll = (int)children[24];
-                    newItem.detid = (int)children[25];
+                    //newItem.detid = (int)children[25];
 
                     dataList.Add(newItem);
                 }
