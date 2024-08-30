@@ -14,6 +14,6 @@ GUI coming soon
 
 ## Common Issues
 
-#### ADB  
+### ADB  
 
 VR Spy Companion utilizes the Android Debug Bridge to communicate with Oculus devices. Please make sure your Oculus Quest device is connected with developer mode enabled before running the companion, and have ADB installed with the executable located in the same directory as VR Spy Companion. This should not be an issue unless you are compiling from source.
