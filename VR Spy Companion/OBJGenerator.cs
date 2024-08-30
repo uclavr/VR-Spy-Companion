@@ -94,7 +94,8 @@ class OBJGenerator {
         zipper.destroyStorage();
 
         
-        Console.WriteLine(targetPath);
+        Console.WriteLine($"OBJ Files written to: {targetPath}\n\nPress ENTER to continue and move files from your device and onto the Oculus Quest");
+        Console.ReadLine();
         Communicate bridge = new Communicate(adbPath);
         bridge.ClearFiles();
         bridge.UploadFiles(targetPath);
