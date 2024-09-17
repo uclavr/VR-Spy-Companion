@@ -67,6 +67,7 @@ struct CalorimetryTowers : ObjectData
     public double[] back_2;
     public double[] back_3;
     public double[] back_4;
+    public List<double[]> geometricVertices;
     public double scale;
     public double deltaPhi;
     public double deltaEta;
@@ -240,7 +241,7 @@ struct cscSegmentV2 : ObjectData
     public int layer;
 }
 
-struct dtRecHitsV1 : ObjectData
+struct DTRecHitsV1 : ObjectData
 {
     public string name;
     public int wireId;

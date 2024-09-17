@@ -24,7 +24,7 @@ namespace IGtoOBJGen {
         public JObject item;
         private List<TrackerMuonData> trackerMuonData;
         private string collection = "MuonTrackerExtras_V1";
-        private string name = "TrackerMuons_V2";
+        private string nam = "TrackerMuons_V2";
         private string eventTitle;
 
         public TrackerMuonV2(JObject arg, string eventtitle) {
@@ -399,7 +399,7 @@ namespace IGtoOBJGen {
             trackingRecHitData = StaticLineHandlers.trackingpointParse(JSON, "TrackingRecHits_V1", 0);
             List<string> dataList = StaticLineHandlers.generatetrackingPoints(trackingRecHitData);
             File.WriteAllText($"{eventTitle}\\TrackingRecHits_V1.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\TrackingRecHits_V1", dataList);
+            File.WriteAllLines($"{eventTitle}\\TrackingRecHits_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(trackingRecHitData);
             //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
             //File.WriteAllLines(Path.Combine(downloadsPath, "TrackingRecHits_V1.obj"), dataList);
@@ -420,7 +420,7 @@ namespace IGtoOBJGen {
             sistripClusterData = StaticLineHandlers.trackingpointParse(JSON, "SiStripClusters_V1", 1);
             List<string> dataList = StaticLineHandlers.generatetrackingPoints(sistripClusterData);
             File.WriteAllText($"{eventTitle}\\SiStripClusters_V1.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\SiStripClusters_V1", dataList);
+            File.WriteAllLines($"{eventTitle}\\SiStripClusters_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(sistripClusterData);
             //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
             //File.WriteAllLines(Path.Combine(downloadsPath, "SiStripClusters_V1.obj"), dataList);
@@ -441,16 +441,21 @@ namespace IGtoOBJGen {
             sipixelClusterData = StaticLineHandlers.trackingpointParse(JSON, "SiPixelClusters_V1", 1);
             List<string> dataList = StaticLineHandlers.generatetrackingPoints(sipixelClusterData);
             File.WriteAllText($"{eventTitle}\\SiPixelClusters_V1.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\SiPixelClusters_V1", dataList);
+            File.WriteAllLines($"{eventTitle}\\SiPixelClusters_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(sipixelClusterData);
             //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
             //File.WriteAllLines(Path.Combine(downloadsPath, "SiPixelClusters_V1.obj"), dataList);
+<<<<<<< HEAD
+=======
+            //File.WriteAllText($"{eventTitle}\\EERecHits_V2.obj", String.Empty);
+            //File.WriteAllLines($"{eventTitle}\\EERecHits_V2.obj", dataList);
+>>>>>>> fe2a4da069da778fedc861fc68f54f515c83e080
             return ("\"SiPixelClusters_V1Data\":" + data);
         }
     }
     class DTRecHits_V1 : TypeConfig
     {
-        private List<dtRecHitsV1> dtrechitdata;
+        private List<DTRecHitsV1> dtrechitdata;
         private string eventTitle;
         public DTRecHits_V1(JObject args, string eventtitle)
         {
@@ -535,6 +540,7 @@ namespace IGtoOBJGen {
     {
         private List<CalorimetryTowers> caloTowerData;
         private string eventTitle;
+        private double scale = 0.01;
 
         public EERecHits_V2(JObject args, string eventtitle)
         {
@@ -546,7 +552,7 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "EERecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = new List<string>();
-            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
+            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;
             File.WriteAllText($"{eventTitle}\\EERecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\EERecHits_V2.obj", dataList);
@@ -567,6 +573,7 @@ namespace IGtoOBJGen {
     {
         private List<CalorimetryTowers> caloTowerData;
         private string eventTitle;
+        private double scale = 0.01;
         public EBRecHits_V2(JObject args, string eventtitle)
         {
             eventTitle = eventtitle;
@@ -577,7 +584,7 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "EBRecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = new List<string>();
-            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
+            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;
             File.WriteAllText($"{eventTitle}\\EBRecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\EBRecHits_V2.obj", dataList);
@@ -589,6 +596,7 @@ namespace IGtoOBJGen {
     {
         private List<CalorimetryTowers> caloTowerData;
         private string eventTitle;
+        private double scale; 
         public ESRecHits_V2(JObject args, string eventtitle)
         {
             eventTitle = eventtitle;
@@ -599,7 +607,7 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "ESRecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData); 
             List<string> dataList;
-            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
+            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;
             File.WriteAllText($"{eventTitle}\\ESRecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\ESRecHits_V2.obj", dataList);
@@ -628,7 +636,7 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HFRecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = new List<string>();
-            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;
             File.WriteAllText($"{eventTitle}\\HFRecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\HFRecHits_V2.obj", dataList);
@@ -650,7 +658,7 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HERecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = new List<string>();
-            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;
             File.WriteAllText($"{eventTitle}\\HERecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\HERecHits_V2.obj", dataList);
@@ -672,7 +680,7 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HORecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = new List<string>();
-            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;
             File.WriteAllText($"{eventTitle}\\HORecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\HORecHits_V2.obj", dataList);
@@ -694,7 +702,7 @@ namespace IGtoOBJGen {
             caloTowerData = StaticBoxHandlers.genericCaloParse(JSON, "HBRecHits_V2");
             caloTowerData = StaticBoxHandlers.setCaloScale(caloTowerData);
             List<string> dataList = new List<string>();
-            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryTowers(caloTowerData);
+            (List<string> strings, List<CalorimetryTowers> caloData) item = StaticBoxHandlers.generateCalorimetryBoxes(caloTowerData);
             dataList = item.strings; caloTowerData = item.caloData;
             File.WriteAllText($"{eventTitle}\\HBRecHits_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\HBRecHits_V2.obj", dataList);
@@ -796,7 +804,7 @@ namespace IGtoOBJGen {
             matchingCSCData = StaticBoxHandlers.matchingCSCParse(JSON, "MatchingCSCs_V1");
             List<string> dataList = StaticBoxHandlers.generateMatchingCSC(matchingCSCData);
             File.WriteAllText($"{eventTitle}\\MatchingCSCs_V1.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\MatchingCSCs_V1", dataList);
+            File.WriteAllLines($"{eventTitle}\\MatchingCSCs_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(matchingCSCData);
             //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
             //File.WriteAllLines(Path.Combine(downloadsPath, "MatchingCSCs_V1.obj"), dataList);
@@ -856,7 +864,7 @@ namespace IGtoOBJGen {
             cscSegmentData = StaticLineHandlers.cscSegmentParse(JSON, "CSCSegments_V2");
             List<string> dataList = StaticLineHandlers.generateCSCSegment(cscSegmentData);
             File.WriteAllText($"{eventTitle}\\CSCSegments_V2.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\CSCSegments_V2", dataList);
+            File.WriteAllLines($"{eventTitle}\\CSCSegments_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(cscSegmentData);
             //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
             //File.WriteAllLines(Path.Combine(downloadsPath, "CSCSegments_V2.obj"), dataList);

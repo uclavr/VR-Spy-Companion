@@ -129,7 +129,7 @@ namespace VR_Spy_Companion
 
             return towers;
         }
-            static public List<CalorimetryTowers> genericCaloParse(JObject data, string name)// double scale)
+        static public List<CalorimetryTowers> genericCaloParse(JObject data, string name)// double scale)
             {
                 List<CalorimetryTowers> dataList = new List<CalorimetryTowers>();
                 foreach (var item in data["Collections"][name])
@@ -338,6 +338,7 @@ namespace VR_Spy_Companion
                 }
                 File.WriteAllLines($"{eventTitle}//0_PFJets_V2.obj", dataList);
             }
+        // Fix RPCRecHit Assignment
             static public List<RPCRecHit> RPCRecHitParse(JObject data)
             {
                 var inputData = data["Collections"]["RPCRecHits_V1"];
@@ -361,7 +362,7 @@ namespace VR_Spy_Companion
                     newItem.layer = (int)children[22];
                     newItem.subsector = (int)children[23];
                     newItem.roll = (int)children[24];
-                    newItem.detid = (int)children[25];
+                    //newItem.detid = (int)children[25];
 
                     dataList.Add(newItem);
                 }
@@ -654,7 +655,19 @@ namespace VR_Spy_Companion
                         v7 *= scale;
                         v7 += center;
 
-                        geometryData.Add($"v {String.Join(' ', v0)}");
+                box.geometricVertices = new List<double[]>();
+                box.geometricVertices.Add(v0.ToArray());
+                box.geometricVertices.Add(v1.ToArray());
+                box.geometricVertices.Add(v2.ToArray());
+                box.geometricVertices.Add(v3.ToArray());
+                box.geometricVertices.Add(v4.ToArray());
+                box.geometricVertices.Add(v5.ToArray());
+                box.geometricVertices.Add(v6.ToArray());
+                box.geometricVertices.Add(v7.ToArray());
+               
+
+
+                geometryData.Add($"v {String.Join(' ', v0)}");
                         geometryData.Add($"v {String.Join(' ', v1)}");
                         geometryData.Add($"v {String.Join(' ', v2)}");
                         geometryData.Add($"v {String.Join(' ', v3)}");
@@ -741,7 +754,17 @@ namespace VR_Spy_Companion
                     v6 += v2;
                     v7 += v3;
 
-                    geometryData.Add($"v {String.Join(' ', v0)}");
+                box.geometricVertices = new List<double[]>();
+                box.geometricVertices.Add(v0.ToArray());
+                box.geometricVertices.Add(v1.ToArray());
+                box.geometricVertices.Add(v2.ToArray());
+                box.geometricVertices.Add(v3.ToArray());
+                box.geometricVertices.Add(v4.ToArray());
+                box.geometricVertices.Add(v5.ToArray());
+                box.geometricVertices.Add(v6.ToArray());
+                box.geometricVertices.Add(v7.ToArray());
+
+                geometryData.Add($"v {String.Join(' ', v0)}");
                     geometryData.Add($"v {String.Join(' ', v1)}");
                     geometryData.Add($"v {String.Join(' ', v2)}");
                     geometryData.Add($"v {String.Join(' ', v3)}");
@@ -773,8 +796,8 @@ namespace VR_Spy_Companion
 
                 double sin_theta1 = Math.Sqrt(Math.Pow(v0[0], 2) + Math.Pow(v0[1], 2)) / v0.L2Norm();
                 double cos_theta1 = v0[2] / v0.L2Norm();
-                double sin_theta4 = Math.Sqrt(Math.Pow(v3[0], 2) + Math.Pow(v3[1], 2)) / v3.L2Norm();
-                double cos_theta4 = v3[2] / v3.L2Norm();
+                double sin_theta4 = Math.Sqrt(Math.Pow(v1[0], 2) + Math.Pow(v1[1], 2)) / v1.L2Norm();
+                double cos_theta4 = v1[2] / v1.L2Norm();
                 double deltaEta = Math.Log(((1 - cos_theta4) / (1 - cos_theta1)) * (sin_theta1 / sin_theta4));
                 
 
@@ -1131,10 +1154,14 @@ namespace VR_Spy_Companion
                     geometryData.Add($"v {box.back_3[0]} {box.back_3[1]} {box.back_3[2]}");
                     geometryData.Add($"v {box.back_4[0]} {box.back_4[1]} {box.back_4[2]}");
 
-                    geometryData.Add($"f {counter} {counter + 1} {counter + 5} {counter + 4}"); // Side 1
-                    geometryData.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}"); // Side 2
-                    geometryData.Add($"f {counter + 2} {counter + 3} {counter + 7} {counter + 6}"); // Side 3
-                    geometryData.Add($"f {counter + 3} {counter} {counter + 4} {counter + 7}"); // Side 4
+                    geometryData.Add($"f {counter} {counter + 1} {counter + 5} {counter + 4}"); 
+                    geometryData.Add($"f {counter+4} {counter + 5} {counter + 1} {counter}"); 
+                    geometryData.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}"); 
+                    geometryData.Add($"f {counter + 5} {counter + 6} {counter + 2} {counter + 1}"); 
+                    geometryData.Add($"f {counter + 2} {counter + 3} {counter + 7} {counter + 6}"); 
+                    geometryData.Add($"f {counter + 6} {counter + 7} {counter + 3} {counter + 2}"); 
+                    geometryData.Add($"f {counter + 3} {counter} {counter + 4} {counter + 7}");
+                    geometryData.Add($"f {counter + 7} {counter+4} {counter} {counter + 3}"); 
 
                     counter += 8;
                 }
@@ -1187,12 +1214,12 @@ namespace VR_Spy_Companion
                 }
                 return geometryData;
             }
-            static public List<dtRecHitsV1> dtRecHitParse(JObject data, string name)
+            static public List<DTRecHitsV1> dtRecHitParse(JObject data, string name)
             {
-                List<dtRecHitsV1> dataList = new List<dtRecHitsV1>();
+                List<DTRecHitsV1> dataList = new List<DTRecHitsV1>();
                 foreach (var item in data["Collections"][name])
                 {
-                    dtRecHitsV1 dtRecHit = new dtRecHitsV1();
+                    DTRecHitsV1 dtRecHit = new DTRecHitsV1();
                     var children = item.Children().Values<double>().ToArray();
                     dtRecHit.name = name;
                     dtRecHit.wireId = (int)children[0];
@@ -1218,11 +1245,11 @@ namespace VR_Spy_Companion
                 }
                 return dataList;
             }
-            static public List<string> generateDTRecHit(List<dtRecHitsV1> inputData)
+            static public List<string> generateDTRecHit(List<DTRecHitsV1> inputData)
             {
                 List<string> geometryData = new List<string>();
                 int counter = 1;
-                foreach (dtRecHitsV1 box in inputData)
+                foreach (DTRecHitsV1 box in inputData)
                 {
                     double[] pos = box.wirePos;
                     double[] axis = box.axis;
