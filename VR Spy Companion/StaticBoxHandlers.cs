@@ -11,6 +11,7 @@ using System.Xml.Linq;
 using System.Globalization;
 using MathNet.Numerics;
 using IGtoOBJGen;
+using MathNet.Numerics.Distributions;
 
 namespace VR_Spy_Companion
 {
@@ -684,7 +685,7 @@ namespace VR_Spy_Companion
                 double sin_theta4 = Math.Sqrt(Math.Pow(v3[0], 2) + Math.Pow(v3[1], 2)) / v3.L2Norm();
                 double cos_theta4 = v3[2] / v3.L2Norm();
                 double deltaEta = Math.Log(((1 - cos_theta4) / (1 - cos_theta1)) * (sin_theta1 / sin_theta4));
-                Console.WriteLine(deltaEta);
+                //Console.WriteLine(deltaEta);
 
 
                 //box.deltaPhi = deltaPhi;
@@ -1099,6 +1100,7 @@ namespace VR_Spy_Companion
                 {
                     TrackerPieceData TrackerPieceData = new TrackerPieceData();
                     var children = item.Children().Values<double>().ToArray();
+                    TrackerPieceData.name = name;
                     TrackerPieceData.detid = (int)children[0];
                     TrackerPieceData.front_1 = new double[] { children[1], children[2], children[3] };
                     TrackerPieceData.front_2 = new double[] { children[4], children[5], children[6] };
@@ -1145,6 +1147,7 @@ namespace VR_Spy_Companion
                 {
                     matchingCSC matchingCSC = new matchingCSC();
                     var children = item.Children().Values<double>().ToArray();
+                    matchingCSC.name = name;
                     matchingCSC.detid = (int)children[0];
                     matchingCSC.front_1 = new double[] { children[1], children[2], children[3] };
                     matchingCSC.front_2 = new double[] { children[4], children[5], children[6] };
@@ -1191,6 +1194,7 @@ namespace VR_Spy_Companion
                 {
                     dtRecHitsV1 dtRecHit = new dtRecHitsV1();
                     var children = item.Children().Values<double>().ToArray();
+                    dtRecHit.name = name;
                     dtRecHit.wireId = (int)children[0];
                     dtRecHit.layerId = (int)children[1];
                     dtRecHit.superLayerId = (int)children[2];
@@ -1237,52 +1241,44 @@ namespace VR_Spy_Companion
                         { w, -h, -d},
                         {-w, -h, -d}
                     };
-                    //normalize axis
-                    double axisLength = Math.Sqrt(axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]);
-                    axis[0] /= axisLength;
-                    axis[1] /= axisLength;
-                    axis[2] /= axisLength;
-                    double cosTheta = Math.Cos(angle);
-                    double sinTheta = Math.Sin(angle);
-                    double oneMinusCosTheta = 1 - cosTheta;
-                    double[,] rotationMatrix = new double[,]
+                    static double[] RotatePointAroundAxis(double[] point, double[] axis, double angle)
                     {
+                        double ux = axis[0];
+                        double uy = axis[1];
+                        double uz = axis[2];
+                        double cosTheta = Math.Cos(angle);
+                        double sinTheta = Math.Sin(angle);
+                        double oneMinusCosTheta = 1 - cosTheta;
+
+                        double[,] rotationMatrix = new double[,]
                         {
-                            cosTheta + axis[0] * axis[0] * oneMinusCosTheta,
-                            axis[0] * axis[1] * oneMinusCosTheta - axis[2] * sinTheta,
-                            axis[0] * axis[2] * oneMinusCosTheta + axis[1] * sinTheta
-                        },
-                        {
-                            axis[1] * axis[0] * oneMinusCosTheta + axis[2] * sinTheta,
-                            cosTheta + axis[1] * axis[1] * oneMinusCosTheta,
-                            axis[1] * axis[2] * oneMinusCosTheta - axis[0] * sinTheta
-                        },
-                        {
-                            axis[2] * axis[0] * oneMinusCosTheta - axis[1] * sinTheta,
-                            axis[2] * axis[1] * oneMinusCosTheta + axis[0] * sinTheta,
-                            cosTheta + axis[2] * axis[2] * oneMinusCosTheta
-                        }
-                    };
-                    double[] MultiplyMatrix(double[] vector, double[,] matrix)
-                    {
-                        return new double[]
-                        {
-                            vector[0] * matrix[0, 0] + vector[1] * matrix[0, 1] + vector[2] * matrix[0, 2],
-                            vector[0] * matrix[1, 0] + vector[1] * matrix[1, 1] + vector[2] * matrix[1, 2],
-                            vector[0] * matrix[2, 0] + vector[1] * matrix[2, 1] + vector[2] * matrix[2, 2]
+                            { cosTheta + ux*ux*oneMinusCosTheta, ux*uy*oneMinusCosTheta - uz*sinTheta, ux*uz*oneMinusCosTheta + uy*sinTheta },
+                            { uy*ux*oneMinusCosTheta + uz*sinTheta, cosTheta + uy*uy*oneMinusCosTheta, uy*uz*oneMinusCosTheta - ux*sinTheta },
+                            { uz*ux*oneMinusCosTheta - uy*sinTheta, uz*uy*oneMinusCosTheta + ux*sinTheta, cosTheta + uz*uz*oneMinusCosTheta }
                         };
+                        double[] result = new double[3];
+                        for (int i = 0; i < 3; i++)
+                        {
+                            result[i] = 0;
+                            for (int j = 0; j < 3; j++)
+                            {
+                                result[i] += rotationMatrix[i, j] * point[j];
+                            }
+                        }
+
+                        return result;
                     }
-
-
                     for (int i = 0; i < vertices.GetLength(0); i++)
                     {
-                        double[] vertex = { vertices[i, 0], vertices[i, 1], vertices[i, 2] };
-
-                        // Apply rotation
-                        vertex = MultiplyMatrix(vertex, rotationMatrix);
+                        double[] point = { vertices[i, 0], vertices[i, 1], vertices[i, 2] };
+                        double[] rotatedPoint = RotatePointAroundAxis(point, axis, angle);
+                        vertices[i, 0] = rotatedPoint[0] + pos[0];
+                        vertices[i, 1] = rotatedPoint[1] + pos[1];
+                        vertices[i, 2] = rotatedPoint[2] + pos[2];
                         geometryData.Add($"v {vertices[i, 0]} {vertices[i, 1]} {vertices[i, 2]}");
+
                     }
-                    // Generate the faces using the counter
+
                     geometryData.Add($"f {counter} {counter + 1} {counter + 2}");
                     geometryData.Add($"f {counter + 2} {counter + 3} {counter}");
 
@@ -1305,5 +1301,189 @@ namespace VR_Spy_Companion
                 }
                 return geometryData;
             }
+
+            //static public List<CaloTowersV2> caloTowerV2Parse(JObject data, string name)// double scale)
+            //{
+            //    List<CaloTowersV2> dataList = new List<CaloTowersV2>();
+            //    foreach (var item in data["Collections"][name])
+            //    {
+            //        CaloTowersV2 caloItem = new CaloTowersV2();
+            //        var children = item.Children().Values<double>().ToArray();
+            //        caloItem.et = children[0];
+            //        caloItem.eta = children[1];
+            //        caloItem.phi = children[2];
+            //        caloItem.iphi = children[3];
+            //        caloItem.hadEnergy = children[4];
+            //        caloItem.emEnergy = children[5];
+            //        caloItem.outerEnergy = children[6];
+            //        caloItem.ecalTime = children[7];
+            //        caloItem.hcalTime = children[8];
+            //        caloItem.emPosition = new double[] { children[9], children[10], children[11] };
+            //        caloItem.hadPosition = new double[] { children[12], children[13], children[14] };
+            //        caloItem.front_1 = new double[] { children[15], children[16], children[17] };
+            //        caloItem.front_2 = new double[] { children[18], children[19], children[20] };
+            //        caloItem.front_3 = new double[] { children[21], children[22], children[23] };
+            //        caloItem.front_4 = new double[] { children[24], children[25], children[26] };
+            //        caloItem.back_1 = new double[] { children[27], children[28], children[29] };
+            //        caloItem.back_2 = new double[] { children[30], children[31], children[32] };
+            //        caloItem.back_3 = new double[] { children[33], children[34], children[35] };
+            //        caloItem.back_4 = new double[] { children[36], children[37], children[38] };
+            //        dataList.Add(caloItem);
+            //    }
+
+            //    return dataList;
+            //}
+            //static public List<string> generateCaloTowerV2(List<CaloTowersV2> data)
+            //{
+            //    var dataList = new List<string>();
+            //    int counter = 1;
+            //    foreach (var tower in data)
+            //    {
+            //        double theta = 2 * Math.Atan(Math.Exp(-1 * tower.eta));
+            //        double scale = 0.1;
+            //        double min_energy = 0.1;
+
+            //        if (tower.et > min_energy)
+            //        {
+            //            var f1 = Vector<double>.Build.DenseOfArray(tower.front_1);
+            //            var f2 = Vector<double>.Build.DenseOfArray(tower.front_2);
+            //            var f3 = Vector<double>.Build.DenseOfArray(tower.front_3);
+            //            var f4 = Vector<double>.Build.DenseOfArray(tower.front_4);
+
+            //            var b1e = Vector<double>.Build.DenseOfArray(tower.back_1);
+            //            var b2e = Vector<double>.Build.DenseOfArray(tower.back_2);
+            //            var b3e = Vector<double>.Build.DenseOfArray(tower.back_3);
+            //            var b4e = Vector<double>.Build.DenseOfArray(tower.back_4);
+
+            //            var b1h = b1e.Clone();
+            //            var b2h = b2e.Clone();
+            //            var b3h = b3e.Clone();
+            //            var b4h = b4e.Clone();
+
+            //            double escale;
+            //            double hscale;
+
+            //            if (tower.emEnergy > 0) escale = tower.emEnergy * Math.Sin(theta);
+            //            else escale = 0;
+            //            if (tower.hadEnergy > 0) hscale = tower.hadEnergy * Math.Sin(theta);
+            //            else hscale = 0;
+
+            //            if (escale > 0)
+            //            {
+            //                b1e /= b1e.L2Norm();
+            //                b2e /= b2e.L2Norm();
+            //                b3e /= b3e.L2Norm();
+            //                b4e /= b4e.L2Norm();
+
+            //                b1e *= escale;
+            //                b2e *= escale;
+            //                b3e *= escale;
+            //                b4e *= escale;
+
+            //                b1e += f1;
+            //                b2e += f2;
+            //                b3e += f3;
+            //                b4e += f4;
+
+            //                dataList.Add($"v {String.Join(' ', f1)}");
+            //                dataList.Add($"v {String.Join(' ', f2)}");
+            //                dataList.Add($"v {String.Join(' ', f3)}");
+            //                dataList.Add($"v {String.Join(' ', f4)}");
+            //                dataList.Add($"v {String.Join(' ', b1e)}");
+            //                dataList.Add($"v {String.Join(' ', b2e)}");
+            //                dataList.Add($"v {String.Join(' ', b3e)}");
+            //                dataList.Add($"v {String.Join(' ', b4e)}");
+
+            //                dataList.Add($"f {counter} {counter + 1} {counter + 2} {counter + 3}");
+            //                dataList.Add($"f {counter + 3} {counter + 2} {counter + 1} {counter}");
+            //                dataList.Add($"f {counter + 4} {counter + 5} {counter + 6} {counter + 7}");
+            //                dataList.Add($"f {counter + 7} {counter + 6} {counter + 5} {counter + 4}");
+            //                dataList.Add($"f {counter} {counter + 3} {counter + 7} {counter + 4}");
+            //                dataList.Add($"f {counter + 4} {counter + 7} {counter + 3} {counter}");
+            //                dataList.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}");
+            //                dataList.Add($"f {counter + 5} {counter + 6} {counter + 2} {counter + 1}");
+            //                dataList.Add($"f {counter + 3} {counter + 2} {counter + 6} {counter + 7}");
+            //                dataList.Add($"f {counter + 7} {counter + 6} {counter + 2} {counter + 3}");
+            //                dataList.Add($"f {counter + 1} {counter} {counter + 4} {counter + 5}");
+            //                dataList.Add($"f {counter + 5} {counter + 4} {counter} {counter + 1}");
+            //                counter += 8;
+            //            }
+
+            //            if (hscale > 0)
+            //            {
+            //                List<Vector<double>> vectors = new List<Vector<double>>();
+            //                if (escale > 0)
+            //                {
+            //                    vectors.Add(b1e);
+            //                    vectors.Add(b2e);
+            //                    vectors.Add(b3e);
+            //                    vectors.Add(b4e);
+            //                }
+            //                else
+            //                {
+            //                    vectors.Add(f1);
+            //                    vectors.Add(f2);
+            //                    vectors.Add(f3);
+            //                    vectors.Add(f4);
+            //                }
+
+            //                b1h /= b1h.L2Norm();
+            //                b2h /= b2h.L2Norm();
+            //                b3h /= b3h.L2Norm();
+            //                b4h /= b4h.L2Norm();
+
+            //                b1h *= hscale;
+            //                b2h *= hscale;
+            //                b3h *= hscale;
+            //                b4h *= hscale;
+
+            //                if (escale > 0)
+            //                {
+            //                    b1h += b1e;
+            //                    b2h += b2e;
+            //                    b3h += b3e;
+            //                    b4h += b4e;
+            //                }
+            //                else
+            //                {
+            //                    b1h += f1;
+            //                    b2h += f2;
+            //                    b3h += f3;
+            //                    b4h += f4;
+            //                }
+
+            //                vectors.Add(b1h);
+            //                vectors.Add(b2h);
+            //                vectors.Add(b3h);
+            //                vectors.Add(b4h);
+
+            //                dataList.Add($"v {String.Join(' ', f1)}");
+            //                dataList.Add($"v {String.Join(' ', f2)}");
+            //                dataList.Add($"v {String.Join(' ', f3)}");
+            //                dataList.Add($"v {String.Join(' ', f4)}");
+            //                dataList.Add($"v {String.Join(' ', b1h)}");
+            //                dataList.Add($"v {String.Join(' ', b2h)}");
+            //                dataList.Add($"v {String.Join(' ', b3h)}");
+            //                dataList.Add($"v {String.Join(' ', b4h)}");
+
+            //                dataList.Add($"f {counter} {counter + 1} {counter + 2} {counter + 3}");
+            //                dataList.Add($"f {counter + 3} {counter + 2} {counter + 1} {counter}");
+            //                dataList.Add($"f {counter + 4} {counter + 5} {counter + 6} {counter + 7}");
+            //                dataList.Add($"f {counter + 7} {counter + 6} {counter + 5} {counter + 4}");
+            //                dataList.Add($"f {counter} {counter + 3} {counter + 7} {counter + 4}");
+            //                dataList.Add($"f {counter + 4} {counter + 7} {counter + 3} {counter}");
+            //                dataList.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}");
+            //                dataList.Add($"f {counter + 5} {counter + 6} {counter + 2} {counter + 1}");
+            //                dataList.Add($"f {counter + 3} {counter + 2} {counter + 6} {counter + 7}");
+            //                dataList.Add($"f {counter + 7} {counter + 6} {counter + 2} {counter + 3}");
+            //                dataList.Add($"f {counter + 1} {counter} {counter + 4} {counter + 5}");
+            //                dataList.Add($"f {counter + 5} {counter + 4} {counter} {counter + 1}");
+            //                counter += 8;
+            //            }
+            //        }
+           
+            //    }
+            //    return dataList;
+            //}
     }
 }

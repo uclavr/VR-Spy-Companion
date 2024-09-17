@@ -264,3 +264,60 @@ struct dtRecHitsV1 : ObjectData
     public double cellHeight;
 
 }
+
+struct dtRecSegment4D_V1 : ObjectData
+{
+    public string name;
+    public int detid;
+    public double[] pos_1;
+    public double[] pos_2;
+    public int sectorId;
+    public int stationId;
+    public int wheelId;
+}
+
+
+struct cscRecHit2Ds_V2 : ObjectData
+{
+    public string name;
+    public double[] u1;
+    public double[] u2;
+    public double[] v1;
+    public double[] v2;
+    public double[] w1;
+    public double[] w2;
+    public int endcap;
+    public int station;
+    public int ring;
+    public int chamber;
+    public int layer;
+    public double tpeak;
+    public double positionWithinStrip;
+    public double errorWithinStrip;
+    public string strips;
+    public string WireGroups;
+}
+
+struct CaloTowersV2 : ObjectData
+{
+    public string name;
+    public double et;
+    public double eta;
+    public double phi;
+    public double iphi;
+    public double hadEnergy;
+    public double emEnergy;
+    public double outerEnergy;
+    public double ecalTime;
+    public double hcalTime;
+    public double[] emPosition;
+    public double[] hadPosition;
+    public double[] front_1;
+    public double[] front_2;
+    public double[] front_3;
+    public double[] front_4;
+    public double[] back_1;
+    public double[] back_2;
+    public double[] back_3;
+    public double[] back_4;
+}

@@ -380,8 +380,8 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}\\TrackDets_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\TrackDets_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(trackerPieceData);
-            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            File.WriteAllLines(Path.Combine(downloadsPath, "TrackDets_V1.obj"), dataList);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "TrackDets_V1.obj"), dataList);
             return ("\"trackDetsV1Data\":" + data);
         }
     }
@@ -401,8 +401,8 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}\\TrackingRecHits_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\TrackingRecHits_V1", dataList);
             string data = JsonConvert.SerializeObject(trackingRecHitData);
-            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            File.WriteAllLines(Path.Combine(downloadsPath, "TrackingRecHits_V1.obj"), dataList);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "TrackingRecHits_V1.obj"), dataList);
             return ("\"TrackingRecHits_V1Data\":" + data);
         }
     }
@@ -422,8 +422,8 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}\\SiStripClusters_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\SiStripClusters_V1", dataList);
             string data = JsonConvert.SerializeObject(sistripClusterData);
-            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            File.WriteAllLines(Path.Combine(downloadsPath, "SiStripClusters_V1.obj"), dataList);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "SiStripClusters_V1.obj"), dataList);
             return ("\"SiStripClusters_V1Data\":" + data);
         }
     }
@@ -443,8 +443,8 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}\\SiPixelClusters_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}\\SiPixelClusters_V1", dataList);
             string data = JsonConvert.SerializeObject(sipixelClusterData);
-            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            File.WriteAllLines(Path.Combine(downloadsPath, "SiPixelClusters_V1.obj"), dataList);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "SiPixelClusters_V1.obj"), dataList);
             return ("\"SiPixelClusters_V1Data\":" + data);
         }
     }
@@ -467,6 +467,27 @@ namespace IGtoOBJGen {
             string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
             File.WriteAllLines(Path.Combine(downloadsPath, "DTRecHits_V1.obj"), dataList);
             return ("\"DTRecHits_V1Data\":" + data);
+        }
+    }
+    class DTRecSegment4D_V1 : TypeConfig
+    {
+        private List<dtRecSegment4D_V1> dtrecsegmentdata;
+        private string eventTitle;
+        public DTRecSegment4D_V1(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            dtrecsegmentdata = StaticLineHandlers.dtRecSegmentParse(JSON, "DTRecSegment4D_V1");
+            List<string> dataList = StaticLineHandlers.generateDTRecSegment(dtrecsegmentdata);
+            File.WriteAllText($"{eventTitle}\\DTRecSegment4D_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\DTRecSegment4D_V1", dataList);
+            string data = JsonConvert.SerializeObject(dtrecsegmentdata);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "DTRecSegment4D_V1.obj"), dataList);
+            return ("\"DTRecSegment4D_V1Data\":" + data);
         }
     }
     class SuperClusters_V1 : TypeConfig
@@ -729,7 +750,7 @@ namespace IGtoOBJGen {
         }
     }
 
-    //class DTRecSegment4D_V1 : TypeConfig { }
+
     class RPCRecHits_V1 : TypeConfig {
         private List<RPCRecHit> rpcRecHits;
         private string eventTitle;
@@ -782,7 +803,27 @@ namespace IGtoOBJGen {
             return ("\"MatchingCSCs_V1\":" + data);
         }
     }
-    /*class CSCRecHit2Ds_V2 : TypeConfig { }*/
+    class CSCRecHit2Ds_V2 : TypeConfig {
+        private List<cscRecHit2Ds_V2> cscRecHits;
+        private string eventTitle;
+        public CSCRecHit2Ds_V2(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            cscRecHits = StaticLineHandlers.ParseCSCRecHits2Ds_V2(JSON, "CSCRecHit2Ds_V2");
+            List<string> dataList = StaticLineHandlers.GenerateCSCRecHits(cscRecHits);
+            File.WriteAllText($"{eventTitle}\\CSCRecHit2Ds_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\CSCRecHit2Ds_V2.obj", dataList);
+            string data = JsonConvert.SerializeObject(cscRecHits);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "CSCRecHit2Ds_V2.obj"), dataList);
+            return ("\"CSCRecSegments2DsV2Datas\":" + data);
+        }
+
+    }
     class CSCSegments_V1 : TypeConfig {
         private List<CSCSegment> cscSegments;
         private string eventTitle;
@@ -841,8 +882,28 @@ namespace IGtoOBJGen {
             //return JsonConvert.SerializeObject(muonChamberData);
         }
     }
-    /*class CaloTowers_V2 : TypeConfig { }
-    class METs_V1 : TypeConfig { }*/
+    //class CaloTowers_V2 : TypeConfig
+    //{
+    //    private List<CaloTowersV2> calotowerv2Data;
+    //    private string eventTitle;
+    //    public CaloTowers_V2(JObject args, string eventtitle)
+    //    {
+    //        eventTitle = eventtitle;
+    //        JSON = args;
+    //    }
+    //    public override string Execute()
+    //    {
+    //        calotowerv2Data = StaticBoxHandlers.caloTowerV2Parse(JSON, "CaloTowers_V2");
+    //        List<string> dataList = StaticBoxHandlers.generateCaloTowerV2(calotowerv2Data);
+    //        File.WriteAllText($"{eventTitle}\\CaloTowers_V2.obj", String.Empty);
+    //        File.WriteAllLines($"{eventTitle}\\CaloTowers_V2", dataList);
+    //        string data = JsonConvert.SerializeObject(calotowerv2Data);
+    //        string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+    //        File.WriteAllLines(Path.Combine(downloadsPath, "CaloTowers_V2.obj"), dataList);
+    //        return ("\"CaloTowers_V2\":" + data);
+    //    }
+    //}
+    /*class METs_V1 : TypeConfig { }*/
     class PFMETs_V1 : TypeConfig
     {
         private METData met;

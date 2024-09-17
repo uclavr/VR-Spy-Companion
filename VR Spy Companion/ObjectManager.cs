@@ -194,8 +194,12 @@ namespace IGtoOBJGen
                             eventObjects.Add(sipixelclustersv1);
                             break;
                         case "DTRecHits_V1":
+                            DTRecHits_V1 dtrechitsv1 = new DTRecHits_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(dtrechitsv1);
                             break;
                         case "DTRecSegment4D_V1":
+                            DTRecSegment4D_V1 dtrecsegmentsv1 = new DTRecSegment4D_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(dtrecsegmentsv1);
                             break;
                         case "RPCRecHits_V1":
                             RPCRecHits_V1 rpc = new RPCRecHits_V1(INPUTJSON, EVENTPATH);
@@ -229,7 +233,9 @@ namespace IGtoOBJGen
                             MatchingCSCs_V1 matchingcsvsv1 = new MatchingCSCs_V1(INPUTJSON, EVENTPATH);
                             eventObjects.Add(matchingcsvsv1);
                             break;
-                        case "CSCRecHit2Ds_V2": 
+                        case "CSCRecHit2Ds_V2":
+                            CSCRecHit2Ds_V2 cscrecv2 = new CSCRecHit2Ds_V2(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(cscrecv2);
                             break;
                         case "CSCSegments_V1":
                             CSCSegments_V1 cscseg1 = new CSCSegments_V1(INPUTJSON, EVENTPATH);
@@ -245,8 +251,10 @@ namespace IGtoOBJGen
                             MuonChambers_V1 muonchambers = new MuonChambers_V1(INPUTJSON, EVENTPATH);
                             eventObjects.Add(muonchambers);
                             break;
-                        case "CaloTowers_V2": 
-                            break;
+                        //case "CaloTowers_V2":
+                        //    CaloTowers_V2 calotowersv2 = new CaloTowers_V2(INPUTJSON, EVENTPATH);
+                        //    eventObjects.Add(calotowersv2);
+                        //    break;
                         case "METs_V1": 
                             break;
                         case "PFMETs_V1":

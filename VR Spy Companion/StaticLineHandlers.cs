@@ -573,6 +573,7 @@ namespace IGtoOBJGen
                 {
                     trackingPoint.detid = (int)children[0];
                 }
+                trackingPoint.name = name;
                 trackingPoint.X = children[index];
                 trackingPoint.Y = children[index + 1];
                 trackingPoint.Z = children[index + 2];
@@ -621,7 +622,7 @@ namespace IGtoOBJGen
 
                 var children = item.Children().Values<double>().ToArray();
                 cscSegmentV2 cscSegmentV2 = new cscSegmentV2();
-
+                cscSegmentV2.name = name;
                 cscSegmentV2.detid = (int)children[0];
                 cscSegmentV2.pos_1 = new double[] { children[1], children[2], children[3] };
                 cscSegmentV2.pos_2 = new double[] { children[4], children[5], children[6] };
@@ -644,6 +645,91 @@ namespace IGtoOBJGen
                 geometryData.Add($"v {point.pos_1[0]} {point.pos_1[1]} {point.pos_1[2]}");
                 geometryData.Add($"v {point.pos_2[0]} {point.pos_2[1]} {point.pos_2[2]}");
 
+                geometryData.Add($"l {vertexIndex} {vertexIndex + 1}");
+                vertexIndex += 2;
+            }
+            return geometryData;
+        }
+
+        static public List<dtRecSegment4D_V1> dtRecSegmentParse(JObject data, string name)
+        {
+            List<dtRecSegment4D_V1> dataList = new List<dtRecSegment4D_V1>();
+            foreach (var item in data["Collections"][name])
+            {
+                dtRecSegment4D_V1 dtRecSegment = new dtRecSegment4D_V1();
+                var children = item.Children().Values<double>().ToArray();
+                dtRecSegment.name = name;
+                dtRecSegment.detid = (int)children[0];
+                dtRecSegment.pos_1 = new double[] { children[1], children[2], children[3] };
+                dtRecSegment.pos_2 = new double[] { children[4], children[5], children[6] };
+                dtRecSegment.sectorId = (int)children[7];
+                dtRecSegment.stationId = (int)children[8];
+                dtRecSegment.wheelId = (int)children[9];
+                dataList.Add(dtRecSegment);
+            }
+            return dataList;
+        }
+        static public List<string> generateDTRecSegment(List<dtRecSegment4D_V1> inputData)
+        {
+            List<string> geometryData = new List<string>();
+            int vertexIndex = 1;
+            foreach (dtRecSegment4D_V1 point in inputData)
+            {
+                geometryData.Add($"v {point.pos_1[0]} {point.pos_1[1]} {point.pos_1[2]}");
+                geometryData.Add($"v {point.pos_2[0]} {point.pos_2[1]} {point.pos_2[2]}");
+
+                geometryData.Add($"l {vertexIndex} {vertexIndex + 1}");
+                vertexIndex += 2;
+            }
+            return geometryData;
+        }
+
+        static public List<cscRecHit2Ds_V2> ParseCSCRecHits2Ds_V2(JObject data, string name)
+        {
+            List<cscRecHit2Ds_V2> dataList = new List<cscRecHit2Ds_V2>();
+            foreach (var item in data["Collections"][name])
+            {
+                cscRecHit2Ds_V2 cscRecHit = new cscRecHit2Ds_V2();
+                var children = item.Children().Values<string>().ToArray();
+                cscRecHit.name = name;
+                cscRecHit.u1 = new double[] { Double.Parse(children[0]), Double.Parse(children[1]), Double.Parse(children[2]) };
+                cscRecHit.u2 = new double[] { Double.Parse(children[3]), Double.Parse(children[4]), Double.Parse(children[5]) };
+                cscRecHit.v1 = new double[] { Double.Parse(children[6]), Double.Parse(children[7]), Double.Parse(children[8]) };
+                cscRecHit.v2 = new double[] { Double.Parse(children[9]), Double.Parse(children[10]), Double.Parse(children[11]) };
+                cscRecHit.w1 = new double[] { Double.Parse(children[12]), Double.Parse(children[13]), Double.Parse(children[14]) };
+                cscRecHit.w2 = new double[] { Double.Parse(children[15]), Double.Parse(children[16]), Double.Parse(children[17]) };
+                cscRecHit.endcap = (int)Double.Parse(children[18]);
+                cscRecHit.station = (int)Double.Parse(children[19]);
+                cscRecHit.ring = (int)Double.Parse(children[20]);
+                cscRecHit.chamber = (int)Double.Parse(children[21]);
+                cscRecHit.layer = (int)Double.Parse(children[22]);
+                cscRecHit.tpeak = Double.Parse(children[23]);
+                cscRecHit.positionWithinStrip = Double.Parse(children[24]);
+                cscRecHit.errorWithinStrip = Double.Parse(children[25]);
+                cscRecHit.strips = children[26];
+                cscRecHit.WireGroups = children[27];
+                dataList.Add(cscRecHit);
+            }
+            return dataList;
+        }
+        static public List<string> GenerateCSCRecHits(List<cscRecHit2Ds_V2> inputData)
+        {
+            List<string> geometryData = new List<string>();
+            int vertexIndex = 1;
+            foreach (cscRecHit2Ds_V2 point in inputData)
+            {
+                geometryData.Add($"v {point.u1[0]} {point.u1[1]} {point.u1[2]}");
+                geometryData.Add($"v {point.u2[0]} {point.u2[1]} {point.u2[2]}");
+                geometryData.Add($"l {vertexIndex} {vertexIndex + 1}");
+                vertexIndex += 2;
+
+                geometryData.Add($"v {point.v1[0]} {point.v1[1]} {point.v1[2]}");
+                geometryData.Add($"v {point.v2[0]} {point.v2[1]} {point.v2[2]}");
+                geometryData.Add($"l {vertexIndex} {vertexIndex + 1}");
+                vertexIndex += 2;
+
+                geometryData.Add($"v {point.w1[0]} {point.w1[1]} {point.w1[2]}");
+                geometryData.Add($"v {point.w2[0]} {point.w2[1]} {point.u2[2]}");
                 geometryData.Add($"l {vertexIndex} {vertexIndex + 1}");
                 vertexIndex += 2;
             }
