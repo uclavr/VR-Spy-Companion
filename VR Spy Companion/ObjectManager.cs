@@ -56,7 +56,7 @@ namespace IGtoOBJGen
             {
                 obj.Add(new JProperty(item.Item1, item.Item2));
             }
-            File.WriteAllText($"{EVENTPATH}//totaldata.json", JsonConvert.SerializeObject(obj, Formatting.Indented));
+            File.WriteAllText($"{EVENTPATH}\\totaldata.json", JsonConvert.SerializeObject(obj, Formatting.Indented));
         }
         public void generateJSON()
         {
@@ -69,7 +69,7 @@ namespace IGtoOBJGen
             data = data.Substring(0, data.Length - 1);
             data += '}';
 
-            File.WriteAllText($"{EVENTPATH}//totaldata.json",data);
+            File.WriteAllText($"{EVENTPATH}\\totaldata.json",data);
             //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
             //File.WriteAllText($"{downloadsPath}//totaldata.json", data);
         }

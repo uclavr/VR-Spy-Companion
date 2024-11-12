@@ -7,8 +7,8 @@ namespace IGtoOBJGen
     {
         private string directoryName { get; set; }
         public string currentFile;
-        private string tempStorageDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"/Temp/IGtoOBJGenExtraction";
-        private string tempTransmitDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"/Temp/IGtoOBJGenTransmission";
+        private string tempStorageDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Temp\IGtoOBJGenExtraction";
+        private string tempTransmitDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"\Temp\IGtoOBJGenTransmission";
         public Unzip(string filename)
         {
             if(Directory.Exists(tempStorageDirectory)) 
@@ -27,7 +27,7 @@ namespace IGtoOBJGen
         }
         public void Run()
         {
-            string runFolder = selectFolderFromFolder(directoryName + "/Events");
+            string runFolder = selectFolderFromFolder(directoryName + "\\Events"); 
             string file = selectFileFromFolder(runFolder);
             currentFile = file;
         }

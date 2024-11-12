@@ -321,7 +321,7 @@ namespace VR_Spy_Companion
                         dataList = jetGeometry(item, radius, length, numSections, index, dataList);
                         index++;
                     }
-                    File.WriteAllLines($"{eventTitle}//PFJets.obj", dataList);
+                    File.WriteAllLines($"{eventTitle}\\PFJets.obj", dataList);
                 }
             static public void generateJetModels(List<JetV2Data> data, string eventTitle)
             {
@@ -346,7 +346,7 @@ namespace VR_Spy_Companion
                     dataList = jetGeometry(item, radius, length, numSections, index, dataList);
                     index++;
                 }
-                File.WriteAllLines($"{eventTitle}//PFJets_V2.obj", dataList);
+                File.WriteAllLines($"{eventTitle}\\PFJets_V2.obj", dataList);
             }
             // Fix RPCRecHit Assignment
             static public List<RPCRecHit> RPCRecHitParse(JObject data)
@@ -941,7 +941,7 @@ namespace VR_Spy_Companion
                     faces.Clear();
                     index++;
                 }
-                File.WriteAllLines($"{eventTitle}//SuperClusters_V1.obj", dataList);
+                File.WriteAllLines($"{eventTitle}\\SuperClusters_V1.obj", dataList);
             }
             /*static List<Vertex> vertexParse()
             {
@@ -1217,8 +1217,6 @@ namespace VR_Spy_Companion
                     geometryData.Add($"f {counter + 6} {counter + 2} {counter + 1}");
                     geometryData.Add($"f {counter + 6} {counter + 5} {counter + 1}");  // Back-facing bottom
                     geometryData.Add($"f {counter + 1} {counter + 2} {counter + 6}");
-
-
 
                     counter += 8;
                 }
