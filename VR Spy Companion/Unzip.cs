@@ -27,7 +27,7 @@ namespace IGtoOBJGen
         }
         public void Run()
         {
-            string runFolder = selectFolderFromFolder(directoryName + "\\Events");
+            string runFolder = selectFolderFromFolder(directoryName + "/Events");
             string file = selectFileFromFolder(runFolder);
             currentFile = file;
         }

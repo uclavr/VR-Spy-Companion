@@ -70,6 +70,8 @@ namespace IGtoOBJGen
             data += '}';
 
             File.WriteAllText($"{EVENTPATH}//totaldata.json",data);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllText($"{downloadsPath}//totaldata.json", data);
         }
         /*private string CreateTempFolder()
         {
@@ -251,10 +253,10 @@ namespace IGtoOBJGen
                             MuonChambers_V1 muonchambers = new MuonChambers_V1(INPUTJSON, EVENTPATH);
                             eventObjects.Add(muonchambers);
                             break;
-                        //case "CaloTowers_V2":
-                        //    CaloTowers_V2 calotowersv2 = new CaloTowers_V2(INPUTJSON, EVENTPATH);
-                        //    eventObjects.Add(calotowersv2);
-                        //    break;
+                        case "CaloTowers_V2":
+                            CaloTowers_V2 calotowersv2 = new CaloTowers_V2(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(calotowersv2);
+                            break;
                         case "METs_V1": 
                             break;
                         case "PFMETs_V1":

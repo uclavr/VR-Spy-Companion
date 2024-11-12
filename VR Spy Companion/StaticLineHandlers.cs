@@ -6,6 +6,8 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using System.Drawing;
+using System.Xml.Linq;
 
 namespace IGtoOBJGen
 {
@@ -560,6 +562,8 @@ namespace IGtoOBJGen
                 strings.AddRange(ble);
             }
             File.WriteAllLines(@$"{eventTitle}\{path}.obj", strings);
+            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            File.WriteAllLines(Path.Combine(downloadsPath, @$"{eventTitle}/{path}.obj"), strings);
         }
         static public List<trackingPoint> trackingpointParse(JObject data, string name, int index)
         {
@@ -584,7 +588,9 @@ namespace IGtoOBJGen
         static public List<string> generatetrackingPoints(List<trackingPoint> inputData)
         {
             List<string> geometryData = new List<string>();
-            double boxLength = 0.00025;
+            //double boxLength = 0.00025;
+            double boxLength = 0.005;
+            //double boxLength = 0.000005;
             int counter = 1;
             foreach (trackingPoint point in inputData)
             {
@@ -635,22 +641,113 @@ namespace IGtoOBJGen
             }
             return dataList;
         }
+
+        static void GeneratePrism(double[] startPoint, double[] endPoint, ref List<string> geometryData, ref int vertexIndex, float size)
+        {
+            Vector3 start = new Vector3((float)startPoint[0], (float)startPoint[1], (float)startPoint[2]);
+            Vector3 end = new Vector3((float)endPoint[0], (float)endPoint[1], (float)endPoint[2]);
+            Vector3 line = end - start;
+            float length = line.Length();
+            Vector3 direction = Vector3.Normalize(end - start);
+
+            // Choose a fallback axis that's not aligned with the direction
+            Vector3 fallback = Math.Abs(direction.Y) < 0.99 ? Vector3.UnitY : Vector3.UnitX;
+
+            // Calculate right as perpendicular to direction
+            Vector3 right = Vector3.Normalize(Vector3.Cross(fallback, direction));
+
+            // Verify right is perpendicular to direction
+            if (Vector3.Dot(direction, right) > 1e-5)
+            {
+                throw new Exception("Right vector is not perpendicular to direction.");
+            }
+
+            // Calculate up as perpendicular to both direction and right
+            Vector3 up = Vector3.Normalize(Vector3.Cross(direction, right));
+
+            // Verify up is perpendicular to both direction and right
+            if (Vector3.Dot(direction, up) > 1e-5 || Vector3.Dot(right, up) > 1e-5)
+            {
+                throw new Exception("Up vector is not perpendicular to both direction and right.");
+            }
+            right = Vector3.Normalize(Vector3.Cross(direction, up));
+
+            Vector3 corner1 = start + right * (size / 2) + up * (size / 2);
+            Vector3 corner2 = start - right * (size / 2) + up * (size / 2);
+            Vector3 corner3 = start - right * (size / 2) - up * (size / 2);
+            Vector3 corner4 = start + right * (size / 2) - up * (size / 2);
+
+            Vector3 corner5 = end + right * (size / 2) + up * (size / 2);
+            Vector3 corner6 = end - right * (size / 2) + up * (size / 2);
+            Vector3 corner7 = end - right * (size / 2) - up * (size / 2);
+            Vector3 corner8 = end + right * (size / 2) - up * (size / 2);
+
+
+            geometryData.Add($"v {corner1.X} {corner1.Y} {corner1.Z}");
+            geometryData.Add($"v {corner2.X} {corner2.Y} {corner2.Z}");
+            geometryData.Add($"v {corner3.X} {corner3.Y} {corner3.Z}");
+            geometryData.Add($"v {corner4.X} {corner4.Y} {corner4.Z}");
+
+            geometryData.Add($"v {corner5.X} {corner5.Y} {corner5.Z}");
+            geometryData.Add($"v {corner6.X} {corner6.Y} {corner6.Z}");
+            geometryData.Add($"v {corner7.X} {corner7.Y} {corner7.Z}");
+            geometryData.Add($"v {corner8.X} {corner8.Y} {corner8.Z}");
+
+            geometryData.Add($"f {vertexIndex} {vertexIndex + 1} {vertexIndex + 2} {vertexIndex + 3}"); // Start face
+            geometryData.Add($"f {vertexIndex + 4} {vertexIndex + 5} {vertexIndex + 6} {vertexIndex + 7}"); // End face
+
+            geometryData.Add($"f {vertexIndex} {vertexIndex + 1} {vertexIndex + 5} {vertexIndex + 4}");
+            geometryData.Add($"f {vertexIndex + 1} {vertexIndex + 2} {vertexIndex + 6} {vertexIndex + 5}");
+            geometryData.Add($"f {vertexIndex + 2} {vertexIndex + 3} {vertexIndex + 7} {vertexIndex + 6}");
+            geometryData.Add($"f {vertexIndex + 3} {vertexIndex} {vertexIndex + 4} {vertexIndex + 7}");
+
+            geometryData.Add($"f {vertexIndex + 3} {vertexIndex + 2} {vertexIndex + 1} {vertexIndex}"); // Reverse start face
+            geometryData.Add($"f {vertexIndex + 7} {vertexIndex + 6} {vertexIndex + 5} {vertexIndex + 4}"); // Reverse end face
+
+            geometryData.Add($"f {vertexIndex + 4} {vertexIndex + 5} {vertexIndex + 1} {vertexIndex}");
+            geometryData.Add($"f {vertexIndex + 5} {vertexIndex + 6} {vertexIndex + 2} {vertexIndex + 1}");
+            geometryData.Add($"f {vertexIndex + 6} {vertexIndex + 7} {vertexIndex + 3} {vertexIndex + 2}");
+            geometryData.Add($"f {vertexIndex + 7} {vertexIndex + 4} {vertexIndex} {vertexIndex + 3}");
+
+            vertexIndex += 8;
+        }
         static public List<string> generateCSCSegment(List<cscSegmentV2> inputData)
         {
             List<string> geometryData = new List<string>();
             int vertexIndex = 1;
-
-            foreach (cscSegmentV2 point in inputData)
+            float size = 0.0025f;
+            foreach (cscSegmentV2 seg in inputData)
             {
-                geometryData.Add($"v {point.pos_1[0]} {point.pos_1[1]} {point.pos_1[2]}");
-                geometryData.Add($"v {point.pos_2[0]} {point.pos_2[1]} {point.pos_2[2]}");
-
-                geometryData.Add($"l {vertexIndex} {vertexIndex + 1}");
-                vertexIndex += 2;
+                GeneratePrism(seg.pos_1, seg.pos_2, ref geometryData, ref vertexIndex, size);
             }
             return geometryData;
         }
-
+        static public List<cscSegmentV1> ParseCSCSegmentsV1(JObject data, string name)
+        {
+            var dataList = new List<cscSegmentV1>();
+            foreach (var item in data["Collections"]["CSCSegments_V1"])
+            {
+                var children = item.Children().Values<double>().ToArray();
+                cscSegmentV1 cscSegmentV1 = new cscSegmentV1();
+                cscSegmentV1.name = name;
+                cscSegmentV1.detid = (int)children[0];
+                cscSegmentV1.pos_1 = new double[] { children[1], children[2], children[3] };
+                cscSegmentV1.pos_2 = new double[] { children[4], children[5], children[6] };
+                dataList.Add(cscSegmentV1);
+            }
+            return dataList;
+        }
+        static public List<string> GenerateCSCSegmentV1(List<cscSegmentV1> inputData)
+        {
+            List<string> geometryData = new List<string>();
+            int vertexIndex = 1;
+            float size = 0.0025f;
+            foreach (cscSegmentV1 seg in inputData)
+            {
+                GeneratePrism(seg.pos_1, seg.pos_2, ref geometryData, ref vertexIndex, size);
+            }
+            return geometryData;
+        }
         static public List<dtRecSegment4D_V1> dtRecSegmentParse(JObject data, string name)
         {
             List<dtRecSegment4D_V1> dataList = new List<dtRecSegment4D_V1>();
@@ -673,17 +770,14 @@ namespace IGtoOBJGen
         {
             List<string> geometryData = new List<string>();
             int vertexIndex = 1;
+            float size = 0.005f;
             foreach (dtRecSegment4D_V1 point in inputData)
             {
-                geometryData.Add($"v {point.pos_1[0]} {point.pos_1[1]} {point.pos_1[2]}");
-                geometryData.Add($"v {point.pos_2[0]} {point.pos_2[1]} {point.pos_2[2]}");
-
-                geometryData.Add($"l {vertexIndex} {vertexIndex + 1}");
-                vertexIndex += 2;
+                GeneratePrism(point.pos_1, point.pos_2, ref geometryData, ref vertexIndex, size);
             }
             return geometryData;
         }
-
+        
         static public List<cscRecHit2Ds_V2> ParseCSCRecHits2Ds_V2(JObject data, string name)
         {
             List<cscRecHit2Ds_V2> dataList = new List<cscRecHit2Ds_V2>();
@@ -712,26 +806,19 @@ namespace IGtoOBJGen
             }
             return dataList;
         }
+     
         static public List<string> GenerateCSCRecHits(List<cscRecHit2Ds_V2> inputData)
         {
             List<string> geometryData = new List<string>();
             int vertexIndex = 1;
+            float size = 0.0005f;
+            //float size = 1;
             foreach (cscRecHit2Ds_V2 point in inputData)
             {
-                geometryData.Add($"v {point.u1[0]} {point.u1[1]} {point.u1[2]}");
-                geometryData.Add($"v {point.u2[0]} {point.u2[1]} {point.u2[2]}");
-                geometryData.Add($"l {vertexIndex} {vertexIndex + 1}");
-                vertexIndex += 2;
-
-                geometryData.Add($"v {point.v1[0]} {point.v1[1]} {point.v1[2]}");
-                geometryData.Add($"v {point.v2[0]} {point.v2[1]} {point.v2[2]}");
-                geometryData.Add($"l {vertexIndex} {vertexIndex + 1}");
-                vertexIndex += 2;
-
-                geometryData.Add($"v {point.w1[0]} {point.w1[1]} {point.w1[2]}");
-                geometryData.Add($"v {point.w2[0]} {point.w2[1]} {point.u2[2]}");
-                geometryData.Add($"l {vertexIndex} {vertexIndex + 1}");
-                vertexIndex += 2;
+                //float size = (float) point.errorWithinStrip;
+                GeneratePrism(point.u1, point.u2, ref geometryData, ref vertexIndex, size);
+                GeneratePrism(point.v1, point.v2, ref geometryData, ref vertexIndex, size);
+                GeneratePrism(point.w1, point.w2, ref geometryData, ref vertexIndex, size);
             }
             return geometryData;
         }

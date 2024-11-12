@@ -18,11 +18,12 @@ struct RPCRecHit
     public int roll;
     public int detid;
 }
-struct CSCSegment
+struct cscSegmentV1
 {
+    public string name;
     public int detid;
-    public double[] pos1;
-    public double[] pos2;
+    public double[] pos_1;
+    public double[] pos_2;
 }
 struct MuonChamberData : ObjectData
 {
@@ -321,4 +322,5 @@ struct CaloTowersV2 : ObjectData
     public double[] back_2;
     public double[] back_3;
     public double[] back_4;
+    public double scale;
 }

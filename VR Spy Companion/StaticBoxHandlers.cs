@@ -18,7 +18,7 @@ namespace VR_Spy_Companion
         static class StaticBoxHandlers
         {
     
-            static public List<MuonChamberData> muonChamberParse(JObject data)
+            static public List<MuonChamberData> muonChamberParse(JObject data, string name)
             {
                 /* 
                  * UGH, I have to work on a way to get the canvases in unity aligned properly with the muon chambers so that we can display 
@@ -45,8 +45,7 @@ namespace VR_Spy_Companion
                         }
                         MuonChamberData muonChamberData = new MuonChamberData();
                         var children = igChamberData.Children().Values<double>().ToArray();
-
-                        muonChamberData.name = "MuonChambers_V1";
+                        muonChamberData.name = name;
                         muonChamberData.id = idNumber;
                         muonChamberData.detid = (int)children[0];
                         muonChamberData.front_1 = new double[] { children[1], children[2], children[3] };
@@ -82,39 +81,39 @@ namespace VR_Spy_Companion
                 }
                 return dataList;
             }
-            static public void generateMuonChamberModels(List<MuonChamberData> data, string eventTitle)
+            static public List<String> generateMuonChamberModels(List<MuonChamberData> data)
             {
-                if (data.Count() == 0) { return; }
-
-                List<string> dataStrings = new List<string>();
-                List<string> normals = new List<string>();
                 int index = 0;
                 int counter = 1;
-                //dataStrings.Add("vn -1.0000 -0.0000 -0.0000\nvn -0.0000 -0.0000 -1.0000\nvn 1.0000 -0.0000 -0.0000\nvn -0.0000 -0.0000 1.0000\nvn -0.0000 -1.0000 -0.0000\nvn -0.0000 1.0000 -0.0000");
-
+                List<string> geometryData = new List<string>();
+                if (data.Count() == 0) { return geometryData; }
                 foreach (var chamber in data)
-                {
-                    dataStrings.Add($"o MuonChamber_{index}");
-                    dataStrings.Add($"v {String.Join(' ', chamber.front_1)}");
-                    dataStrings.Add($"v {String.Join(' ', chamber.front_2)}");
-                    dataStrings.Add($"v {String.Join(' ', chamber.front_3)}");
-                    dataStrings.Add($"v {String.Join(' ', chamber.front_4)}");
-                    dataStrings.Add($"v {String.Join(' ', chamber.back_1)}");
-                    dataStrings.Add($"v {String.Join(' ', chamber.back_2)}");
-                    dataStrings.Add($"v {String.Join(' ', chamber.back_3)}");
-                    dataStrings.Add($"v {String.Join(' ', chamber.back_4)}");
-                  
-                    dataStrings.Add($"f {counter + 3} {counter + 2} {counter + 1} {counter}");
-                    dataStrings.Add($"f {counter + 4} {counter + 5} {counter + 6} {counter + 7}");
-                    dataStrings.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}");
-                    dataStrings.Add($"f {counter + 4} {counter + 7} {counter + 3} {counter}");
-                    dataStrings.Add($"f {counter + 2} {counter + 3} {counter + 7} {counter + 6}");
-                    dataStrings.Add($"f {counter} {counter + 1} {counter + 5} {counter + 4}");
-                    index++;
+                    {
+                    geometryData.Add($"o MuonChamber_{index}");
+                    geometryData.Add($"v {String.Join(' ', chamber.front_1)}");
+                    geometryData.Add($"v {String.Join(' ', chamber.front_2)}");
+                    geometryData.Add($"v {String.Join(' ', chamber.front_3)}");
+                    geometryData.Add($"v {String.Join(' ', chamber.front_4)}");
+                    geometryData.Add($"v {String.Join(' ', chamber.back_1)}");
+                    geometryData.Add($"v {String.Join(' ', chamber.back_2)}");
+                    geometryData.Add($"v {String.Join(' ', chamber.back_3)}");
+                    geometryData.Add($"v {String.Join(' ', chamber.back_4)}");
+
+                    geometryData.Add($"f {counter + 3} {counter + 2} {counter + 1} {counter}");
+                    geometryData.Add($"f {counter + 4} {counter + 5} {counter + 6} {counter + 7}");
+                    geometryData.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}");
+                    geometryData.Add($"f {counter + 4} {counter + 7} {counter + 3} {counter}");
+                    geometryData.Add($"f {counter + 2} {counter + 3} {counter + 7} {counter + 6}");
+                    geometryData.Add($"f {counter} {counter + 1} {counter + 5} {counter + 4}");
                     counter += 8;
+                    index++; 
                 }
-                File.WriteAllText($"{eventTitle}\\MuonChambers_V1.obj", String.Empty);
-                File.WriteAllLines($"{eventTitle}\\MuonChambers_V1.obj", dataStrings);
+                return geometryData;
+                //}
+                //File.WriteAllText($"{eventTitle}\\MuonChambers_V1.obj", String.Empty);
+                //File.WriteAllLines($"{eventTitle}\\MuonChambers_V1.obj", dataStrings);
+                //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+                //File.WriteAllLines(Path.Combine(downloadsPath, "MuonChambers_V1.obj"), dataStrings);
             }
             static public List<CalorimetryTowers> setCaloScale(List<CalorimetryTowers> towers)
             {
@@ -150,7 +149,7 @@ namespace VR_Spy_Companion
                     caloItem.back_2 = new double[] { children[20], children[21], children[22] };
                     caloItem.back_3 = new double[] { children[23], children[24], children[25] };
                     caloItem.back_4 = new double[] { children[26], children[27], children[28] };
-                    if (children.Length == 30)//deltaPhi and deltaEta present
+                    if (children.Length >= 30)//deltaPhi and deltaEta present
                     {
                         caloItem.deltaEta = children[29];
                         caloItem.deltaPhi = children[30];
@@ -376,39 +375,6 @@ namespace VR_Spy_Companion
                     //newItem.detid = (int)children[25];
 
                     dataList.Add(newItem);
-                }
-                return dataList;
-            }
-            static public List<CSCSegment> ParseCSCSegmentsV1(JObject data)
-            {
-                var dataList = new List<CSCSegment>();
-                foreach(var item in data["Collections"]["CSCSegments_V1"])
-                {
-                    var newItem = new CSCSegment();
-
-                    var children = item.Children().Values<double>().ToArray();
-                    newItem.detid = (int)children[0];
-                    newItem.pos1 = children[1..4];
-                    newItem.pos2 = children[4..7];
-
-                    dataList.Add(newItem);
-                }
-                return dataList;
-            }
-            static public List<string> GenerateCSCSegments(List<CSCSegment> data, int version)
-            {
-                var dataList = new List<string>();
-                int counter = 0;
-                foreach(var seg in data)
-                {
-                    dataList.Add($"o CSCSegments_V{version}_{counter}");
-                    dataList.Add($"v {seg.pos1[0]} {seg.pos1[1]-0.005} {seg.pos1[2]}");
-                    dataList.Add($"v {seg.pos1[0]} {seg.pos1[1] + 0.005} {seg.pos1[2]}");
-                    dataList.Add($"v {seg.pos2[0]} {seg.pos2[1] - 0.005} {seg.pos2[2]}");
-                    dataList.Add($"v {seg.pos2[0]} {seg.pos2[1] + 0.005} {seg.pos2[2]}");
-                    dataList.Add($"f {4*counter + 1} {4 * counter + 2} {4 * counter + 3} {4 * counter + 4}");
-                    dataList.Add($"f {4 * counter + 4} {4 * counter + 3} {4 * counter + 2} {4 * counter + 1}");
-                    counter++;
                 }
                 return dataList;
             }
@@ -679,41 +645,41 @@ namespace VR_Spy_Companion
 
 
                 geometryData.Add($"v {String.Join(' ', v0)}");
-                        geometryData.Add($"v {String.Join(' ', v1)}");
-                        geometryData.Add($"v {String.Join(' ', v2)}");
-                        geometryData.Add($"v {String.Join(' ', v3)}");
-                        geometryData.Add($"v {String.Join(' ', v4)}");
-                        geometryData.Add($"v {String.Join(' ', v5)}");
-                        geometryData.Add($"v {String.Join(' ', v6)}");
-                        geometryData.Add($"v {String.Join(' ', v7)}");
+                geometryData.Add($"v {String.Join(' ', v1)}");
+                geometryData.Add($"v {String.Join(' ', v2)}");
+                geometryData.Add($"v {String.Join(' ', v3)}");
+                geometryData.Add($"v {String.Join(' ', v4)}");
+                geometryData.Add($"v {String.Join(' ', v5)}");
+                geometryData.Add($"v {String.Join(' ', v6)}");
+                geometryData.Add($"v {String.Join(' ', v7)}");
 
-                        geometryData.Add($"f {counter}//1 {counter + 1}//1 {counter + 2}//1 {counter + 3}//1");
-                        geometryData.Add($"f {counter + 3}//1 {counter + 2}//1 {counter + 1}//1 {counter}//1");
-                        geometryData.Add($"f {counter + 4}//2 {counter + 5}//2 {counter + 6}//2 {counter + 7}//2");
-                        geometryData.Add($"f {counter + 7}//2 {counter + 6}//2 {counter + 5}//2 {counter + 4}//2");
-                        geometryData.Add($"f {counter}//3 {counter + 3}//3 {counter + 7}//3 {counter + 4}//3");
-                        geometryData.Add($"f {counter + 4}//3 {counter + 7}//3 {counter + 3}//3 {counter}//3");
-                        geometryData.Add($"f {counter + 1}//4 {counter + 2}//4 {counter + 6}//4 {counter + 5}//4");
-                        geometryData.Add($"f {counter + 5}//4 {counter + 6}//4 {counter + 2}//4 {counter + 1}//4");
-                        geometryData.Add($"f {counter + 3}//5 {counter + 2}//5 {counter + 6}//5 {counter + 7}//5");
-                        geometryData.Add($"f {counter + 7}//5 {counter + 6}//5 {counter + 2}//5 {counter + 3}//5");
-                        geometryData.Add($"f {counter + 1}//6 {counter}//6 {counter + 4}//6 {counter + 5}//6");
-                        geometryData.Add($"f {counter + 5}//6 {counter + 4}//6 {counter}//6 {counter + 1}//6");
+                geometryData.Add($"f {counter}//1 {counter + 1}//1 {counter + 2}//1 {counter + 3}//1");
+                geometryData.Add($"f {counter + 3}//1 {counter + 2}//1 {counter + 1}//1 {counter}//1");
+                geometryData.Add($"f {counter + 4}//2 {counter + 5}//2 {counter + 6}//2 {counter + 7}//2");
+                geometryData.Add($"f {counter + 7}//2 {counter + 6}//2 {counter + 5}//2 {counter + 4}//2");
+                geometryData.Add($"f {counter}//3 {counter + 3}//3 {counter + 7}//3 {counter + 4}//3");
+                geometryData.Add($"f {counter + 4}//3 {counter + 7}//3 {counter + 3}//3 {counter}//3");
+                geometryData.Add($"f {counter + 1}//4 {counter + 2}//4 {counter + 6}//4 {counter + 5}//4");
+                geometryData.Add($"f {counter + 5}//4 {counter + 6}//4 {counter + 2}//4 {counter + 1}//4");
+                geometryData.Add($"f {counter + 3}//5 {counter + 2}//5 {counter + 6}//5 {counter + 7}//5");
+                geometryData.Add($"f {counter + 7}//5 {counter + 6}//5 {counter + 2}//5 {counter + 3}//5");
+                geometryData.Add($"f {counter + 1}//6 {counter}//6 {counter + 4}//6 {counter + 5}//6");
+                geometryData.Add($"f {counter + 5}//6 {counter + 4}//6 {counter}//6 {counter + 1}//6");
 
-                    
+
                 //double deltaPhi = 1.0;
                 //double deltaEta = 1.0;
 
-                double sin_theta1 = Math.Sqrt(Math.Pow(v0[0], 2) + Math.Pow(v0[1], 2)) / v0.L2Norm();
-                double cos_theta1 = v0[2] / v0.L2Norm();
-                double sin_theta4 = Math.Sqrt(Math.Pow(v3[0], 2) + Math.Pow(v3[1], 2)) / v3.L2Norm();
-                double cos_theta4 = v3[2] / v3.L2Norm();
-                double deltaEta = Math.Log(((1 - cos_theta4) / (1 - cos_theta1)) * (sin_theta1 / sin_theta4));
+                //double sin_theta1 = Math.Sqrt(Math.Pow(v0[0], 2) + Math.Pow(v0[1], 2)) / v0.L2Norm();
+                //double cos_theta1 = v0[2] / v0.L2Norm();
+                //double sin_theta4 = Math.Sqrt(Math.Pow(v3[0], 2) + Math.Pow(v3[1], 2)) / v3.L2Norm();
+                //double cos_theta4 = v3[2] / v3.L2Norm();
+                //double deltaEta = Math.Log(((1 - cos_theta4) / (1 - cos_theta1)) * (sin_theta1 / sin_theta4));
                 //Console.WriteLine(deltaEta);
 
 
                 //box.deltaPhi = deltaPhi;
-                box.deltaEta = deltaEta;
+                //box.deltaEta = deltaEta;
                 deltas.Add(box);
                     counter += 8;
                 }
@@ -723,7 +689,7 @@ namespace VR_Spy_Companion
             {
                 List<string> geometryData = new List<string>();
                 int counter = 1;
-            List<CalorimetryTowers> deltas = new List<CalorimetryTowers>();
+                List<CalorimetryTowers> deltas = new List<CalorimetryTowers>();
                 geometryData.Add("vn -1.0000 -0.0000 -0.0000\nvn -0.0000 -0.0000 -1.0000\nvn 1.0000 -0.0000 -0.0000\nvn -0.0000 -0.0000 1.0000\nvn -0.0000 -1.0000 -0.0000\nvn -0.0000 1.0000 -0.0000");
 
                 var V = Vector<double>.Build;
@@ -776,26 +742,26 @@ namespace VR_Spy_Companion
                 box.geometricVertices.Add(v7.ToArray());
 
                 geometryData.Add($"v {String.Join(' ', v0)}");
-                    geometryData.Add($"v {String.Join(' ', v1)}");
-                    geometryData.Add($"v {String.Join(' ', v2)}");
-                    geometryData.Add($"v {String.Join(' ', v3)}");
-                    geometryData.Add($"v {String.Join(' ', v4)}");
-                    geometryData.Add($"v {String.Join(' ', v5)}");
-                    geometryData.Add($"v {String.Join(' ', v6)}");
-                    geometryData.Add($"v {String.Join(' ', v7)}");
+                geometryData.Add($"v {String.Join(' ', v1)}");
+                geometryData.Add($"v {String.Join(' ', v2)}");
+                geometryData.Add($"v {String.Join(' ', v3)}");
+                geometryData.Add($"v {String.Join(' ', v4)}");
+                geometryData.Add($"v {String.Join(' ', v5)}");
+                geometryData.Add($"v {String.Join(' ', v6)}");
+                geometryData.Add($"v {String.Join(' ', v7)}");
 
-                    geometryData.Add($"f {counter}//1 {counter + 1}//1 {counter + 2}//1 {counter + 3}//1");
-                    geometryData.Add($"f {counter + 3}//1 {counter + 2}//1 {counter + 1}//1 {counter}//1");
-                    geometryData.Add($"f {counter + 4}//2 {counter + 5}//2 {counter + 6}//2 {counter + 7}//2");
-                    geometryData.Add($"f {counter + 7}//2 {counter + 6}//2 {counter + 5}//2 {counter + 4}//2");
-                    geometryData.Add($"f {counter}//3 {counter + 3}//3 {counter + 7}//3 {counter + 4}//3");
-                    geometryData.Add($"f {counter + 4}//3 {counter + 7}//3 {counter + 3}//3 {counter}//3");
-                    geometryData.Add($"f {counter + 1}//4 {counter + 2}//4 {counter + 6}//4 {counter + 5}//4");
-                    geometryData.Add($"f {counter + 5}//4 {counter + 6}//4 {counter + 2}//4 {counter + 1}//4");
-                    geometryData.Add($"f {counter + 3}//5 {counter + 2}//5 {counter + 6}//5 {counter + 7}//5");
-                    geometryData.Add($"f {counter + 7}//5 {counter + 6}//5 {counter + 2}//5 {counter + 3}//5");
-                    geometryData.Add($"f {counter + 1}//6 {counter}//6 {counter + 4}//6 {counter + 5}//6");
-                    geometryData.Add($"f {counter + 5}//6 {counter + 4}//6 {counter}//6 {counter + 1}//6");
+                geometryData.Add($"f {counter}//1 {counter + 1}//1 {counter + 2}//1 {counter + 3}//1");
+                geometryData.Add($"f {counter + 3}//1 {counter + 2}//1 {counter + 1}//1 {counter}//1");
+                geometryData.Add($"f {counter + 4}//2 {counter + 5}//2 {counter + 6}//2 {counter + 7}//2");
+                geometryData.Add($"f {counter + 7}//2 {counter + 6}//2 {counter + 5}//2 {counter + 4}//2");
+                geometryData.Add($"f {counter}//3 {counter + 3}//3 {counter + 7}//3 {counter + 4}//3");
+                geometryData.Add($"f {counter + 4}//3 {counter + 7}//3 {counter + 3}//3 {counter}//3");
+                geometryData.Add($"f {counter + 1}//4 {counter + 2}//4 {counter + 6}//4 {counter + 5}//4");
+                geometryData.Add($"f {counter + 5}//4 {counter + 6}//4 {counter + 2}//4 {counter + 1}//4");
+                geometryData.Add($"f {counter + 3}//5 {counter + 2}//5 {counter + 6}//5 {counter + 7}//5");
+                geometryData.Add($"f {counter + 7}//5 {counter + 6}//5 {counter + 2}//5 {counter + 3}//5");
+                geometryData.Add($"f {counter + 1}//6 {counter}//6 {counter + 4}//6 {counter + 5}//6");
+                geometryData.Add($"f {counter + 5}//6 {counter + 4}//6 {counter}//6 {counter + 1}//6");
 
                 v1 /= v1.L2Norm();
                 v2 /= v2.L2Norm();
@@ -1216,10 +1182,43 @@ namespace VR_Spy_Companion
                     geometryData.Add($"v {box.back_3[0]} {box.back_3[1]} {box.back_3[2]}");
                     geometryData.Add($"v {box.back_4[0]} {box.back_4[1]} {box.back_4[2]}");
 
-                    geometryData.Add($"f {counter} {counter + 1} {counter + 5} {counter + 4}"); // Side 1
-                    geometryData.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}"); // Side 2
-                    geometryData.Add($"f {counter + 2} {counter + 3} {counter + 7} {counter + 6}"); // Side 3
-                    geometryData.Add($"f {counter + 3} {counter} {counter + 4} {counter + 7}"); // Side 4
+                    // Front face
+                    geometryData.Add($"f {counter} {counter + 1} {counter + 2}");
+                    geometryData.Add($"f {counter + 2} {counter + 3} {counter}");
+                    geometryData.Add($"f {counter + 2} {counter + 1} {counter}");  // Back-facing front
+                    geometryData.Add($"f {counter} {counter + 3} {counter + 2}");
+
+                    // Back face
+                    geometryData.Add($"f {counter + 4} {counter + 5} {counter + 6}");
+                    geometryData.Add($"f {counter + 6} {counter + 7} {counter + 4}");
+                    geometryData.Add($"f {counter + 6} {counter + 5} {counter + 4}");  // Back-facing back
+                    geometryData.Add($"f {counter + 4} {counter + 7} {counter + 6}");
+
+                    // Left side
+                    geometryData.Add($"f {counter + 4} {counter + 5} {counter + 1}");
+                    geometryData.Add($"f {counter + 1} {counter} {counter + 4}");
+                    geometryData.Add($"f {counter + 1} {counter + 5} {counter + 4}");  // Back-facing left
+                    geometryData.Add($"f {counter + 4} {counter} {counter + 1}");
+
+                    // Right side
+                    geometryData.Add($"f {counter + 7} {counter + 6} {counter + 2}");
+                    geometryData.Add($"f {counter + 2} {counter + 3} {counter + 7}");
+                    geometryData.Add($"f {counter + 2} {counter + 6} {counter + 7}");  // Back-facing right
+                    geometryData.Add($"f {counter + 7} {counter + 3} {counter + 2}");
+
+                    // Top face
+                    geometryData.Add($"f {counter} {counter + 3} {counter + 7}");
+                    geometryData.Add($"f {counter + 7} {counter + 4} {counter}");
+                    geometryData.Add($"f {counter + 7} {counter + 3} {counter}");  // Back-facing top
+                    geometryData.Add($"f {counter} {counter + 4} {counter + 7}");
+
+                    // Bottom face
+                    geometryData.Add($"f {counter + 1} {counter + 5} {counter + 6}");
+                    geometryData.Add($"f {counter + 6} {counter + 2} {counter + 1}");
+                    geometryData.Add($"f {counter + 6} {counter + 5} {counter + 1}");  // Back-facing bottom
+                    geometryData.Add($"f {counter + 1} {counter + 2} {counter + 6}");
+
+
 
                     counter += 8;
                 }
@@ -1317,23 +1316,18 @@ namespace VR_Spy_Companion
 
                     }
 
-                    geometryData.Add($"f {counter} {counter + 1} {counter + 2}");
-                    geometryData.Add($"f {counter + 2} {counter + 3} {counter}");
-
-                    geometryData.Add($"f {counter + 4} {counter + 5} {counter + 6}");
-                    geometryData.Add($"f {counter + 6} {counter + 7} {counter + 4}");
-
-                    geometryData.Add($"f {counter + 4} {counter + 5} {counter + 1}");
-                    geometryData.Add($"f {counter + 1} {counter} {counter + 4}");
-
-                    geometryData.Add($"f {counter + 7} {counter + 6} {counter + 2}");
-                    geometryData.Add($"f {counter + 2} {counter + 3} {counter + 7}");
-
-                    geometryData.Add($"f {counter} {counter + 3} {counter + 7}");
-                    geometryData.Add($"f {counter + 7} {counter + 4} {counter}");
-
-                    geometryData.Add($"f {counter + 1} {counter + 5} {counter + 6}");
-                    geometryData.Add($"f {counter + 6} {counter + 2} {counter + 1}");
+                    geometryData.Add($"f {counter} {counter + 1} {counter + 2} {counter + 3}");
+                    geometryData.Add($"f {counter + 3} {counter + 2} {counter + 1} {counter}");
+                    geometryData.Add($"f {counter + 4} {counter + 5} {counter + 6} {counter + 7}");
+                    geometryData.Add($"f {counter + 7} {counter + 6} {counter + 5} {counter + 4}");
+                    geometryData.Add($"f {counter} {counter + 3} {counter + 7} {counter + 4}");
+                    geometryData.Add($"f {counter + 4} {counter + 7} {counter + 3} {counter}");
+                    geometryData.Add($"f {counter + 1} {counter + 2} {counter + 6} {counter + 5}");
+                    geometryData.Add($"f {counter + 5} {counter + 6} {counter + 2} {counter + 1}");
+                    geometryData.Add($"f {counter + 3} {counter + 2} {counter + 6} {counter + 7}");
+                    geometryData.Add($"f {counter + 7} {counter + 6} {counter + 2} {counter + 3}");
+                    geometryData.Add($"f {counter + 1} {counter} {counter + 4} {counter + 5}");
+                    geometryData.Add($"f {counter + 5} {counter + 4} {counter} {counter + 1}");
                     counter += 8;
 
                 }
@@ -1379,7 +1373,8 @@ namespace VR_Spy_Companion
                 foreach (var tower in data)
                 {
                     double theta = 2 * Math.Atan(Math.Exp(-1 * tower.eta));
-                    double scale = tower.scale;
+                    //double scale = tower.scale;
+                    double scale = 0.1; //ispy
                     double min_energy = 0.1;
 
                     if (tower.et > min_energy)
@@ -1428,6 +1423,7 @@ namespace VR_Spy_Companion
                             dataList.Add($"v {String.Join(' ', f2)}");
                             dataList.Add($"v {String.Join(' ', f3)}");
                             dataList.Add($"v {String.Join(' ', f4)}");
+
                             dataList.Add($"v {String.Join(' ', b1e)}");
                             dataList.Add($"v {String.Join(' ', b2e)}");
                             dataList.Add($"v {String.Join(' ', b3e)}");
