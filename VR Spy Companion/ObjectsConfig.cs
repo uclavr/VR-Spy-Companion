@@ -819,8 +819,8 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}/CSCRecHit2Ds_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/CSCRecHit2Ds_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(cscRecHits);
-            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            File.WriteAllLines(Path.Combine(downloadsPath, "CSCRecHit2Ds_V2.obj"), dataList);
+            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
+            //File.WriteAllLines(Path.Combine(downloadsPath, "CSCRecHit2Ds_V2.obj"), dataList);
             return ("\"CSCRecSegments2DsV2Datas\":" + data);
         }
 
@@ -901,8 +901,8 @@ namespace IGtoOBJGen {
         {
             calotowerv2Data = StaticBoxHandlers.caloTowerV2Parse(JSON, "CaloTowers_V2");
             List<string> dataList = StaticBoxHandlers.generateCaloTowerV2(calotowerv2Data);
-            File.WriteAllText($"{eventTitle}/CaloTowers_V2.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}/CaloTowers_V2", dataList);
+            //File.WriteAllText($"{eventTitle}/CaloTowers_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}/CaloTowers_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(calotowerv2Data);
             //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads/code/UCLA_CMS_VR/IGDATA/obj_files");
             //File.WriteAllLines(Path.Combine(downloadsPath, "CaloTowers_V2.obj"), dataList);
@@ -1181,7 +1181,8 @@ namespace IGtoOBJGen {
         }
         private void GenerateVertexOBJ()
         {
-            StaticBoxHandlers.GenerateEllipsoidObj($@"{eventTitle}\Vertices_V1.obj", vertexDatas, 3.0);
+            StaticBoxHandlers.GenerateEllipsoidObj($@"{eventTitle}/Vertices_V1.obj", vertexDatas, 3.0);
+            //WE FIXED THIS IT WAS A \ BEFORE
         }
     }
     class PrimaryVertices_V1 : TypeConfig

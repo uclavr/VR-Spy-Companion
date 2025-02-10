@@ -3,8 +3,40 @@ using Newtonsoft.Json.Linq;
 using System.Diagnostics;
 using IGtoOBJGen;
 using System.Reflection;
+using System.IO;
+using System.Text.RegularExpressions;
 
 class OBJGenerator {
+    static void flip(string targetPath)
+    {
+        string[] files = Directory.GetFiles(targetPath);
+        foreach (string file in files)
+        {
+            if (Path.GetExtension(file) == ".obj")
+            {
+                string[] lines = File.ReadAllLines(file);
+                string pattern = @"v (\d+) (\d+) (\d+)";
+                for (int i = 0; i < lines.Length; i++)
+                { 
+                    string line = lines[i];
+                    if (line[0] == 'v')
+                    {
+                        string temp = line;
+                        temp = temp.Trim(); 
+                        string[] arr = temp.Split(); 
+                        double z = Double.Parse(arr[3]); //convert string to double
+                        z *= -1; //negate z
+                        arr[3] = z.ToString();
+                        temp = string.Join(" ", arr); 
+                        lines[i] = temp;
+                    }
+                }
+                //string name = Path.GetFileNameWithoutExtension(file);
+                //name = targetPath + "/" + name + "_flipped" + ".obj";
+                File.WriteAllLines(file, lines);
+            }
+        }
+    }
     static void Main(string[] args) {
         bool inputState;
         string eventName;
@@ -93,9 +125,8 @@ class OBJGenerator {
             cleanup.callCleanUp();
         };
 
+        flip(targetPath);
         zipper.destroyStorage();
-
-        
         Console.WriteLine($"OBJ Files written to: {targetPath}\n\nPress ENTER to continue and move files from your device and onto the Oculus Quest");
         Console.ReadLine();
         Communicate bridge = new Communicate(adbPath);

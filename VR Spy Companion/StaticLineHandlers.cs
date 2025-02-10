@@ -67,7 +67,7 @@ namespace IGtoOBJGen
             }
 
             string Contents;
-            Contents = $"v {x0} {y0} {z0}\nv {x0 + 0.001} {y0 + 0.001} {z0 + 0.001}\nv {x0 + px * t} {y0 + py * t} {z0 + pz * t}\nv {x0 + px * t + 0.001} {y0 + py * t + 0.001} {z0 + pz * t + 0.001}";
+            Contents = $"v {x0} {y0} {z0}\nv {x0 + 0.001} {y0 + 0.001} {(z0 + 0.001)}\nv {x0 + px * t} {y0 + py * t} {(z0 + pz * t)}\nv {x0 + px * t + 0.001} {y0 + py * t + 0.001} {(z0 + pz * t + 0.001)}";
             //Output a string of obj vectors that define the photon path
             return Contents;
         }
@@ -198,7 +198,7 @@ namespace IGtoOBJGen
             }
             return dataList;
         }
-        static public List<TrackExtrasData> setExtras(JObject data,string association)
+        static public List<TrackExtrasData> setExtras(JObject data,string association) 
         {
             List<TrackExtrasData> dataList = new List<TrackExtrasData>();
             var assocsExtras = data["Associations"][association];
@@ -210,7 +210,7 @@ namespace IGtoOBJGen
                 TrackExtrasData currentItem = new TrackExtrasData();
 
                 var children = extra.Children().Values<double>().ToArray();
-
+                
                 currentItem.pos1 = new double[3] { children[0], children[1], children[2] };
 
                 double dir1mag = Math.Sqrt(  //dir1mag and dir2mag are for making sure the direction vectors are normalized
@@ -220,7 +220,7 @@ namespace IGtoOBJGen
                 );
                 currentItem.dir1 = new double[3] { children[3] / dir1mag, children[4] / dir1mag, children[5] / dir1mag };
 
-                currentItem.pos2 = new double[3] { children[6], children[7], children[8] };
+                currentItem.pos2 = new double[3] { children[6], children[7],  children[8] };
 
                 double dir2mag = Math.Sqrt(
                     Math.Pow(children[9], 2) +
@@ -524,7 +524,9 @@ namespace IGtoOBJGen
                 mi = item[0][1].Value<int>();
                 pi = item[1][1].Value<int>();
                 if (positions.Count() <= mi) { List<double[]> blank = new List<double[]>(); positions.Add(blank); }
-                positions[mi].Add(extras[pi][0].ToObject<double[]>());
+                double[] point = extras[pi][0].ToObject<double[]>();
+                positions[mi].Add(point);
+                
             }
             return positions;
         }
@@ -561,7 +563,7 @@ namespace IGtoOBJGen
                 accountingfactor += count - 1;
                 strings.AddRange(ble);
             }
-            File.WriteAllLines(@$"{eventTitle}\{path}.obj", strings);
+            File.WriteAllLines(@$"{eventTitle}/{path}.obj", strings);
             string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
             File.WriteAllLines(Path.Combine(downloadsPath, @$"{eventTitle}/{path}.obj"), strings);
         }

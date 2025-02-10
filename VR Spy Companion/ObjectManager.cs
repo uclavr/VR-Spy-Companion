@@ -24,12 +24,6 @@ namespace IGtoOBJGen
         private bool EXTRASFLAG;
         private bool POINTSFLAG;
 
-        /*
-         TODO:
-            add cleanup methods and listeners
-            implement adb
-            go into maui
-         */
         public ObjectManager(JObject JSON, string eventTitle)
         {
             dataObjects = new List<ObjectData>();

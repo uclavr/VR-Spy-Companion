@@ -18,7 +18,7 @@ namespace IGtoOBJGen
             List<DeviceData> devices = client.GetDevices();
             foreach(var device in devices)
             {
-                if (device.Model == "Quest_2")
+                if (device.Model == "Quest_2" || device.Model == "Quest_3")
                 {
                     oculusDevice = device;
                 }
