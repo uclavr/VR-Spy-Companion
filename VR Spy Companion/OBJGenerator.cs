@@ -31,8 +31,6 @@ class OBJGenerator {
                         lines[i] = temp;
                     }
                 }
-                //string name = Path.GetFileNameWithoutExtension(file);
-                //name = targetPath + "/" + name + "_flipped" + ".obj";
                 File.WriteAllLines(file, lines);
             }
         }
@@ -46,7 +44,7 @@ class OBJGenerator {
         JsonTextReader reader;
         JObject o2;
         List<string> fileNames = new List<string>();
-        //string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/platform-tools/adb.exe";
+        //string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\platform-tools\adb.exe"; //windows
         string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/platform-tools/adb"; //macos
         inputState = args.Length == 0;
         

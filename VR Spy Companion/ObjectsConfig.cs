@@ -380,8 +380,6 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}/TrackDets_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/TrackDets_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(trackerPieceData);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "TrackDets_V1.obj"), dataList);
             return ("\"trackDetsV1Data\":" + data);
         }
     }
@@ -401,8 +399,6 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}/TrackingRecHits_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/TrackingRecHits_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(trackingRecHitData);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "TrackingRecHits_V1.obj"), dataList);
             return ("\"TrackingRecHits_V1Data\":" + data);
         }
     }
@@ -422,8 +418,6 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}/SiStripClusters_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/SiStripClusters_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(sistripClusterData);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "SiStripClusters_V1.obj"), dataList);
             return ("\"SiStripClusters_V1Data\":" + data);
         }
     }
@@ -443,8 +437,6 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}/SiPixelClusters_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/SiPixelClusters_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(sipixelClusterData);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "SiPixelClusters_V1.obj"), dataList)
             return ("\"SiPixelClusters_V1Data\":" + data);
         }
     }
@@ -464,8 +456,6 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}/DTRecHits_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/DTRecHits_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(dtrechitdata);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "DTRecHits_V1.obj"), dataList);
             return ("\"DTRecHits_V1Data\":" + data);
         }
     }
@@ -485,8 +475,6 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}/DTRecSegment4D_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/DTRecSegment4D_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(dtrecsegmentdata);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "DTRecSegment4D_V1.obj"), dataList);
             return ("\"DTRecSegment4D_V1Data\":" + data);
         }
     }
@@ -799,8 +787,6 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}/MatchingCSCs_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/MatchingCSCs_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(matchingCSCData);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "MatchingCSCs_V1.obj"), dataList);
             return ("\"MatchingCSCs_V1\":" + data);
         }
     }
@@ -819,8 +805,6 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}/CSCRecHit2Ds_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/CSCRecHit2Ds_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(cscRecHits);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "CSCRecHit2Ds_V2.obj"), dataList);
             return ("\"CSCRecSegments2DsV2Datas\":" + data);
         }
 
@@ -859,8 +843,6 @@ namespace IGtoOBJGen {
             File.WriteAllText($"{eventTitle}/CSCSegments_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/CSCSegments_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(cscSegmentData);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "CSCSegments_V2.obj"), dataList);
             return ("\"CSCSegments_V2\":" + data);
         }
     }
@@ -883,8 +865,6 @@ namespace IGtoOBJGen {
             ////return JsonConvert.SerializeObject(muonChamberData);
             File.WriteAllLines($"{eventTitle}/MuonChambers_V1.obj", dataList);
             string data = JsonConvert.SerializeObject(muonChamberData);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "MuonChambers_V1.obj"), dataList);
             return ("\"MuonChambers_V1\":" + data);
         }
     }
@@ -904,8 +884,6 @@ namespace IGtoOBJGen {
             //File.WriteAllText($"{eventTitle}/CaloTowers_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/CaloTowers_V2.obj", dataList);
             string data = JsonConvert.SerializeObject(calotowerv2Data);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads/code/UCLA_CMS_VR/IGDATA/obj_files");
-            //File.WriteAllLines(Path.Combine(downloadsPath, "CaloTowers_V2.obj"), dataList);
             return ("\"CaloTowers_V2\":" + data);
         }
     }
