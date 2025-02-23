@@ -562,8 +562,6 @@ namespace IGtoOBJGen
                 strings.AddRange(ble);
             }
             File.WriteAllLines(@$"{eventTitle}\{path}.obj", strings);
-            string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            File.WriteAllLines(Path.Combine(downloadsPath, @$"{eventTitle}/{path}.obj"), strings);
         }
         static public List<trackingPoint> trackingpointParse(JObject data, string name, int index)
         {

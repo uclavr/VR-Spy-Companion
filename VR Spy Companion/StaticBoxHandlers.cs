@@ -109,11 +109,6 @@ namespace VR_Spy_Companion
                     index++; 
                 }
                 return geometryData;
-                //}
-                //File.WriteAllText($"{eventTitle}\\MuonChambers_V1.obj", String.Empty);
-                //File.WriteAllLines($"{eventTitle}\\MuonChambers_V1.obj", dataStrings);
-                //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-                //File.WriteAllLines(Path.Combine(downloadsPath, "MuonChambers_V1.obj"), dataStrings);
             }
             static public List<CalorimetryTowers> setCaloScale(List<CalorimetryTowers> towers)
             {

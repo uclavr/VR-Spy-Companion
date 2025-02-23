@@ -70,8 +70,6 @@ namespace IGtoOBJGen
             data += '}';
 
             File.WriteAllText($"{EVENTPATH}\\totaldata.json",data);
-            //string downloadsPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "Downloads");
-            //File.WriteAllText($"{downloadsPath}//totaldata.json", data);
         }
         /*private string CreateTempFolder()
         {

@@ -5,6 +5,34 @@ using IGtoOBJGen;
 using System.Reflection;
 
 class OBJGenerator {
+    static void flip(string targetPath)
+    {
+        string[] files = Directory.GetFiles(targetPath);
+        foreach (string file in files)
+        {
+            if (Path.GetExtension(file) == ".obj")
+            {
+                string[] lines = File.ReadAllLines(file);
+                string pattern = @"v (\d+) (\d+) (\d+)";
+                for (int i = 0; i < lines.Length; i++)
+                {
+                    string line = lines[i];
+                    if (line[0] == 'v')
+                    {
+                        string temp = line;
+                        temp = temp.Trim();
+                        string[] arr = temp.Split();
+                        double z = Double.Parse(arr[3]); //convert string to double
+                        z *= -1; //negate z
+                        arr[3] = z.ToString();
+                        temp = string.Join(" ", arr);
+                        lines[i] = temp;
+                    }
+                    File.WriteAllLines(file, lines);
+                }
+            }
+        }
+    }
     static void Main(string[] args) {
         bool inputState;
         string eventName;
@@ -14,7 +42,7 @@ class OBJGenerator {
         JsonTextReader reader;
         JObject o2;
         List<string> fileNames = new List<string>();
-        string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/platform-tools/adb.exe"; //windows
+        string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + @"\platform-tools\adb.exe"; //windows
         //string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/platform-tools/adb"; //macos
         inputState = args.Length == 0;
         
@@ -51,7 +79,7 @@ class OBJGenerator {
         watch.Start();
 
         if (inputState == true) {
-            file = File.OpenText(@"/IGdata/Event_1096322990");
+            file = File.OpenText(@"\IGdata\Event_1096322990");
             eventName = "Event_1096322990";
         }
         else {
@@ -77,7 +105,7 @@ class OBJGenerator {
         var deletionPath = Path.GetDirectoryName(targetPath);
         string temp_Folder = targetPath;
         eventName = Path.GetFileName(eventName);
-        targetPath += "/" + eventName;
+        targetPath += @"\" + eventName;
         Directory.CreateDirectory(targetPath);
         reader = new JsonTextReader(file);
         o2 = (JObject)JToken.ReadFrom(reader);
@@ -91,7 +119,7 @@ class OBJGenerator {
         AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) => {
             cleanup.callCleanUp();
         };
-
+        flip(targetPath);
         zipper.destroyStorage();
 
         
