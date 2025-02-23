@@ -14,7 +14,7 @@ The master branch of this repository is designed to be used by macOS. If you are
 
 1) Clone the repository
 2) Connect your headset (Quest 2 & Quest 3 are supported) and enable USB Debugging and Developer Mode on the headset
-3) Go to bin/Release/net6.0 and run the following command
+3) Go to bin/Debug/net6.0 and run the following command
 ```
 "VR Spy Companion.exe" path_to_ig_file
 ```
