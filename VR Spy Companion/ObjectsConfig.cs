@@ -95,6 +95,7 @@ namespace IGtoOBJGen {
         {
             JSON = arg;
             eventTitle = eventtitle;
+            trackExtras = new List<TrackExtrasData>();
             SetExtras();
         }
         private void SetExtras()
@@ -228,13 +229,14 @@ namespace IGtoOBJGen {
     }
     class TracksV3 : TypeConfig
     {
-        private List<TrackExtrasData> trackExtras = new List<TrackExtrasData>();
+        private List<TrackExtrasData> trackExtras;
         private List<Track> trackData;
         private string eventTitle;
         public TracksV3(JObject arg, string eventtitle)
         {
             JSON = arg;
             eventTitle = eventtitle;
+            trackExtras = new List<TrackExtrasData>();
             SetExtras();
         }
         private void SetExtras()
@@ -304,6 +306,7 @@ namespace IGtoOBJGen {
         {
             JSON = arg;
             eventTitle = eventtitle;
+            trackExtras = new List<TrackExtrasData>();
             SetExtras();
         }
         private void SetExtras()
