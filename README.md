@@ -36,4 +36,4 @@ VR Spy Companion utilizes the Android Debug Bridge to communicate with Oculus de
 ### ISpy Analyzer & Generation of IG Files
 To visualize energies registered by the CMS's Electromagnetic Calorimeter (ECAL) in the Endcap regions (EE) within LEGO plots, users must create .ig files using our modified ISpy Analyzer file (ISpyEERecHit.cc) which has been updated to include calorimeter segmentation data for the EE regions.
 
-To do this, simply replace the file "ISpyEERecHit.cc" at "cd CMSSW_14_0_5/src/ISpy/Analyzers/src/ISpyEERecHit.cc" in CMSSW with the file at https://github.com/nathan-joshua/ispy-analyzers/tree/master and run the remaining commands to generate .ig files as usual.
+To do this, simply replace the file "ISpyEERecHit.cc" at "cd CMSSW_14_0_5/src/ISpy/Analyzers/src/ISpyEERecHit.cc" in CMSSW with the file at https://github.com/nathan-joshua/ispy-analyzers/blob/master/src/ISpyEERecHit.cc and run the remaining commands to generate .ig files as usual.
