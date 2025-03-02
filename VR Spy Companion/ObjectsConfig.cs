@@ -95,6 +95,7 @@ namespace IGtoOBJGen {
         {
             JSON = arg;
             eventTitle = eventtitle;
+            trackExtras = new List<TrackExtrasData>();
             SetExtras();
         }
         private void SetExtras()
@@ -228,13 +229,14 @@ namespace IGtoOBJGen {
     }
     class TracksV3 : TypeConfig
     {
-        private List<TrackExtrasData> trackExtras = new List<TrackExtrasData>();
+        private List<TrackExtrasData> trackExtras;
         private List<Track> trackData;
         private string eventTitle;
         public TracksV3(JObject arg, string eventtitle)
         {
             JSON = arg;
             eventTitle = eventtitle;
+            trackExtras = new List<TrackExtrasData>();
             SetExtras();
         }
         private void SetExtras()
@@ -304,6 +306,7 @@ namespace IGtoOBJGen {
         {
             JSON = arg;
             eventTitle = eventtitle;
+            trackExtras = new List<TrackExtrasData>();
             SetExtras();
         }
         private void SetExtras()
@@ -346,8 +349,8 @@ namespace IGtoOBJGen {
 
                 currentItem.pos3 = new double[3] { children[0] + scale * currentItem.dir1[0], children[1] + scale * currentItem.dir1[1], children[2] + scale * currentItem.dir1[2] };
                 currentItem.pos4 = new double[3] { children[6] - scale * currentItem.dir2[0], children[7] - scale * currentItem.dir2[1], children[8] - scale * currentItem.dir2[2] };
-
-                trackExtras.Add(currentItem);
+                try { trackExtras.Add(currentItem); }
+                catch(Exception error) { Console.WriteLine(error); }
             }
         }
         public override string Execute()
