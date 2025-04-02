@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
 
 namespace IGtoOBJGen
@@ -6,7 +7,8 @@ namespace IGtoOBJGen
     class Unzip
     {
         private string directoryName { get; set; }
-        public string currentFile;
+        //public string currentFile;
+        public string[] files;
         private string tempStorageDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"/Temp/IGtoOBJGenExtraction";
         private string tempTransmitDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"/Temp/IGtoOBJGenTransmission";
         public Unzip(string filename)
@@ -25,13 +27,15 @@ namespace IGtoOBJGen
             directoryName = tempStorageDirectory;
             
         }
-        public void Run()
+        public void Run() 
         {
             string runFolder = selectFolderFromFolder(directoryName + "/Events");
-            string file = selectFileFromFolder(runFolder);
-            currentFile = file;
+            //string file = selectFileFromFolder(runFolder);
+            //currentFile = file;
+            files = Directory.GetFiles(runFolder);
+
         }
-        public void destroyStorage()
+        public void destroyStorage() //make sure this destroys temp storage
         {
             Directory.Delete(directoryName,true);
             Console.WriteLine("Temp storage cleared!");
@@ -55,21 +59,21 @@ namespace IGtoOBJGen
             int selection = int.Parse(Console.ReadLine());
             return folders[selection];
         }
-        public static string selectFileFromFolder(string path)
-        {
-            string[] files = Directory.GetFiles(path);
-            foreach (string file in files)
-            {
-                int index = Array.IndexOf(files, file);
-                Console.WriteLine($"{index}) {file}");
-            }
-            Console.WriteLine("Enter ID # of desired event file:");
+        //public static string selectFileFromFolder(string path)
+        //{
+        //    string[] files = Directory.GetFiles(path);
+        //    foreach (string file in files)
+        //    {
+        //        int index = Array.IndexOf(files, file);
+        //        Console.WriteLine($"{index}) {file}");
+        //    }
+        //    Console.WriteLine("Enter ID # of desired event file:");
 
-            int selection = int.Parse(Console.ReadLine());
+        //    int selection = int.Parse(Console.ReadLine());
 
-            Console.WriteLine(files[selection]);
+        //    Console.WriteLine(files[selection]);
 
-            return files[selection];
-        }
+        //    return files[selection];
+        //}
     }
 }
