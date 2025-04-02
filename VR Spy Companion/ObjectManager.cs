@@ -65,14 +65,6 @@ namespace IGtoOBJGen
 
             File.WriteAllText($"{EVENTPATH}//totaldata.json",data);
         }
-        /*private string CreateTempFolder()
-        {
-            string tempFolder = Path.GetTempFileName();
-            File.Delete(tempFolder);
-            Directory.CreateDirectory(tempFolder);
-            Console.CancelKeyPress += delegate { Directory.Delete(tempFolder, true); };
-            return tempFolder;
-        }*/
         public void CreateObjects()
         {
             foreach(var item in eventObjects)
