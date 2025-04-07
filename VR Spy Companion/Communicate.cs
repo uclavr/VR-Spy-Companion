@@ -28,7 +28,7 @@ namespace IGtoOBJGen
         }
         public void UploadFiles(string binPath)
         {
-            Console.WriteLine($"push \"{binPath}\" /data/local/tmp/obj/");
+            //Console.WriteLine($"push \"{binPath}\" /data/local/tmp/obj/");
             RunAdbCommand($"push \"{binPath}\" /data/local/tmp/obj/");
             //DirectoryInfo dir = new DirectoryInfo(binPath); 
             //foreach (var path in dir.GetFiles())
@@ -69,7 +69,7 @@ namespace IGtoOBJGen
             }
             else
             {
-                Console.WriteLine("ADB Output: " + output);
+                //Console.WriteLine("ADB Output: " + output);
             }
         }
 
