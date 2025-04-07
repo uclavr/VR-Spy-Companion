@@ -5,7 +5,7 @@ using IGtoOBJGen;
 using System.Reflection;
 using System.IO;
 using System.Text.RegularExpressions;
-
+using System.Linq;
 class OBJGenerator {
     static void flip(string targetPath)
     {
@@ -38,18 +38,26 @@ class OBJGenerator {
     static void Main(string[] args) {
         string targetPath;
         Unzip zipper;
-
         List<string> fileNames = new List<string>();
         //string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\platform-tools\adb.exe"; //windows
         string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/platform-tools/adb"; //macos
-        
+        bool single = false;
         if (args.Count() > 1) {
             targetPath = "";
             foreach (char flag in args[1].ToCharArray()) {
                 switch (flag) {
+                    //output to desktop
+                    //case 'd':
+                    //    targetPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "/" + Path.GetFileNameWithoutExtension(args[0]); ;
+                    //    //Console.WriteLine("targetPath: " + targetPath);
+                    //    break;
                     case 's':
-                        targetPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-                        Console.WriteLine("targetPath: " + targetPath);
+                        single = true;
+                        string tempFolder = Path.GetTempFileName();
+                        File.Delete(tempFolder);
+                        Directory.CreateDirectory(tempFolder);
+                        targetPath = tempFolder + "/" + Path.GetFileNameWithoutExtension(args[0]);                                         //Console.WriteLine("targetPath: " + targetPath);
+                        Console.CancelKeyPress += delegate { Directory.Delete(tempFolder, true); };
                         break;
                     default:
                         targetPath = "hui";
@@ -64,35 +72,62 @@ class OBJGenerator {
             File.Delete(tempFolder);
             Directory.CreateDirectory(tempFolder);
             targetPath = tempFolder + "/" + Path.GetFileNameWithoutExtension(args[0]); //maybe update this when more flags come out
-            Console.WriteLine("targetPath: " + targetPath);
+            //Console.WriteLine("targetPath: " + targetPath);
             Console.CancelKeyPress += delegate { Directory.Delete(tempFolder, true); };
         }
         zipper = new Unzip(args[0]);
-
         Console.CancelKeyPress += delegate { zipper.destroyStorage(); };
-        zipper.Run();
-
         //Timer stopwatch
         var watch = new Stopwatch();
         watch.Start();
-
-        foreach (string eventName in zipper.files)
+        if (single)
         {
+            int selection = zipper.RunSingle();
+            string eventName = zipper.files[selection];
             string eventTargetPath = targetPath;
-            Directory.CreateDirectory(eventTargetPath);
+
             generateOBJ(eventName, eventTargetPath, args);
+
         }
+        else
+        {
+            zipper.Run();
+            int total = zipper.files.Count();
+            for (int i = 0; i < total; i++)
+            {
+                string eventName = zipper.files[i];
+                string eventTargetPath = targetPath;
+                Directory.CreateDirectory(eventTargetPath);
+
+                PrintProgressBar(i + 1, total, Path.GetFileName(eventName));
+
+
+                generateOBJ(eventName, eventTargetPath, args);
+            }
+            Console.WriteLine("\nAll events processed!");
+        }
+        Console.WriteLine($"Total Execution Time: {watch.ElapsedMilliseconds} ms"); // See how fast code runs. Code goes brrrrrrr on fancy office pc. It makes me happy. :)
 
         Console.WriteLine($"OBJ Files written to: {targetPath}\n\nPress ENTER to continue and move files from your device and onto the Oculus Quest");
         Console.ReadLine();
+        try
+        {
+            Communicate bridge = new Communicate(adbPath);
+            bridge.ClearFiles();
+            bridge.UploadFiles(targetPath);
 
-        Communicate bridge = new Communicate(adbPath);
-        bridge.ClearFiles();
-        bridge.UploadFiles(targetPath);
-        zipper.destroyStorage();
-        var deletionPath = Path.GetDirectoryName(targetPath);
-        cleanUp(deletionPath);
-        Console.WriteLine($"Total Execution Time: {watch.ElapsedMilliseconds} ms"); // See how fast code runs. Code goes brrrrrrr on fancy office pc. It makes me happy. :)
+            zipper.destroyStorage();
+            var deletionPath = Path.GetDirectoryName(targetPath);
+            cleanUp(deletionPath);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            //delete regardless if communicate fails
+            zipper.destroyStorage();
+            var deletionPath = Path.GetDirectoryName(targetPath);
+            cleanUp(deletionPath);
+        }
     }
     static void generateOBJ(string eventPath, string currentTargetPath, string[] args)
     {
@@ -121,14 +156,12 @@ class OBJGenerator {
 
         ObjectManager manager = new ObjectManager(o2, currentTargetPath);
         manager.Execute();
-        flip(currentTargetPath); //verify this
+
+
+        flip(currentTargetPath); 
     }
-
-
     static void cleanUp(string deletionPath)
     {
-        // Code inside this block will be executed just before the program exits
-        Console.WriteLine("Executing cleanup before exit...");
         try
         {
             if (deletionPath != null)
@@ -137,14 +170,26 @@ class OBJGenerator {
             }
             else
             {
-                // Handle the case when deletionPath is null (if needed)
                 Console.WriteLine("deletionPath is null. Unable to perform cleanup.");
             }
         }
         catch (Exception ex)
         {
-            // Handle the exception
             Console.WriteLine($"An error occurred during cleanup: {ex.Message}");
         }
     }
+
+    static void PrintProgressBar(int current, int total, string currentItem)
+    {
+        int barLength = 20;
+        double percent = (double)current / total;
+        int filled = (int)(percent * barLength);
+        int empty = barLength - filled;
+
+        string bar = "[" + new string('#', filled) + new string('-', empty) + "]";
+        string message = $"{bar} {(int)(percent * 100)}% Processing {currentItem}";
+
+        Console.Write("\r" + message.PadRight(Console.WindowWidth - 1)); 
+    }
+
 }

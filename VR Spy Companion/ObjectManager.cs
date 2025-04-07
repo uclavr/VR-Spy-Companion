@@ -40,45 +40,73 @@ namespace IGtoOBJGen
         public void Execute()
         {
             InstantiateObjects();
-            CreateObjects();
+            CreateObjects(); // sorta deprecated
             generateJSON();
         }
         public void createJSON()
         {
+            //JObject obj = new JObject();
+            //foreach(var item in JObjects)
+            //{
+            //    obj.Add(new JProperty(item.Item1, item.Item2));
+            //}
+            //File.WriteAllText($"{EVENTPATH}//totaldata.json", JsonConvert.SerializeObject(obj, Formatting.Indented));
+
             JObject obj = new JObject();
-            foreach(var item in JObjects)
+            foreach (var item in JObjects)
             {
                 obj.Add(new JProperty(item.Item1, item.Item2));
             }
-            File.WriteAllText($"{EVENTPATH}//totaldata.json", JsonConvert.SerializeObject(obj, Formatting.Indented));
+
+            using (var sw = new StreamWriter($"{EVENTPATH}/totaldata.json", false, Encoding.UTF8, bufferSize: 65536))
+            using (var writer = new JsonTextWriter(sw))
+            {
+                writer.Formatting = Formatting.None; // 🚀 fastest: no pretty printing
+                var serializer = new JsonSerializer();
+                serializer.Serialize(writer, obj);
+            }
+
+
         }
         public void generateJSON()
         {
-            List<object> dataList = new List<object>();
-            string data = "{";
-            foreach(var json in outputJSONStrings)
-            {
-                data += json+',';
-            }
-            data = data.Substring(0, data.Length - 1);
-            data += '}';
+            //List<object> dataList = new List<object>();
+            //string data = "{";
+            //foreach(var json in outputJSONStrings)
+            //{
+            //    data += json+',';
+            //}
+            //data = data.Substring(0, data.Length - 1);
+            //data += '}';
 
-            File.WriteAllText($"{EVENTPATH}//totaldata.json",data);
+            //File.WriteAllText($"{EVENTPATH}//totaldata.json",data);
+
+            //more optimized
+            var sb = new StringBuilder();
+            sb.Append("{");
+            sb.AppendJoin(",", outputJSONStrings);
+            sb.Append("}");
+
+            File.WriteAllText($"{EVENTPATH}/totaldata.json", sb.ToString());
+
         }
-        /*private string CreateTempFolder()
-        {
-            string tempFolder = Path.GetTempFileName();
-            File.Delete(tempFolder);
-            Directory.CreateDirectory(tempFolder);
-            Console.CancelKeyPress += delegate { Directory.Delete(tempFolder, true); };
-            return tempFolder;
-        }*/
         public void CreateObjects()
         {
-            foreach(var item in eventObjects)
+            //optimized
+            Parallel.ForEach(eventObjects, obj =>
             {
-                outputJSONStrings.Add(item.Execute());
-            }
+                string json = obj.Execute();
+
+                lock (outputJSONStrings)
+                {
+                    outputJSONStrings.Add(json);
+                }
+            });
+
+            //foreach (var item in eventObjects)
+            //{
+            //    outputJSONStrings.Add(item.Execute());
+            //}
         }
         public void InstantiateObjects()
         {
