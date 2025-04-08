@@ -1184,7 +1184,7 @@ namespace IGtoOBJGen {
         }
         private void GenerateVertexOBJ()
         {
-            StaticBoxHandlers.GenerateEllipsoidObj($@"{eventTitle}\PrimaryVertices_V1.obj", primaryVertexDatas, 3.0);
+            StaticBoxHandlers.GenerateEllipsoidObj($@"{eventTitle}/PrimaryVertices_V1.obj", primaryVertexDatas, 3.0); //change for windows?
         }
     }
     class SecondaryVertices_V1 : TypeConfig
@@ -1205,7 +1205,7 @@ namespace IGtoOBJGen {
         }
         private void GenerateVertexOBJ()
         {
-            StaticBoxHandlers.GenerateEllipsoidObj($@"{eventTitle}\SecondaryVertices_V1.obj", secondaryVertexDatas, 3.0);
+            StaticBoxHandlers.GenerateEllipsoidObj($@"{eventTitle}/SecondaryVertices_V1.obj", secondaryVertexDatas, 3.0); //change for windows?
         }
     }
     /*class VertexCompositeCandidates_V1 : TypeConfig { }

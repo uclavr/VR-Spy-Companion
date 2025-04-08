@@ -1,4 +1,5 @@
-﻿using System.IO;
+﻿using System;
+using System.IO;
 using System.IO.Compression;
 
 namespace IGtoOBJGen
@@ -6,7 +7,8 @@ namespace IGtoOBJGen
     class Unzip
     {
         private string directoryName { get; set; }
-        public string currentFile;
+        public string[] files;
+        public string runFolder;
         private string tempStorageDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"/Temp/IGtoOBJGenExtraction";
         private string tempTransmitDirectory = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData) + @"/Temp/IGtoOBJGenTransmission";
         public Unzip(string filename)
@@ -25,16 +27,24 @@ namespace IGtoOBJGen
             directoryName = tempStorageDirectory;
             
         }
-        public void Run()
+        public void Run() 
         {
-            string runFolder = selectFolderFromFolder(directoryName + "/Events");
-            string file = selectFileFromFolder(runFolder);
-            currentFile = file;
+            runFolder = selectFolderFromFolder(directoryName + "/Events");
+            //string file = selectFileFromFolder(runFolder);
+            //currentFile = file;
+            files = Directory.GetFiles(runFolder);
+
         }
-        public void destroyStorage()
+        public int RunSingle()
+        {
+            runFolder = selectFolderFromFolder(directoryName + "/Events");
+            files = Directory.GetFiles(runFolder);
+            return selectFileFromFolder(runFolder);
+        }
+        public void destroyStorage() //make sure this destroys temp storage
         {
             Directory.Delete(directoryName,true);
-            Console.WriteLine("Temp storage cleared!");
+            //Console.WriteLine("Temp storage cleared!");
         }
         private static string tempDirectoryPath()
         {
@@ -55,7 +65,7 @@ namespace IGtoOBJGen
             int selection = int.Parse(Console.ReadLine());
             return folders[selection];
         }
-        public static string selectFileFromFolder(string path)
+        public static int selectFileFromFolder(string path)
         {
             string[] files = Directory.GetFiles(path);
             foreach (string file in files)
@@ -69,7 +79,8 @@ namespace IGtoOBJGen
 
             Console.WriteLine(files[selection]);
 
-            return files[selection];
+            //return files[selection];
+            return selection;
         }
     }
 }

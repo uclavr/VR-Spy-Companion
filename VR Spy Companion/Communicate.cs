@@ -9,11 +9,12 @@ namespace IGtoOBJGen
         protected AdbServer server;
         protected AdbClient client;
         protected DeviceData oculusDevice;
+        protected string adbPath;
 
-        public Communicate(string adbPath) 
+        public Communicate(string _adbPath) 
         {
             server = new AdbServer();
-            var result = server.StartServer(adbPath,restartServerIfNewer:false);
+            var result = server.StartServer(_adbPath,restartServerIfNewer:false);
             client = new AdbClient();
             List<DeviceData> devices = client.GetDevices();
             foreach(var device in devices)
@@ -23,36 +24,63 @@ namespace IGtoOBJGen
                     oculusDevice = device;
                 }
             }
+            adbPath = _adbPath;
         }
         public void UploadFiles(string binPath)
         {
-            DirectoryInfo dir = new DirectoryInfo(binPath); 
-            foreach (var path in dir.GetFiles())
-            {
-                using (SyncService service = new SyncService(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), oculusDevice)) 
-                {                
-                    using (Stream stream = File.OpenRead(path.FullName))
-                    {
-                        service.Push(stream, $"/data/local/tmp/obj/{path.Name}", 444, DateTime.Now, null, CancellationToken.None);
-                    }
-                }
-            }
-
-            
+            //Console.WriteLine($"push \"{binPath}\" /data/local/tmp/obj/");
+            RunAdbCommand($"push \"{binPath}\" /data/local/tmp/obj/");
+            //DirectoryInfo dir = new DirectoryInfo(binPath); 
+            //foreach (var path in dir.GetFiles())
+            //{
+            //    using (SyncService service = new SyncService(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), oculusDevice)) 
+            //    {                
+            //        using (Stream stream = File.OpenRead(path.FullName))
+            //        {
+            //            service.Push(stream, $"/data/local/tmp/obj/{path.Name}", 444, DateTime.Now, null, CancellationToken.None);
+            //        }
+            //    }
+            //}
         }
         public void ClearFiles()
         {
             var receiver = new ConsoleOutputReceiver();
-            client.ExecuteRemoteCommand("rm /data/local/tmp/obj/*", oculusDevice, receiver);
+            client.ExecuteRemoteCommand("rm -rf /data/local/tmp/obj/*", oculusDevice, receiver);
         }
-        public void DownloadFiles(string fileName)
+        private void RunAdbCommand(string arguments)
         {
-            using (SyncService service = new SyncService(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), oculusDevice))
-            using (Stream stream = File.OpenWrite(@"C:\Users\uclav\Desktop\yessir.obj"))
+            var process = new System.Diagnostics.Process();
+            process.StartInfo.FileName = adbPath;
+            process.StartInfo.Arguments = arguments;
+            process.StartInfo.RedirectStandardOutput = true;
+            process.StartInfo.RedirectStandardError = true;
+            process.StartInfo.UseShellExecute = false;
+            process.StartInfo.CreateNoWindow = true;
+
+            process.Start();
+
+            string output = process.StandardOutput.ReadToEnd();
+            string error = process.StandardError.ReadToEnd();
+            process.WaitForExit();
+
+            if (process.ExitCode != 0)
             {
-                service.Pull($"/data/local/tmp/{fileName}", stream, null, CancellationToken.None);
+                Console.WriteLine("ADB Error: " + error);
+            }
+            else
+            {
+                //Console.WriteLine("ADB Output: " + output);
             }
         }
+
+        //public void DownloadFiles(string fileName)
+        //{
+        //    using (SyncService service = new SyncService(new AdbSocket(new IPEndPoint(IPAddress.Loopback, AdbClient.AdbServerPort)), oculusDevice))
+        //    using (Stream stream = File.OpenWrite(@"C:\Users\uclav\Desktop\yessir.obj"))
+        //    {
+        //        service.Pull($"/data/local/tmp/{fileName}", stream, null, CancellationToken.None);
+        //    }
+        //}
     }
 }
 

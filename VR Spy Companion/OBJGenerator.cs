@@ -5,7 +5,7 @@ using IGtoOBJGen;
 using System.Reflection;
 using System.IO;
 using System.Text.RegularExpressions;
-
+using System.Linq;
 class OBJGenerator {
     static void flip(string targetPath)
     {
@@ -36,25 +36,28 @@ class OBJGenerator {
         }
     }
     static void Main(string[] args) {
-        bool inputState;
-        string eventName;
         string targetPath;
         Unzip zipper;
-        StreamReader file;
-        JsonTextReader reader;
-        JObject o2;
         List<string> fileNames = new List<string>();
         //string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\platform-tools\adb.exe"; //windows
         string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/platform-tools/adb"; //macos
-        inputState = args.Length == 0;
-        
+        bool single = false;
         if (args.Count() > 1) {
             targetPath = "";
             foreach (char flag in args[1].ToCharArray()) {
                 switch (flag) {
+                    //output to desktop
+                    //case 'd':
+                    //    targetPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory) + "/" + Path.GetFileNameWithoutExtension(args[0]); ;
+                    //    //Console.WriteLine("targetPath: " + targetPath);
+                    //    break;
                     case 's':
-                        targetPath = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-                        Console.WriteLine(targetPath);
+                        single = true;
+                        string tempFolder = Path.GetTempFileName();
+                        File.Delete(tempFolder);
+                        Directory.CreateDirectory(tempFolder);
+                        targetPath = tempFolder + "/" + Path.GetFileNameWithoutExtension(args[0]);                                         //Console.WriteLine("targetPath: " + targetPath);
+                        Console.CancelKeyPress += delegate { Directory.Delete(tempFolder, true); };
                         break;
                     default:
                         targetPath = "hui";
@@ -68,80 +71,125 @@ class OBJGenerator {
             string tempFolder = Path.GetTempFileName();
             File.Delete(tempFolder);
             Directory.CreateDirectory(tempFolder);
-            targetPath = tempFolder;
+            targetPath = tempFolder + "/" + Path.GetFileNameWithoutExtension(args[0]); //maybe update this when more flags come out
+            //Console.WriteLine("targetPath: " + targetPath);
             Console.CancelKeyPress += delegate { Directory.Delete(tempFolder, true); };
         }
         zipper = new Unzip(args[0]);
-
         Console.CancelKeyPress += delegate { zipper.destroyStorage(); };
-        zipper.Run();
-
         //Timer stopwatch
         var watch = new Stopwatch();
         watch.Start();
+        if (single)
+        {
+            int selection = zipper.RunSingle();
+            string eventName = zipper.files[selection];
+            string eventTargetPath = targetPath;
 
-        if (inputState == true) {
-            file = File.OpenText(@"/IGdata/Event_1096322990");
-            eventName = "Event_1096322990";
+            generateOBJ(eventName, eventTargetPath, args);
+
         }
-        else {
-            /*  Right so what's all this? We get the name of the event and then
-            find and replace all occurrences of nan that are in the original file
-            with null so that the JSON library can properly parse it. Store the revisions in a temp file that
-            is deleted at the end of the program's execution so that the original file goes unchanged and can 
-            still be used with iSpy  */
-            //zipper = new Unzip(args[0]);
-            string destination = zipper.currentFile;
-            string[] split = destination.Split('\\');
-            eventName = split.Last();
+        else
+        {
+            zipper.Run();
+            int total = zipper.files.Count();
+            for (int i = 0; i < total; i++)
+            {
+                string eventName = zipper.files[i];
+                string eventTargetPath = targetPath;
+                Directory.CreateDirectory(eventTargetPath);
 
-            string text = File.ReadAllText($"{destination}");
-            string newText = text.Replace("nan,", "null,").Replace('(','[').Replace(')',']');
+                PrintProgressBar(i + 1, total, Path.GetFileName(eventName));
 
 
-            File.WriteAllText($"{args[0]}.tmp", newText);
-            file = File.OpenText($"{args[0]}.tmp");
-            Console.CancelKeyPress += delegate { file.Close(); File.Delete($"{args[0]}.tmp"); };
+                generateOBJ(eventName, eventTargetPath, args);
+            }
+            Console.WriteLine("\nAll events processed!");
         }
+        Console.WriteLine($"Total Execution Time: {watch.ElapsedMilliseconds} ms"); // See how fast code runs. Code goes brrrrrrr on fancy office pc. It makes me happy. :)
 
-        var deletionPath = Path.GetDirectoryName(targetPath);
-        string temp_Folder = targetPath;
-        Console.WriteLine("eventName:" + eventName);
+        Console.WriteLine($"OBJ Files written to: {targetPath}\n\nPress ENTER to continue and move files from your device and onto the Oculus Quest");
+        Console.ReadLine();
+        try
+        {
+            Communicate bridge = new Communicate(adbPath);
+            bridge.ClearFiles();
+            bridge.UploadFiles(targetPath);
+
+            zipper.destroyStorage();
+            var deletionPath = Path.GetDirectoryName(targetPath);
+            cleanUp(deletionPath);
+        }
+        catch (Exception e)
+        {
+            Console.WriteLine(e.Message);
+            //delete regardless if communicate fails
+            zipper.destroyStorage();
+            var deletionPath = Path.GetDirectoryName(targetPath);
+            cleanUp(deletionPath);
+        }
+    }
+    static void generateOBJ(string eventPath, string currentTargetPath, string[] args)
+    {
+        StreamReader file;
+        JsonTextReader reader;
+        JObject o2;
+        string eventName;
+
+        //replace NAN with null
+        string destination = eventPath;
+        string[] split = destination.Split('\\');
+        eventName = split.Last();
+        string text = File.ReadAllText($"{destination}");
+        string newText = text.Replace("nan,", "null,").Replace('(', '[').Replace(')', ']');
+        File.WriteAllText($"{args[0]}.tmp", newText);
+        file = File.OpenText($"{args[0]}.tmp");
+        Console.CancelKeyPress += delegate { file.Close(); File.Delete($"{args[0]}.tmp"); };
+
         eventName = Path.GetFileName(eventName);
-        targetPath += "/" + eventName;
-        Directory.CreateDirectory(targetPath);
+        currentTargetPath += "/" + eventName;
+        Directory.CreateDirectory(currentTargetPath);
         reader = new JsonTextReader(file);
         o2 = (JObject)JToken.ReadFrom(reader);
         file.Close();
         File.Delete($"{args[0]}.tmp");
 
-        ObjectManager manager = new ObjectManager(o2, targetPath);
+        ObjectManager manager = new ObjectManager(o2, currentTargetPath);
         manager.Execute();
-        string temp_name = Path.GetFileNameWithoutExtension(Path.GetFileName(targetPath)); // i.e. tmp900y20.tmp
-        var cleanup = new Cleanup(temp_name, deletionPath);
-        AppDomain.CurrentDomain.ProcessExit += (sender, eventArgs) => {
-            cleanup.callCleanUp();
-        };
 
-        flip(targetPath);
-        zipper.destroyStorage();
-        Console.WriteLine($"OBJ Files written to: {targetPath}\n\nPress ENTER to continue and move files from your device and onto the Oculus Quest");
-        Console.ReadLine();
-        Communicate bridge = new Communicate(adbPath);
-        bridge.ClearFiles();
-        bridge.UploadFiles(targetPath);
-        Directory.Delete(temp_Folder, true);
-        
-        /*catch (Exception e) {
-            if (e is System.ArgumentOutOfRangeException) {
-                Console.WriteLine("System.ArgumentOutOfRangeException thrown while trying to locate ADB.\nPlease check that ADB is installed and the proper path has been provided. The default path for Windows is C:\\Users\\[user]\\adbPath\\Local\\Android\\sdk\\platform-tools\n");
-            }
-            else if (e is SharpAdbClient.Exceptions.AdbException) {
-                Console.WriteLine("An ADB exception has been thrown.\nPlease check that the Oculus is connected to the computer.");
-            }
-            Directory.Delete(temp_Folder, true);
-            Environment.Exit(1);
-        }*/
-        Console.WriteLine($"Total Execution Time: {watch.ElapsedMilliseconds} ms"); // See how fast code runs. Code goes brrrrrrr on fancy office pc. It makes me happy. :)
+
+        flip(currentTargetPath); 
     }
+    static void cleanUp(string deletionPath)
+    {
+        try
+        {
+            if (deletionPath != null)
+            {
+                Directory.Delete(deletionPath, recursive: true);
+            }
+            else
+            {
+                Console.WriteLine("deletionPath is null. Unable to perform cleanup.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"An error occurred during cleanup: {ex.Message}");
+        }
+    }
+
+    static void PrintProgressBar(int current, int total, string currentItem)
+    {
+        int barLength = 20;
+        double percent = (double)current / total;
+        int filled = (int)(percent * barLength);
+        int empty = barLength - filled;
+
+        string bar = "[" + new string('#', filled) + new string('-', empty) + "]";
+        string message = $"{bar} {(int)(percent * 100)}% Processing {currentItem}";
+
+        Console.Write("\r" + message.PadRight(Console.WindowWidth - 1)); 
+    }
+
 }
