@@ -61,7 +61,7 @@ namespace IGtoOBJGen
             using (var sw = new StreamWriter($"{EVENTPATH}/totaldata.json", false, Encoding.UTF8, bufferSize: 65536))
             using (var writer = new JsonTextWriter(sw))
             {
-                writer.Formatting = Formatting.None; // 🚀 fastest: no pretty printing
+                writer.Formatting = Formatting.None;
                 var serializer = new JsonSerializer();
                 serializer.Serialize(writer, obj);
             }
