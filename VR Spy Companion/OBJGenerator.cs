@@ -138,7 +138,7 @@ class OBJGenerator {
 
         //replace NAN with null
         string destination = eventPath;
-        string[] split = destination.Split('\\');
+        string[] split = destination.Split('/');
         eventName = split.Last();
         string text = File.ReadAllText($"{destination}");
         string newText = text.Replace("nan,", "null,").Replace('(', '[').Replace(')', ']');
