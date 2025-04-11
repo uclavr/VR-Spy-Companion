@@ -51,25 +51,44 @@ namespace IGtoOBJGen
         }
         public void createJSON()
         {
+            //JObject obj = new JObject();
+            //foreach(var item in JObjects)
+            //{
+            //    obj.Add(new JProperty(item.Item1, item.Item2));
+            //}
+            //File.WriteAllText($"{EVENTPATH}\\totaldata.json", JsonConvert.SerializeObject(obj, Formatting.Indented));
             JObject obj = new JObject();
-            foreach(var item in JObjects)
+            foreach (var item in JObjects)
             {
                 obj.Add(new JProperty(item.Item1, item.Item2));
             }
-            File.WriteAllText($"{EVENTPATH}\\totaldata.json", JsonConvert.SerializeObject(obj, Formatting.Indented));
+
+            using (var sw = new StreamWriter($"{EVENTPATH}\\totaldata.json", false, Encoding.UTF8, bufferSize: 65536))
+            using (var writer = new JsonTextWriter(sw))
+            {
+                writer.Formatting = Formatting.None;
+                var serializer = new JsonSerializer();
+                serializer.Serialize(writer, obj);
+            }
         }
         public void generateJSON()
         {
-            List<object> dataList = new List<object>();
-            string data = "{";
-            foreach(var json in outputJSONStrings)
-            {
-                data += json+',';
-            }
-            data = data.Substring(0, data.Length - 1);
-            data += '}';
+            //List<object> dataList = new List<object>();
+            //string data = "{";
+            //foreach(var json in outputJSONStrings)
+            //{
+            //    data += json+',';
+            //}
+            //data = data.Substring(0, data.Length - 1);
+            //data += '}';
 
-            File.WriteAllText($"{EVENTPATH}\\totaldata.json",data);
+            //File.WriteAllText($"{EVENTPATH}\\totaldata.json",data);
+            var sb = new StringBuilder();
+            sb.Append("{");
+            sb.AppendJoin(",", outputJSONStrings);
+            sb.Append("}");
+
+            File.WriteAllText($"{EVENTPATH}\\totaldata.json", sb.ToString());
         }
         /*private string CreateTempFolder()
         {
@@ -81,10 +100,19 @@ namespace IGtoOBJGen
         }*/
         public void CreateObjects()
         {
-            foreach(var item in eventObjects)
+            //foreach(var item in eventObjects)
+            //{
+            //    outputJSONStrings.Add(item.Execute());
+            //}
+            Parallel.ForEach(eventObjects, obj =>
             {
-                outputJSONStrings.Add(item.Execute());
-            }
+                string json = obj.Execute();
+
+                lock (outputJSONStrings)
+                {
+                    outputJSONStrings.Add(json);
+                }
+            });
         }
         public void InstantiateObjects()
         {
