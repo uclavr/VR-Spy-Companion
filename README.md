@@ -16,11 +16,13 @@ The master branch of this repository is designed to be used by macOS. If you are
 2) Connect your headset (Quest 2 & Quest 3 are supported) and enable USB Debugging and Developer Mode on the headset
 3) Go to bin/Debug/net6.0 and run the following command
 ```
-./VR\ Spy\ Companion path_to_ig_file
+./VR\ Spy\ Companion path_to_ig_file [options]
 ```
 
-VR Spy Companion accepts 1 argument (the path to your '.ig' file) when being called from the command line. An interface will display allowing you to select your desired event.
+VR Spy Companion accepts 2 arguments (the path to your '.ig' file and option flags) when being called from the command line. An interface will display allowing you to select your desired run. After execution, the event files will be automatically uploaded to your headset. 
 
+### Options
+- 's': Allows you to select a single event from the run
 ### GUI Use
 
 GUI coming soon
