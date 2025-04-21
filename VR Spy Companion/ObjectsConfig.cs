@@ -1085,7 +1085,7 @@ namespace IGtoOBJGen {
         }
         public void GenerateElectronOBJ()
         {
-            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "GsfElectrons");
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "GsfElectrons_V1");
             File.WriteAllText($"{eventTitle}/GsfElectrons_V1.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/GsfElectrons_V1.obj", dataList);
         }
@@ -1111,7 +1111,7 @@ namespace IGtoOBJGen {
         }
         public void GenerateElectronOBJ()
         {
-            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "GsfElectrons");
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "GsfElectrons_V2");
             File.WriteAllText($"{eventTitle}/GsfElectrons_V2.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/GsfElectrons_V2.obj", dataList);
         }
@@ -1137,7 +1137,7 @@ namespace IGtoOBJGen {
         }
         public void GenerateElectronOBJ()
         {
-            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "GsfElectrons");
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "GsfElectrons_V3");
             File.WriteAllText($"{eventTitle}/GsfElectrons_V3.obj", String.Empty);
             File.WriteAllLines($"{eventTitle}/GsfElectrons_V3.obj", dataList);
         }
