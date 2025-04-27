@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Xml.Linq;
+using System.Reflection;
 
 namespace IGtoOBJGen
 {
@@ -680,7 +681,6 @@ namespace IGtoOBJGen
             Vector3 corner7 = end - right * (size / 2) - up * (size / 2);
             Vector3 corner8 = end + right * (size / 2) - up * (size / 2);
 
-
             geometryData.Add($"v {corner1.X} {corner1.Y} {corner1.Z}");
             geometryData.Add($"v {corner2.X} {corner2.Y} {corner2.Z}");
             geometryData.Add($"v {corner3.X} {corner3.Y} {corner3.Z}");
@@ -713,10 +713,13 @@ namespace IGtoOBJGen
         {
             List<string> geometryData = new List<string>();
             int vertexIndex = 1;
+            int objectIndex = 0;
             float size = 0.0025f;
             foreach (cscSegmentV2 seg in inputData)
             {
+                geometryData.Add($"o CSCSegments_V2_{objectIndex}");
                 GeneratePrism(seg.pos_1, seg.pos_2, ref geometryData, ref vertexIndex, size);
+                objectIndex += 1;
             }
             return geometryData;
         }
@@ -768,10 +771,14 @@ namespace IGtoOBJGen
         {
             List<string> geometryData = new List<string>();
             int vertexIndex = 1;
+            int objectIndex = 0;
+
             float size = 0.005f;
             foreach (dtRecSegment4D_V1 point in inputData)
             {
+                geometryData.Add($"o DTRecSegment4D_V1_{objectIndex}");
                 GeneratePrism(point.pos_1, point.pos_2, ref geometryData, ref vertexIndex, size);
+                objectIndex += 1;
             }
             return geometryData;
         }
@@ -811,12 +818,15 @@ namespace IGtoOBJGen
             int vertexIndex = 1;
             float size = 0.0005f;
             //float size = 1;
+            int objectIndex = 0;
             foreach (cscRecHit2Ds_V2 point in inputData)
             {
                 //float size = (float) point.errorWithinStrip;
+                geometryData.Add($"o CSCRecHit2Ds_V21_{objectIndex}");
                 GeneratePrism(point.u1, point.u2, ref geometryData, ref vertexIndex, size);
-                GeneratePrism(point.v1, point.v2, ref geometryData, ref vertexIndex, size);
+                GeneratePrism(point.v1, point.v2, ref geometryData, ref vertexIndex,size);
                 GeneratePrism(point.w1, point.w2, ref geometryData, ref vertexIndex, size);
+                objectIndex += 1;
             }
             return geometryData;
         }
