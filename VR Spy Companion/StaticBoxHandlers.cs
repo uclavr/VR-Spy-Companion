@@ -1252,9 +1252,9 @@ namespace VR_Spy_Companion
             {
                 List<string> geometryData = new List<string>();
                 int counter = 1;
+                int objectIndex = 0;
                 foreach (DTRecHitsV1 box in inputData)
                 {
-                    int objectIndex = 1;
                     double[] pos = box.wirePos;
                     double[] axis = box.axis;
                     double angle = box.angle;
