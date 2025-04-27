@@ -1282,6 +1282,7 @@ namespace VR_Spy_Companion
 
                         return result;
                     }
+                    geometryData.Add($"o DTRecHits_V1_{objectindex}");
                     for (int i = 0; i < vertices.GetLength(0); i++)
                     {
                         double[] point = { vertices[i, 0], vertices[i, 1], vertices[i, 2] };
@@ -1292,7 +1293,6 @@ namespace VR_Spy_Companion
                         geometryData.Add($"v {vertices[i, 0]} {vertices[i, 1]} {vertices[i, 2]}");
 
                     }
-                    geometryData.Add($"o DTRecHits_V1_{objectindex}");
                     geometryData.Add($"f {counter} {counter + 1} {counter + 2} {counter + 3}");
                     //geometryData.Add($"f {counter + 3} {counter + 2} {counter + 1} {counter}");
                     geometryData.Add($"f {counter + 4} {counter + 5} {counter + 6} {counter + 7}");
