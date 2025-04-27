@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Drawing;
 using System.Xml.Linq;
+using System.Reflection;
 
 namespace IGtoOBJGen
 {
@@ -716,9 +717,12 @@ namespace IGtoOBJGen
             List<string> geometryData = new List<string>();
             int vertexIndex = 1;
             float size = 0.0025f;
+            int objectIndex = 0;
             foreach (cscSegmentV2 seg in inputData)
             {
+                geometryData.Add($"o CSCSegments_V2_{objectIndex}");
                 GeneratePrism(seg.pos_1, seg.pos_2, ref geometryData, ref vertexIndex, size);
+                objectIndex += 1;
             }
             return geometryData;
         }
@@ -771,9 +775,12 @@ namespace IGtoOBJGen
             List<string> geometryData = new List<string>();
             int vertexIndex = 1;
             float size = 0.005f;
+            int objectIndex = 0;
             foreach (dtRecSegment4D_V1 point in inputData)
             {
+                geometryData.Add($"o DTRecSegment4D_V1_{objectIndex}");
                 GeneratePrism(point.pos_1, point.pos_2, ref geometryData, ref vertexIndex, size);
+                objectIndex += 1;
             }
             return geometryData;
         }
@@ -813,12 +820,15 @@ namespace IGtoOBJGen
             int vertexIndex = 1;
             float size = 0.0005f;
             //float size = 1;
+            int objectIndex = 0;
             foreach (cscRecHit2Ds_V2 point in inputData)
             {
                 //float size = (float) point.errorWithinStrip;
+                geometryData.Add($"o CSCRecHit2Ds_V2_{objectIndex}");
                 GeneratePrism(point.u1, point.u2, ref geometryData, ref vertexIndex, size);
                 GeneratePrism(point.v1, point.v2, ref geometryData, ref vertexIndex, size);
                 GeneratePrism(point.w1, point.w2, ref geometryData, ref vertexIndex, size);
+                objectIndex += 1;
             }
             return geometryData;
         }
