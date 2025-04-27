@@ -822,7 +822,7 @@ namespace IGtoOBJGen
             foreach (cscRecHit2Ds_V2 point in inputData)
             {
                 //float size = (float) point.errorWithinStrip;
-                geometryData.Add($"o CSCRecHit2Ds_V21_{objectIndex}");
+                geometryData.Add($"o CSCRecHit2Ds_V2_{objectIndex}");
                 GeneratePrism(point.u1, point.u2, ref geometryData, ref vertexIndex, size);
                 GeneratePrism(point.v1, point.v2, ref geometryData, ref vertexIndex,size);
                 GeneratePrism(point.w1, point.w2, ref geometryData, ref vertexIndex, size);
