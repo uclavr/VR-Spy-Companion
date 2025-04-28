@@ -985,9 +985,9 @@ namespace IGtoOBJGen {
             globalMuons = StaticLineHandlers.globalMuonParse(JSON, 1);
             points = StaticLineHandlers.makeTrackPoints(collection, JSON);
             StaticLineHandlers.makeGeometryFromPoints(points, "GlobalMuons_V1", "GlobalMuons_V1", eventTitle);
-            string data = JsonConvert.SerializeObject(points);
+            //string data = JsonConvert.SerializeObject(points);
+            string data = JsonConvert.SerializeObject(globalMuons);
             return ("\"globalMuonDatas\":" + data);
-            //return JsonConvert.SerializeObject(globalMuons);
         }
     }
     class GlobalMuons_V2 : TypeConfig
