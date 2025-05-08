@@ -41,7 +41,7 @@ class OBJGenerator
         string targetPath;
         Unzip zipper;
         List<string> fileNames = new List<string>();
-        string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\platform-tools\adb.exe"; //windows
+        string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\platform-tools\\adb.exe"; //windows
         //string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/platform-tools/adb"; //macos
         bool single = false;
         if (args.Count() > 1)
