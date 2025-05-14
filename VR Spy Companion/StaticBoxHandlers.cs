@@ -164,92 +164,7 @@ namespace VR_Spy_Companion
 
                 return dataList;
             }
-            /*public void makeHFRec()
-            {
-                HFData = genericCaloParse("HFRecHits_V2", HFSCALE);
-                if (HFData.Count == 0)
-                {
-                    File.WriteAllText($"{eventTitle}\\6_HFRecHits_V2.obj", String.Empty);
-                    return;
-                }
-                List<string> dataList = generateCalorimetryBoxes(HFData);
-                File.WriteAllText($"{eventTitle}\\6_HFRecHits_V2.obj", String.Empty);
-                File.WriteAllLines($"{eventTitle}\\6_HFRecHits_V2.obj", dataList);
-            }
-            public void makeHBRec()
-            {
-                HBData = genericCaloParse("HBRecHits_V2", HBSCALE);
-                List<string> dataList = generateCalorimetryBoxes(HBData);
-                if (HBData.Count == 0)
-                {
-                    File.WriteAllText($"{eventTitle}\\6_HBRecHits_V2.obj", String.Empty);
-                    return;
-                }
-                File.WriteAllText($"{eventTitle}\\6_HBRecHits_V2.obj", String.Empty);
-                File.WriteAllLines($"{eventTitle}\\6_HBRecHits_V2.obj", dataList);
-            }
-            public void makeHERec()
-            {
-                HEData = genericCaloParse("HERecHits_V2", HESCALE);
-                List<string> dataList = generateCalorimetryBoxes(HEData);
-                if (HEData.Count == 0)
-                {
-                    File.WriteAllText($"{eventTitle}\\6_HERecHits_V2.obj", String.Empty);
-                    return;
-                }
-                File.WriteAllText($"{eventTitle}\\6_HERecHits_V2.obj", String.Empty);
-                File.WriteAllLines($"{eventTitle}\\6_HERecHits_V2.obj", dataList);
-            }
-            public void makeHORec()
-            {
-                HOData = genericCaloParse("HORecHits_V2", HOSCALE);
-                List<string> dataList = generateCalorimetryTowers(HOData);
-                if (HOData.Count == 0)
-                {
-                    File.WriteAllText($"{eventTitle}\\6_HORecHits_V2.obj", String.Empty);
-
-                    return;
-                }
-                File.WriteAllText($"{eventTitle}\\6_HORecHits_V2.obj", String.Empty);
-                File.WriteAllLines($"{eventTitle}\\6_HORecHits_V2.obj", dataList);
-            }
-            public void makeEBRec()
-            {
-                EBData = genericCaloParse("EBRecHits_V2", EBSCALE);
-                List<string> dataList = generateCalorimetryTowers(EBData);
-                if (EBData.Count == 0)
-                {
-                    File.WriteAllText($"{eventTitle}\\5_EBRecHits_V2.obj", String.Empty);
-                    return;
-                }
-                File.WriteAllText($"{eventTitle}\\5_EBRecHits_V2.obj", String.Empty);
-                File.WriteAllLines($"{eventTitle}\\5_EBRecHits_V2.obj", dataList);
-            }
-            public void makeEERec()
-            {
-                EEData = genericCaloParse("EERecHits_V2", EESCALE);
-                List<string> dataList = generateCalorimetryTowers(EEData);
-                if (EEData.Count == 0)
-                {
-                    File.WriteAllText($"{eventTitle}\\5_EERecHits_V2.obj", String.Empty);
-                    return;
-                }
-                File.WriteAllText($"{eventTitle}\\5_EERecHits_V2.obj", String.Empty);
-                File.WriteAllLines($"{eventTitle}\\5_EERecHits_V2.obj", dataList);
-            }
-            public void makeESRec()
-            {
-                ESData = genericCaloParse("ESRecHits_V2", ESSCALE);
-                List<string> dataList = generateCalorimetryTowers(ESData);
-                if (ESData.Count == 0)
-                {
-                    File.WriteAllText($"{eventTitle}\\5_ESRecHits_V2.obj", String.Empty);
-
-                    return;
-                }
-                File.WriteAllText($"{eventTitle}\\5_ESRecHits_V2.obj", String.Empty);
-                File.WriteAllLines($"{eventTitle}\\5_ESRecHits_V2.obj", dataList);
-            }*/
+            
             static public List<JetV1Data> jetV1Parse(JObject data)
             {
                 int idNumber = 0;
@@ -579,7 +494,7 @@ namespace VR_Spy_Companion
                 dataList.AddRange(normals);
                 return dataList;
             }
-            static public (List<string>,List<CalorimetryTowers>) generateCalorimetryBoxes(List<CalorimetryTowers> inputData)
+            static public (List<string>,List<CalorimetryTowers>) generateCalorimetryBoxes(List<CalorimetryTowers> inputData, string dataType)
                 {
                     List<string> geometryData = new List<string>();
                     int counter = 1;
@@ -639,58 +554,58 @@ namespace VR_Spy_Companion
                         v7 *= scale;
                         v7 += center;
 
-                box.geometricVertices = new List<double[]>();
-                box.geometricVertices.Add(v0.ToArray());
-                box.geometricVertices.Add(v1.ToArray());
-                box.geometricVertices.Add(v2.ToArray());
-                box.geometricVertices.Add(v3.ToArray());
-                box.geometricVertices.Add(v4.ToArray());
-                box.geometricVertices.Add(v5.ToArray());
-                box.geometricVertices.Add(v6.ToArray());
-                box.geometricVertices.Add(v7.ToArray());
+                    box.geometricVertices = new List<double[]>();
+                    box.geometricVertices.Add(v0.ToArray());
+                    box.geometricVertices.Add(v1.ToArray());
+                    box.geometricVertices.Add(v2.ToArray());
+                    box.geometricVertices.Add(v3.ToArray());
+                    box.geometricVertices.Add(v4.ToArray());
+                    box.geometricVertices.Add(v5.ToArray());
+                    box.geometricVertices.Add(v6.ToArray());
+                    box.geometricVertices.Add(v7.ToArray());
 
-                geometryData.Add($"v {String.Join(' ', v0)}");
-                geometryData.Add($"v {String.Join(' ', v1)}");
-                geometryData.Add($"v {String.Join(' ', v2)}");
-                geometryData.Add($"v {String.Join(' ', v3)}");
-                geometryData.Add($"v {String.Join(' ', v4)}");
-                geometryData.Add($"v {String.Join(' ', v5)}");
-                geometryData.Add($"v {String.Join(' ', v6)}");
-                geometryData.Add($"v {String.Join(' ', v7)}");
+                    geometryData.Add($"o {dataType}_{i}");
+                    geometryData.Add($"v {String.Join(' ', v0)}");
+                    geometryData.Add($"v {String.Join(' ', v1)}");
+                    geometryData.Add($"v {String.Join(' ', v2)}");
+                    geometryData.Add($"v {String.Join(' ', v3)}");
+                    geometryData.Add($"v {String.Join(' ', v4)}");
+                    geometryData.Add($"v {String.Join(' ', v5)}");
+                    geometryData.Add($"v {String.Join(' ', v6)}");
+                    geometryData.Add($"v {String.Join(' ', v7)}");
 
-                geometryData.Add($"f {counter}//1 {counter + 1}//1 {counter + 2}//1 {counter + 3}//1");
-                geometryData.Add($"f {counter + 3}//1 {counter + 2}//1 {counter + 1}//1 {counter}//1");
-                geometryData.Add($"f {counter + 4}//2 {counter + 5}//2 {counter + 6}//2 {counter + 7}//2");
-                geometryData.Add($"f {counter + 7}//2 {counter + 6}//2 {counter + 5}//2 {counter + 4}//2");
-                geometryData.Add($"f {counter}//3 {counter + 3}//3 {counter + 7}//3 {counter + 4}//3");
-                geometryData.Add($"f {counter + 4}//3 {counter + 7}//3 {counter + 3}//3 {counter}//3");
-                geometryData.Add($"f {counter + 1}//4 {counter + 2}//4 {counter + 6}//4 {counter + 5}//4");
-                geometryData.Add($"f {counter + 5}//4 {counter + 6}//4 {counter + 2}//4 {counter + 1}//4");
-                geometryData.Add($"f {counter + 3}//5 {counter + 2}//5 {counter + 6}//5 {counter + 7}//5");
-                geometryData.Add($"f {counter + 7}//5 {counter + 6}//5 {counter + 2}//5 {counter + 3}//5");
-                geometryData.Add($"f {counter + 1}//6 {counter}//6 {counter + 4}//6 {counter + 5}//6");
-                geometryData.Add($"f {counter + 5}//6 {counter + 4}//6 {counter}//6 {counter + 1}//6");
+                    geometryData.Add($"f {counter}//1 {counter + 1}//1 {counter + 2}//1 {counter + 3}//1");
+                    geometryData.Add($"f {counter + 3}//1 {counter + 2}//1 {counter + 1}//1 {counter}//1");
+                    geometryData.Add($"f {counter + 4}//2 {counter + 5}//2 {counter + 6}//2 {counter + 7}//2");
+                    geometryData.Add($"f {counter + 7}//2 {counter + 6}//2 {counter + 5}//2 {counter + 4}//2");
+                    geometryData.Add($"f {counter}//3 {counter + 3}//3 {counter + 7}//3 {counter + 4}//3");
+                    geometryData.Add($"f {counter + 4}//3 {counter + 7}//3 {counter + 3}//3 {counter}//3");
+                    geometryData.Add($"f {counter + 1}//4 {counter + 2}//4 {counter + 6}//4 {counter + 5}//4");
+                    geometryData.Add($"f {counter + 5}//4 {counter + 6}//4 {counter + 2}//4 {counter + 1}//4");
+                    geometryData.Add($"f {counter + 3}//5 {counter + 2}//5 {counter + 6}//5 {counter + 7}//5");
+                    geometryData.Add($"f {counter + 7}//5 {counter + 6}//5 {counter + 2}//5 {counter + 3}//5");
+                    geometryData.Add($"f {counter + 1}//6 {counter}//6 {counter + 4}//6 {counter + 5}//6");
+                    geometryData.Add($"f {counter + 5}//6 {counter + 4}//6 {counter}//6 {counter + 1}//6");
+
+                    //double deltaPhi = 1.0;
+                    //double deltaEta = 1.0;
+
+                    //double sin_theta1 = Math.Sqrt(Math.Pow(v0[0], 2) + Math.Pow(v0[1], 2)) / v0.L2Norm();
+                    //double cos_theta1 = v0[2] / v0.L2Norm();
+                    //double sin_theta4 = Math.Sqrt(Math.Pow(v3[0], 2) + Math.Pow(v3[1], 2)) / v3.L2Norm();
+                    //double cos_theta4 = v3[2] / v3.L2Norm();
+                    //double deltaEta = Math.Log(((1 - cos_theta4) / (1 - cos_theta1)) * (sin_theta1 / sin_theta4));
+                    //Console.WriteLine(deltaEta);
 
 
-                //double deltaPhi = 1.0;
-                //double deltaEta = 1.0;
-
-                //double sin_theta1 = Math.Sqrt(Math.Pow(v0[0], 2) + Math.Pow(v0[1], 2)) / v0.L2Norm();
-                //double cos_theta1 = v0[2] / v0.L2Norm();
-                //double sin_theta4 = Math.Sqrt(Math.Pow(v3[0], 2) + Math.Pow(v3[1], 2)) / v3.L2Norm();
-                //double cos_theta4 = v3[2] / v3.L2Norm();
-                //double deltaEta = Math.Log(((1 - cos_theta4) / (1 - cos_theta1)) * (sin_theta1 / sin_theta4));
-                //Console.WriteLine(deltaEta);
-
-
-                //box.deltaPhi = deltaPhi;
-                //box.deltaEta = deltaEta;
-                deltas.Add(box);
-                    counter += 8;
-                }
-                return (geometryData,deltas);
+                    //box.deltaPhi = deltaPhi;
+                    //box.deltaEta = deltaEta;
+                    deltas.Add(box);
+                        counter += 8;
+                    }
+                    return (geometryData,deltas);
             }
-            static public (List<string>, List<CalorimetryTowers>) generateCalorimetryTowers(List<CalorimetryTowers> inputData)
+            static public (List<string>, List<CalorimetryTowers>) generateCalorimetryTowers(List<CalorimetryTowers> inputData, string dataType)
             {
                 List<string> geometryData = new List<string>();
                 int counter = 1;
@@ -746,6 +661,7 @@ namespace VR_Spy_Companion
                 box.geometricVertices.Add(v6.ToArray());
                 box.geometricVertices.Add(v7.ToArray());
 
+                geometryData.Add($"o {dataType}_{i}");
                 geometryData.Add($"v {String.Join(' ', v0)}");
                 geometryData.Add($"v {String.Join(' ', v1)}");
                 geometryData.Add($"v {String.Join(' ', v2)}");
@@ -791,53 +707,6 @@ namespace VR_Spy_Companion
                 }
                 return (geometryData,deltas);
             }
-            /*public void setScales()
-            {
-                //Hadronic scaling factor is equivalent to the largest energy value in each respective set (HE,HB,HO,HF)
-                List<string> CALSETS = new List<string>() { "HERecHits_V2", "HBRecHits_V2", "HFRecHits_V2", "HORecHits_V2", "EBRecHits_V2", "ESRecHits_V2", "EERecHits_V2" };
-                foreach (string CALSET in CALSETS)
-                {
-                    var collection = data["Collections"][CALSET];
-
-                    if (collection == null || collection.HasValues == false)
-                    {
-                        continue;
-                    }
-
-                    List<double> energies = new List<double>();
-                    foreach (var item in collection)
-                    {
-                        energies.Add((double)item[0].Value<double>());
-                    }
-
-                    double scaleEnergy = energies.ToArray().Max();
-
-                    switch (CALSET)
-                    {
-                        case "HERecHits_V2":
-                            HESCALE = scaleEnergy;
-                            break;
-                        case "HBRecHits_V2":
-                            HBSCALE = scaleEnergy;
-                            break;
-                        case "HFRecHits_V2":
-                            HFSCALE = scaleEnergy;
-                            break;
-                        case "HORecHits_V2":
-                            HOSCALE = scaleEnergy;
-                            break;
-                        case "EBRecHits_V2":
-                            EBSCALE = scaleEnergy;
-                            break;
-                        case "EERecHits_V2":
-                            EESCALE = scaleEnergy;
-                            break;
-                        case "ESRecHits_V2":
-                            ESSCALE = scaleEnergy;
-                            break;
-                    }
-                }
-            }*/
             static public List<RecHitFraction> recHitFractionsParse(JObject data)
             {
                 List<RecHitFraction> dataList = new List<RecHitFraction>();
@@ -863,27 +732,7 @@ namespace VR_Spy_Companion
                 }
                 return dataList;
             }
-            /*public List<List<RecHitFraction>> assignRecHitFractions(List<RecHitFraction> extras)
-            {
-                List<List<RecHitFraction>> dataList = new List<List<RecHitFraction>>();
-                int indexer = 0;
-                if (data["Associations"]["SuperClusterRecHitFractions_V1"] == null)
-                {
-                    return dataList;
-                }
-                foreach (var item in data["Associations"]["SuperClusterRecHitFractions_V1"])
-                {
-                    int index = item[0][1].Value<int>();
-                    if (dataList.Count() < index + 1)
-                    {
-                        List<RecHitFraction> h = new List<RecHitFraction>();
-                        dataList.Add(h);
-                    }
-                    dataList[index].Add(extras[indexer]);
-                    indexer++;
-                }
-                return dataList;
-            }*/
+
             static public List<SuperCluster> superClusterParse(JObject data)
             {
                 List<SuperCluster> dataList = new List<SuperCluster>();
