@@ -44,6 +44,7 @@ class OBJGenerator
         string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "\\platform-tools\\adb.exe"; //windows
         //string adbPath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location) + "/platform-tools/adb"; //macos
         bool single = false;
+        bool range = false;
         if (args.Count() > 1)
         {
             targetPath = "";
@@ -58,11 +59,9 @@ class OBJGenerator
                     //    break;
                     case 's':
                         single = true;
-                        string tempFolder = Path.GetTempFileName();
-                        File.Delete(tempFolder);
-                        Directory.CreateDirectory(tempFolder);
-                        targetPath = tempFolder + "\\" + Path.GetFileNameWithoutExtension(args[0]);                                         //Console.WriteLine("targetPath: " + targetPath);
-                        Console.CancelKeyPress += delegate { Directory.Delete(tempFolder, true); };
+                        break;
+                    case 'c':
+                        range = true;
                         break;
                     default:
                         targetPath = "hui";
@@ -71,6 +70,11 @@ class OBJGenerator
                         break;
                 }
             }
+            string tempFolder = Path.GetTempFileName();
+            File.Delete(tempFolder);
+            Directory.CreateDirectory(tempFolder);
+            targetPath = tempFolder + "\\" + Path.GetFileNameWithoutExtension(args[0]);                                    
+            Console.CancelKeyPress += delegate { Directory.Delete(tempFolder, true); };
         }
         else
         {
@@ -95,6 +99,21 @@ class OBJGenerator
             generateOBJ(eventName, eventTargetPath, args);
 
         }
+        else if (range)
+        {
+            zipper.RunRange();
+            int total = zipper.files.Count();
+            for (int i = 0; i < total; i++)
+                {
+                    string eventName = zipper.files[i];
+                    string eventTargetPath = targetPath;
+                    Directory.CreateDirectory(eventTargetPath);
+
+                    PrintProgressBar(i + 1, total, Path.GetFileName(eventName));
+                    generateOBJ(eventName, eventTargetPath, args);
+                }
+            Console.WriteLine("\nAll events processed!");
+        }
         else
         {
             zipper.Run();
@@ -112,6 +131,7 @@ class OBJGenerator
             }
             Console.WriteLine("\nAll events processed!");
         }
+        generateMetaInfo(targetPath,zipper.runName, Path.GetFileName(args[0]),zipper.files.Count());
         Console.WriteLine($"Total Execution Time: {watch.ElapsedMilliseconds} ms"); // See how fast code runs. Code goes brrrrrrr on fancy office pc. It makes me happy. :)
 
         Console.WriteLine($"OBJ Files written to: {targetPath}\n\nPress ENTER to continue and move files from your device and onto the Oculus Quest");
@@ -197,5 +217,10 @@ class OBJGenerator
 
         Console.Write("\r" + message.PadRight(Console.WindowWidth - 1));
     }
-
+    static void generateMetaInfo(string targetPath, string runName, string igFileName, int eventCount)
+        {
+            var jsonData = new {runName = runName, igFileName = igFileName, eventCount = eventCount};
+            string json = JsonConvert.SerializeObject(jsonData, Formatting.Indented);
+            File.WriteAllText(Path.Combine(targetPath, "MetaInfo.json"), json);
+        }
 }

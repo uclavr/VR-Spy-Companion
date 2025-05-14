@@ -68,7 +68,7 @@ namespace IGtoOBJGen
             }
 
             string Contents;
-            Contents = $"v {x0} {y0} {z0}\nv {x0 + 0.001} {y0 + 0.001} {z0 + 0.001}\nv {x0 + px * t} {y0 + py * t} {z0 + pz * t}\nv {x0 + px * t + 0.001} {y0 + py * t + 0.001} {z0 + pz * t + 0.001}";
+            Contents = $"v {x0} {y0} {z0}\nv {x0 + 0.001} {y0 + 0.001} {(z0 + 0.001)}\nv {x0 + px * t} {y0 + py * t} {(z0 + pz * t)}\nv {x0 + px * t + 0.001} {y0 + py * t + 0.001} {(z0 + pz * t + 0.001)}";
             //Output a string of obj vectors that define the photon path
             return Contents;
         }
@@ -105,40 +105,87 @@ namespace IGtoOBJGen
             int n = 0;
             int num = 0;
             int j = 0;
+
+            // double barrelRadius = 1.284;
+            double barrelLength = 6.088;
+            double thicknessInside = 0.001;
+            double thicknessOutside = 0.01;
+
             foreach (var item in inputData)
             {
                 testList.Clear();
                 dataList.Add($"o {objectName}_{num}");
-                for (double i = 0.0; i <= numVerts; i++)
+                string[] muonTypes = { "GlobalMuons_V1", "GlobalMuons_V2", "StandaloneMuons_V1", "StandaloneMuons_V2", "TrackerMuons_V1", "TrackerMuons_V2" };
+                if (muonTypes.Contains(objectName))
                 {
+                    for (int i = 0; i <= numVerts; i++)
+                    {
+                        double t = (double)i / numVerts;
 
-                    double t = (double)(i) / (double)(numVerts);
+                        double t1 = Math.Pow(1.0 - t, 3);
+                        double t2 = 3 * t * Math.Pow(1.0 - t, 2);
+                        double t3 = 3 * t * t * (1.0 - t);
+                        double t4 = Math.Pow(t, 3);
 
-                    double t1 = Math.Pow(1.0 - t, 3);
-                    double t2 = 3 * t * Math.Pow(1.0 - t, 2);
-                    double t3 = 3 * t * t * (1.0 - t);
-                    double t4 = Math.Pow(t, 3);
+                        double[] term1 = { t1 * item.pos1[0], t1 * item.pos1[1], t1 * item.pos1[2] };
+                        double[] term2 = { t2 * item.pos3[0], t2 * item.pos3[1], t2 * item.pos3[2] };
+                        double[] term3 = { t3 * item.pos4[0], t3 * item.pos4[1], t3 * item.pos4[2] };
+                        double[] term4 = { t4 * item.pos2[0], t4 * item.pos2[1], t4 * item.pos2[2] };
+                        double[] point = {
+                            term1[0] + term2[0] + term3[0] + term4[0],
+                            term1[1] + term2[1] + term3[1] + term4[1],
+                            term1[2] + term2[2] + term3[2] + term4[2]
+                        };
 
-                    // Check out the wikipedia page for bezier curves if you want to understand the math. That's where I learned it!
-                    // also we're using double arrays because i dont like Vector3 and floats. I'm the one who has to go through the headaches of working with double arrays
-                    // instead of Vector3 so i get to make that call. i also wrote this before i realized i couldn't avoid using MathNET and i can't be bothered to 
-                    // change it such that it uses MathNET vectors
+                        double radiusXY = Math.Sqrt(point[0] * point[0] + point[1] * point[1]);
+                        bool isOutsideBarrel = radiusXY > BarrelRadiusAtZ(point[2]) || Math.Abs(point[2]) > barrelLength/2;
 
-                    // UPDATE: I should have refactored to use MathNET for everything when I had the chance
+                        double thickness = isOutsideBarrel ? thicknessOutside : thicknessInside;
 
-                    double[] term1 = { t1 * item.pos1[0], t1 * item.pos1[1], t1 * item.pos1[2] };
-                    double[] term2 = { t2 * item.pos3[0], t2 * item.pos3[1], t2 * item.pos3[2] };
-                    double[] term3 = { t3 * item.pos4[0], t3 * item.pos4[1], t3 * item.pos4[2] };
-                    double[] term4 = { t4 * item.pos2[0], t4 * item.pos2[1], t4 * item.pos2[2] };
-                    double[] point = { term1[0] + term2[0] + term3[0] + term4[0], term1[1] + term2[1] + term3[1] + term4[1], term1[2] + term2[2] + term3[2] + term4[2] };
-
-                    string poin_t = $"v {point[0]} {point[1]} {point[2]}";
-                    string point_t2 = $"v {point[0]} {point[1] + 0.001} {point[2]}";
-
-                    dataList.Add(poin_t); dataList.Add(point_t2);
-                    testList.Add(poin_t); testList.Add(point_t2);
-                    n += 2;
+                        double offset = thickness / 2;
+                        string line1 = $"v {point[0]} {point[1] - offset} {point[2]}";
+                        string line2 = $"v {point[0]} {point[1] + offset} {point[2]}";
+            
+                        dataList.Add(line1); dataList.Add(line2);
+                        testList.Add(line1); testList.Add(line2);
+                        n += 2;
+                    }
                 }
+                else
+                {
+                    for (double i = 0.0; i <= numVerts; i++)
+                    {
+
+                        double t = (double)(i) / (double)(numVerts);
+
+                        double t1 = Math.Pow(1.0 - t, 3);
+                        double t2 = 3 * t * Math.Pow(1.0 - t, 2);
+                        double t3 = 3 * t * t * (1.0 - t);
+                        double t4 = Math.Pow(t, 3);
+
+                        // Check out the wikipedia page for bezier curves if you want to understand the math. That's where I learned it!
+                        // also we're using double arrays because i dont like Vector3 and floats. I'm the one who has to go through the headaches of working with double arrays
+                        // instead of Vector3 so i get to make that call. i also wrote this before i realized i couldn't avoid using MathNET and i can't be bothered to 
+                        // change it such that it uses MathNET vectors
+
+                        // UPDATE: I should have refactored to use MathNET for everything when I had the chance
+
+                        double[] term1 = { t1 * item.pos1[0], t1 * item.pos1[1], t1 * item.pos1[2] };
+                        double[] term2 = { t2 * item.pos3[0], t2 * item.pos3[1], t2 * item.pos3[2] };
+                        double[] term3 = { t3 * item.pos4[0], t3 * item.pos4[1], t3 * item.pos4[2] };
+                        double[] term4 = { t4 * item.pos2[0], t4 * item.pos2[1], t4 * item.pos2[2] };
+                        double[] point = { term1[0] + term2[0] + term3[0] + term4[0], term1[1] + term2[1] + term3[1] + term4[1], term1[2] + term2[2] + term3[2] + term4[2] };
+
+                        double offset = thicknessInside / 2;
+                        string point_1 = $"v {point[0]} {point[1] - offset} {point[2]}";
+                        string point_2 = $"v {point[0]} {point[1] + offset} {point[2]}";
+
+                        dataList.Add(point_1); dataList.Add(point_2);
+                        testList.Add(point_1); testList.Add(point_2);
+                        n += 2;
+                    }
+                }
+ 
                 for (int r = 1; r < (numVerts * 2); r++)
                 {
                     string faces1 = $"f {r + (j * 33)} {r + 1 + (j * 33)} {r + 3 + (j * 33)} {r + 2 + (j * 33)}";
@@ -149,7 +196,6 @@ namespace IGtoOBJGen
                 j += 2;
                 exclusion_indeces.Add(n);
             }
-
             return dataList;
         }
         static public List<TrackExtrasData> trackExtrasParse(JObject data)
@@ -199,7 +245,7 @@ namespace IGtoOBJGen
             }
             return dataList;
         }
-        static public List<TrackExtrasData> setExtras(JObject data,string association)
+        static public List<TrackExtrasData> setExtras(JObject data,string association) 
         {
             List<TrackExtrasData> dataList = new List<TrackExtrasData>();
             var assocsExtras = data["Associations"][association];
@@ -211,7 +257,7 @@ namespace IGtoOBJGen
                 TrackExtrasData currentItem = new TrackExtrasData();
 
                 var children = extra.Children().Values<double>().ToArray();
-
+                
                 currentItem.pos1 = new double[3] { children[0], children[1], children[2] };
 
                 double dir1mag = Math.Sqrt(  //dir1mag and dir2mag are for making sure the direction vectors are normalized
@@ -221,7 +267,7 @@ namespace IGtoOBJGen
                 );
                 currentItem.dir1 = new double[3] { children[3] / dir1mag, children[4] / dir1mag, children[5] / dir1mag };
 
-                currentItem.pos2 = new double[3] { children[6], children[7], children[8] };
+                currentItem.pos2 = new double[3] { children[6], children[7],  children[8] };
 
                 double dir2mag = Math.Sqrt(
                     Math.Pow(children[9], 2) +
@@ -525,9 +571,15 @@ namespace IGtoOBJGen
                 mi = item[0][1].Value<int>();
                 pi = item[1][1].Value<int>();
                 if (positions.Count() <= mi) { List<double[]> blank = new List<double[]>(); positions.Add(blank); }
-                positions[mi].Add(extras[pi][0].ToObject<double[]>());
+                double[] point = extras[pi][0].ToObject<double[]>();
+                positions[mi].Add(point);
+                
             }
             return positions;
+        }
+        static public double BarrelRadiusAtZ(double z)
+        {
+            return 1.55713089 - 0.02149809 * z - 0.02798209 * z * z;
         }
         static public void makeGeometryFromPoints(List<List<double[]>> points, string name, string path, string eventTitle)
         {
@@ -535,15 +587,44 @@ namespace IGtoOBJGen
             int accountingfactor = 0;
             List<string> strings = new List<string>();
             int counter = 0;
+            // double barrelRadius = 1.284;
+            double barrelLength = 6.088;
+            double thicknessInside = 0.001;
+            double thicknessOutside = 0.01;
             foreach (var subitem in points)
             {
                 List<string> medi = new List<string>();
                 medi.Add($"o {name}_{counter}");
                 foreach (var item in subitem)
                 {
-                    string line1 = $"v {item[0]} {item[1]} {item[2]}";
-                    string line2 = $"v {item[0]} {item[1] + 0.001} {item[2]}";
-                    medi.Add(line1); medi.Add(line2);
+                    string[] muonTypes = { "GlobalMuons_V1", "GlobalMuons_V2", "StandaloneMuons_V1", "StandaloneMuons_V2", "TrackerMuons_V1", "TrackerMuons_V2" };
+                    if (muonTypes.Contains(name))
+                    {
+
+                        double x = item[0];
+                        double y = item[1];
+                        double z = item[2];
+
+                        double radiusXY = Math.Sqrt(x*x + y*y);
+                        bool isOutsideBarrel = radiusXY > BarrelRadiusAtZ(z) || Math.Abs(z) > barrelLength/2;
+
+                        double thickness = isOutsideBarrel ? thicknessOutside : thicknessInside;
+
+                        double offset = thickness / 2;
+                        string line1 = $"v {x} {y - offset} {z}";
+                        string line2 = $"v {x} {y + offset} {z}";
+                        medi.Add(line1); 
+                        medi.Add(line2);
+                    }
+                    else
+                    {
+                        double offset = thicknessInside / 2;
+                        string line1 = $"v {item[0]} {item[1] - offset} {item[2]}";
+                        string line2 = $"v {item[0]} {item[1] + offset} {item[2]}";
+                        medi.Add(line1); medi.Add(line2);
+                    }
+
+
                 }
                 dataLists.Add(medi);
                 counter++;
@@ -562,9 +643,8 @@ namespace IGtoOBJGen
                 accountingfactor += count - 1;
                 strings.AddRange(ble);
             }
-            File.WriteAllLines(@$"{eventTitle}\{path}.obj", strings);
-        }
-        static public List<trackingPoint> trackingpointParse(JObject data, string name, int index)
+            File.WriteAllLines(@$"{eventTitle}\\{path}.obj", strings);
+        }        static public List<trackingPoint> trackingpointParse(JObject data, string name, int index)
         {
             List<trackingPoint> dataList = new List<trackingPoint>();
             foreach (var item in data["Collections"][name])
@@ -681,6 +761,7 @@ namespace IGtoOBJGen
             Vector3 corner7 = end - right * (size / 2) - up * (size / 2);
             Vector3 corner8 = end + right * (size / 2) - up * (size / 2);
 
+
             geometryData.Add($"v {corner1.X} {corner1.Y} {corner1.Z}");
             geometryData.Add($"v {corner2.X} {corner2.Y} {corner2.Z}");
             geometryData.Add($"v {corner3.X} {corner3.Y} {corner3.Z}");
@@ -713,8 +794,8 @@ namespace IGtoOBJGen
         {
             List<string> geometryData = new List<string>();
             int vertexIndex = 1;
-            int objectIndex = 0;
             float size = 0.0025f;
+            int objectIndex = 0;
             foreach (cscSegmentV2 seg in inputData)
             {
                 geometryData.Add($"o CSCSegments_V2_{objectIndex}");
@@ -771,9 +852,8 @@ namespace IGtoOBJGen
         {
             List<string> geometryData = new List<string>();
             int vertexIndex = 1;
-            int objectIndex = 0;
-
             float size = 0.005f;
+            int objectIndex = 0;
             foreach (dtRecSegment4D_V1 point in inputData)
             {
                 geometryData.Add($"o DTRecSegment4D_V1_{objectIndex}");
@@ -824,7 +904,7 @@ namespace IGtoOBJGen
                 //float size = (float) point.errorWithinStrip;
                 geometryData.Add($"o CSCRecHit2Ds_V2_{objectIndex}");
                 GeneratePrism(point.u1, point.u2, ref geometryData, ref vertexIndex, size);
-                GeneratePrism(point.v1, point.v2, ref geometryData, ref vertexIndex,size);
+                GeneratePrism(point.v1, point.v2, ref geometryData, ref vertexIndex, size);
                 GeneratePrism(point.w1, point.w2, ref geometryData, ref vertexIndex, size);
                 objectIndex += 1;
             }

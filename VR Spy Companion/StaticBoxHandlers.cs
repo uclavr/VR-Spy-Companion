@@ -567,7 +567,7 @@ namespace VR_Spy_Companion
                 dataList.AddRange(normals);
                 return dataList;
             }
-            static public (List<string>,List<CalorimetryTowers>) generateCalorimetryBoxes(List<CalorimetryTowers> inputData)
+            static public (List<string>,List<CalorimetryTowers>) generateCalorimetryBoxes(List<CalorimetryTowers> inputData, string dataType)
                 {
                     List<string> geometryData = new List<string>();
                     int counter = 1;
@@ -638,7 +638,7 @@ namespace VR_Spy_Companion
                 box.geometricVertices.Add(v7.ToArray());
                
 
-
+                geometryData.Add($"o {dataType}_{i}");
                 geometryData.Add($"v {String.Join(' ', v0)}");
                 geometryData.Add($"v {String.Join(' ', v1)}");
                 geometryData.Add($"v {String.Join(' ', v2)}");
@@ -680,7 +680,7 @@ namespace VR_Spy_Companion
                 }
                 return (geometryData,deltas);
             }
-            static public (List<string>, List<CalorimetryTowers>) generateCalorimetryTowers(List<CalorimetryTowers> inputData)
+            static public (List<string>, List<CalorimetryTowers>) generateCalorimetryTowers(List<CalorimetryTowers> inputData, string dataType)
             {
                 List<string> geometryData = new List<string>();
                 int counter = 1;
@@ -736,6 +736,7 @@ namespace VR_Spy_Companion
                 box.geometricVertices.Add(v6.ToArray());
                 box.geometricVertices.Add(v7.ToArray());
 
+                geometryData.Add($"o {dataType}_{i}");
                 geometryData.Add($"v {String.Join(' ', v0)}");
                 geometryData.Add($"v {String.Join(' ', v1)}");
                 geometryData.Add($"v {String.Join(' ', v2)}");

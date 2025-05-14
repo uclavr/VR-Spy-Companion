@@ -90,20 +90,8 @@ namespace IGtoOBJGen
 
             File.WriteAllText($"{EVENTPATH}\\totaldata.json", sb.ToString());
         }
-        /*private string CreateTempFolder()
-        {
-            string tempFolder = Path.GetTempFileName();
-            File.Delete(tempFolder);
-            Directory.CreateDirectory(tempFolder);
-            Console.CancelKeyPress += delegate { Directory.Delete(tempFolder, true); };
-            return tempFolder;
-        }*/
         public void CreateObjects()
         {
-            //foreach(var item in eventObjects)
-            //{
-            //    outputJSONStrings.Add(item.Execute());
-            //}
             Parallel.ForEach(eventObjects, obj =>
             {
                 string json = obj.Execute();
