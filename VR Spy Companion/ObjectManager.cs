@@ -329,6 +329,18 @@ namespace IGtoOBJGen
                             break;
                         case "SimVertices_V1":
                             break;
+                        case "Event_V1":
+                            Event_V1 event_V1 = new Event_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(event_V1);
+                            break;
+                        case "Event_V2":
+                            Event_V2 event_V2 = new Event_V2(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(event_V2);
+                            break;
+                        case "Event_V3":
+                            Event_V3 event_V3 = new Event_V3(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(event_V3);
+                            break;
                         default:
                             break;
                     }

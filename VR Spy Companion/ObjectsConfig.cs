@@ -718,18 +718,48 @@ namespace IGtoOBJGen {
         }
         public override string Execute()
         {
-            return JsonConvert.SerializeObject(JSON["Collections"]["Event_V1"]);
+            var fieldNames = new[] {
+                "run", "event", "ls", "orbit", "bx", "time", "localtime"
+            };
+
+            JArray raw = (JArray)JSON["Collections"]["Event_V1"];
+            JArray values = (JArray)raw[0];
+
+            var fieldMap = new Dictionary<string, JToken>();
+            for (int i = 0; i < fieldNames.Length; i++)
+            {
+                fieldMap[fieldNames[i]] = values[i];
+            }
+
+            string serializedInner = JsonConvert.SerializeObject(fieldMap);
+
+            return $"\"Event_V1\":{serializedInner}";
         }
     }
     class Event_V2 : TypeConfig
-    { 
+    {
         public Event_V2(JObject args, string eventtitle)
         {
             JSON = args;
         }
         public override string Execute()
         {
-            return JsonConvert.SerializeObject(JSON["Collections"]["Event_V2"]);
+            var fieldNames = new[] {
+                "run", "event", "ls", "orbit", "bx", "time", "localtime"
+            };
+
+            JArray raw = (JArray)JSON["Collections"]["Event_V2"];
+            JArray values = (JArray)raw[0];
+
+            var fieldMap = new Dictionary<string, JToken>();
+            for (int i = 0; i < fieldNames.Length; i++)
+            {
+                fieldMap[fieldNames[i]] = values[i];
+            }
+
+            string serializedInner = JsonConvert.SerializeObject(fieldMap);
+
+            return $"\"Event_V2\":{serializedInner}";
         }
     }
     class Event_V3 : TypeConfig
@@ -740,7 +770,22 @@ namespace IGtoOBJGen {
         }
         public override string Execute()
         {
-            return JsonConvert.SerializeObject(JSON["Collections"]["Event_V3"]);
+            var fieldNames = new[] {
+                "run", "event", "ls", "orbit", "bx", "time", "localtime"
+            };
+
+            JArray raw = (JArray)JSON["Collections"]["Event_V3"];
+            JArray values = (JArray)raw[0];
+
+            var fieldMap = new Dictionary<string, JToken>();
+            for (int i = 0; i < fieldNames.Length; i++)
+            {
+                fieldMap[fieldNames[i]] = values[i];
+            }
+
+            string serializedInner = JsonConvert.SerializeObject(fieldMap);
+
+            return $"\"Event_V3\":{serializedInner}";
         }
     }
     class RPCRecHits_V1 : TypeConfig {
