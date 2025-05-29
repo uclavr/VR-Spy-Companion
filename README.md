@@ -23,6 +23,7 @@ VR Spy Companion accepts 2 arguments (the path to your '.ig' file and option fla
 
 ### Options
 - 's': Allows you to select a single event from the run
+- 'c': Allows you to select a range of events from the run
 ### GUI Use
 
 GUI coming soon
