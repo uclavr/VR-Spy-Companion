@@ -12,6 +12,7 @@ using System.Globalization;
 using MathNet.Numerics;
 using IGtoOBJGen;
 using MathNet.Numerics.Distributions;
+using System.IO;
 
 namespace VR_Spy_Companion
 {
@@ -905,49 +906,51 @@ namespace VR_Spy_Companion
                     {
                         writer.WriteLine($"o Vertex_{vertexNumber}");
                         double[] pos = item.pos;
-                        double xDiameter = sigmaFactor * item.xError; double yDiameter = sigmaFactor * item.yError; double zDiameter = sigmaFactor * item.zError;
 
                         int index = 0;
-                        // Generate vertices
-                        int numVertices = 100;
-                        for (int i = 0; i < numVertices; i++)
+                        int lonSegments = 100;       // longitude (around)
+                        int latSegments = 50;        // latitude (top→bottom)
+
+                        // --- Generate vertices ---
+                        for (int j = 0; j <= latSegments; j++)
                         {
-                            double theta = 2.0 * Math.PI * i / numVertices;
-                            for (int j = 0; j < numVertices / 2; j++)
+                            double phi = Math.PI * j / latSegments;   // 0..π
+                            for (int i = 0; i < lonSegments; i++)
                             {
-                                double phi = Math.PI * j / (numVertices / 2);
-
-                                double x = pos[0] + xDiameter * Math.Sin(phi) * Math.Cos(theta);
-                                double y = pos[1] + yDiameter * Math.Sin(phi) * Math.Sin(theta);
-                                double z = pos[2] + zDiameter * Math.Cos(phi);
-
-                                writer.WriteLine($"v {x} {y} {z}");
+                                double theta = 2.0 * Math.PI * i / lonSegments; // 0..2π
+                                double x = pos[0] + Math.Sin(phi) * Math.Cos(theta);
+                                double y = pos[1] + Math.Sin(phi) * Math.Sin(theta);
+                                double z = pos[2] + Math.Cos(phi);
+                                writer.WriteLine($"v {x:F6} {y:F6} {z:F6}");
                             }
                         }
 
-                        int vIndex = 1; // Vertex indices start from 1 in OBJ format
-                        for (int i = 0; i < numVertices; i++)
+                        // --- Faces ---
+                        int ringVerts = lonSegments;
+                        for (int j = 0; j < latSegments; j++)
                         {
-                            for (int j = 0; j < numVertices / 2 - 1; j++)
+                            for (int i = 0; i < lonSegments; i++)
                             {
-                                int v1 = vIndex + j;
-                                int v2 = vIndex + (j + 1) % (numVertices / 2);
-                                int v3 = vIndex + (j + 1) % (numVertices / 2) + numVertices / 2;
-                                int v4 = vIndex + j + numVertices / 2;
+                                int nextI = (i + 1) % lonSegments;
 
-                                writer.WriteLine($"f {indexer + v1} {indexer + v2} {indexer + v3} {indexer + v4}");
-                                //writer.WriteLine($"f {indexer + v1} {indexer + v3} {indexer + v4}");
+                                int v1 = indexer + 1 + j * ringVerts + i;
+                                int v2 = indexer + 1 + (j + 1) * ringVerts + i;
+                                int v3 = indexer + 1 + (j + 1) * ringVerts + nextI;
+                                int v4 = indexer + 1 + j * ringVerts + nextI;
+
+                                writer.WriteLine($"f {v1} {v2} {v3} {v4}");
                                 index = v4;
                             }
-                            vIndex += numVertices / 2;
                         }
-                        indexer += index;
+
+                        indexer += (latSegments + 1) * ringVerts;
                         vertexNumber++;
                     }
                 }
-
             }
-            static public List<TrackerPieceData> trackerPieceParse(JObject data, string name)
+
+
+        static public List<TrackerPieceData> trackerPieceParse(JObject data, string name)
             {
                 List<TrackerPieceData> dataList = new List<TrackerPieceData>();
                 foreach (var item in data["Collections"][name])
