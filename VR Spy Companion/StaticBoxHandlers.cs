@@ -1037,6 +1037,7 @@ namespace VR_Spy_Companion
 
                 return dataList;
             }
+
             public static void GenerateEllipsoidObj(string filePath, List<Vertex> vertexList, double sigmaFactor)
             {
                 int vertexNumber = 0;
@@ -1047,68 +1048,68 @@ namespace VR_Spy_Companion
                     {
                         writer.WriteLine($"o Vertex_{vertexNumber}");
                         double[] pos = item.pos;
-                        double xDiameter = sigmaFactor * item.xError; double yDiameter = sigmaFactor * item.yError; double zDiameter = sigmaFactor * item.zError;
 
                         int index = 0;
-                        // Generate vertices
-                        int numVertices = 100;
-                        for (int i = 0; i < numVertices; i++)
+                        int lonSegments = 100;       // longitude (around)
+                        int latSegments = 50;        // latitude (top→bottom)
+
+                        // --- Generate vertices ---
+                        for (int j = 0; j <= latSegments; j++)
                         {
-                            double theta = 2.0 * Math.PI * i / numVertices;
-                            for (int j = 0; j < numVertices / 2; j++)
+                            double phi = Math.PI * j / latSegments;   // 0..π
+                            for (int i = 0; i < lonSegments; i++)
                             {
-                                double phi = Math.PI * j / (numVertices / 2);
-
-                                double x = pos[0] + xDiameter * Math.Sin(phi) * Math.Cos(theta);
-                                double y = pos[1] + yDiameter * Math.Sin(phi) * Math.Sin(theta);
-                                double z = pos[2] + zDiameter * Math.Cos(phi);
-
-                                writer.WriteLine($"v {x} {y} {z}");
+                                double theta = 2.0 * Math.PI * i / lonSegments; // 0..2π
+                                double x = pos[0] + Math.Sin(phi) * Math.Cos(theta);
+                                double y = pos[1] + Math.Sin(phi) * Math.Sin(theta);
+                                double z = pos[2] + Math.Cos(phi);
+                                writer.WriteLine($"v {x:F6} {y:F6} {z:F6}");
                             }
                         }
 
-                        int vIndex = 1; // Vertex indices start from 1 in OBJ format
-                        for (int i = 0; i < numVertices; i++)
+                        // --- Faces ---
+                        int ringVerts = lonSegments;
+                        for (int j = 0; j < latSegments; j++)
                         {
-                            for (int j = 0; j < numVertices / 2 - 1; j++)
+                            for (int i = 0; i < lonSegments; i++)
                             {
-                                int v1 = vIndex + j;
-                                int v2 = vIndex + (j + 1) % (numVertices / 2);
-                                int v3 = vIndex + (j + 1) % (numVertices / 2) + numVertices / 2;
-                                int v4 = vIndex + j + numVertices / 2;
+                                int nextI = (i + 1) % lonSegments;
 
-                                writer.WriteLine($"f {indexer + v1} {indexer + v2} {indexer + v3} {indexer + v4}");
-                                //writer.WriteLine($"f {indexer + v1} {indexer + v3} {indexer + v4}");
+                                int v1 = indexer + 1 + j * ringVerts + i;
+                                int v2 = indexer + 1 + (j + 1) * ringVerts + i;
+                                int v3 = indexer + 1 + (j + 1) * ringVerts + nextI;
+                                int v4 = indexer + 1 + j * ringVerts + nextI;
+
+                                writer.WriteLine($"f {v1} {v2} {v3} {v4}");
                                 index = v4;
                             }
-                            vIndex += numVertices / 2;
                         }
-                        indexer += index;
+
+                        indexer += (latSegments + 1) * ringVerts;
                         vertexNumber++;
                     }
                 }
-
             }
             static public List<TrackerPieceData> trackerPieceParse(JObject data, string name)
-            {
-                List<TrackerPieceData> dataList = new List<TrackerPieceData>();
-                foreach (var item in data["Collections"][name])
                 {
-                    TrackerPieceData TrackerPieceData = new TrackerPieceData();
-                    var children = item.Children().Values<double>().ToArray();
-                    TrackerPieceData.name = name;
-                    TrackerPieceData.detid = (int)children[0];
-                    TrackerPieceData.front_1 = new double[] { children[1], children[2], children[3] };
-                    TrackerPieceData.front_2 = new double[] { children[4], children[5], children[6] };
-                    TrackerPieceData.front_3 = new double[] { children[7], children[8], children[9] };
-                    TrackerPieceData.front_4 = new double[] { children[10], children[11], children[12] };
-                    TrackerPieceData.back_1 = new double[] { children[13], children[14], children[15] };
-                    TrackerPieceData.back_2 = new double[] { children[16], children[17], children[18] };
-                    TrackerPieceData.back_3 = new double[] { children[19], children[20], children[21] };
-                    TrackerPieceData.back_4 = new double[] { children[22], children[23], children[24] };
-                    dataList.Add(TrackerPieceData);
-                }
-                return dataList;
+                    List<TrackerPieceData> dataList = new List<TrackerPieceData>();
+                    foreach (var item in data["Collections"][name])
+                    {
+                        TrackerPieceData TrackerPieceData = new TrackerPieceData();
+                        var children = item.Children().Values<double>().ToArray();
+                        TrackerPieceData.name = name;
+                        TrackerPieceData.detid = (int)children[0];
+                        TrackerPieceData.front_1 = new double[] { children[1], children[2], children[3] };
+                        TrackerPieceData.front_2 = new double[] { children[4], children[5], children[6] };
+                        TrackerPieceData.front_3 = new double[] { children[7], children[8], children[9] };
+                        TrackerPieceData.front_4 = new double[] { children[10], children[11], children[12] };
+                        TrackerPieceData.back_1 = new double[] { children[13], children[14], children[15] };
+                        TrackerPieceData.back_2 = new double[] { children[16], children[17], children[18] };
+                        TrackerPieceData.back_3 = new double[] { children[19], children[20], children[21] };
+                        TrackerPieceData.back_4 = new double[] { children[22], children[23], children[24] };
+                        dataList.Add(TrackerPieceData);
+                    }
+                    return dataList;
             }
             static public List<string> generateTrackerPiece(List<TrackerPieceData> inputData)
             {
