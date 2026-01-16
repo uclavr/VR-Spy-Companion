@@ -1015,7 +1015,7 @@ namespace IGtoOBJGen {
         public override string Execute()
         {
             jetDatas = StaticBoxHandlers.genjetV1Parse(JSON);
-            StaticBoxHandlers.generateJetModels(jetDatas, eventTitle);
+            StaticBoxHandlers.generategenJetModels(jetDatas, eventTitle);
             string data = JsonConvert.SerializeObject(jetDatas);
             return ("\"jetDatas\":" + data);
             //return JsonConvert.SerializeObject(jetDatas);

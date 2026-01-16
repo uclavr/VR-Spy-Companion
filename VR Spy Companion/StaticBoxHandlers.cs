@@ -286,6 +286,31 @@ namespace VR_Spy_Companion
                     }
                     File.WriteAllLines($"{eventTitle}//PFJets.obj", dataList);
                 }
+            static public void generategenJetModels(List<JetV1Data> data, string eventTitle)
+                {
+                    double maxZ = 2.25;
+                    double maxR = 1.10;
+                    double radius = 0.3 * (1.0 / (1 + 0.001));
+                    int numSections = 64;
+                    int iterNumber = 0;
+                    int index = 0;
+                    List<string> dataList = new List<string>();
+
+                    foreach (var item in data)
+                    {
+                        iterNumber++;
+                        double ct = Math.Cos(item.theta);
+                        double st = Math.Sin(item.theta);
+
+                        double length1 = (ct != 0.0) ? maxZ / Math.Abs(ct) : maxZ;
+                        double length2 = (st != 0.0) ? maxR / Math.Abs(st) : maxR;
+                        double length = length1 < length2 ? length1 : length2;
+
+                        dataList = jetGeometry(item, radius, length, numSections, index, dataList);
+                        index++;
+                    }
+                    File.WriteAllLines($"{eventTitle}//GenJets_V1.obj", dataList);
+                }
             static public void generateJetModels(List<JetV2Data> data, string eventTitle)
             {
                 double maxZ = 2.25;
