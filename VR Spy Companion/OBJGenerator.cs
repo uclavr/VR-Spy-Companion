@@ -179,7 +179,7 @@ class OBJGenerator {
         ObjectManager manager = new ObjectManager(o2, currentTargetPath);
         manager.Execute();
 
-        flip(currentTargetPath); 
+        flip(currentTargetPath);
     }
     static void cleanUp(string deletionPath)
     {

@@ -108,6 +108,16 @@ struct GlobalMuonData : ObjectData
     public double eta;
     public double caloEnergy;
 }
+
+struct PATGlobalMuonData : ObjectData
+{
+    public int id;
+    public double pt;
+    public int charge;
+    public double[] position;
+    public double phi;
+    public double eta;
+}
 struct StandaloneMuonData : ObjectData
 {
     public int id;
@@ -167,6 +177,18 @@ struct GsfElectron : ObjectData
     public int charge;
     public double[] pos;
     public double[] dir;
+}
+
+struct PATElectron : ObjectData
+{
+    public int id;
+    public double pt;
+    public double eta;
+    public double phi;
+    public int charge;
+    public double[] pos;
+    public double[] dir;
+    public string electronId;
 }
 struct SuperCluster : ObjectData
 {

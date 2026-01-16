@@ -189,6 +189,29 @@ namespace VR_Spy_Companion
 
                 return datalist;
             }
+            static public List<JetV1Data> genjetV1Parse(JObject data)
+            {
+                int idNumber = 0;
+                List<JetV1Data> datalist = new List<JetV1Data>();
+
+                foreach (var item in data["Collections"]["GenJets_V1"])
+                {
+
+                    JetV1Data currentJet = new JetV1Data();
+                    var children = item.Children().Values<double>().ToArray();
+
+                    currentJet.id = idNumber;
+                    currentJet.et = children[0];
+                    currentJet.eta = children[1];
+                    currentJet.theta = children[2];
+                    currentJet.phi = children[3];
+
+                    idNumber++;
+                    datalist.Add(currentJet);
+                }
+
+                return datalist;
+            }
             static public List<JetV2Data> jetV2Parse(JObject data)
             {
                 int idNumber = 0;
@@ -213,6 +236,31 @@ namespace VR_Spy_Companion
 
                 return datalist;
             }
+            static public List<JetV2Data> jetPATV1Parse(JObject data)
+            {
+                int idNumber = 0;
+                List<JetV2Data> datalist = new List<JetV2Data>();
+
+                foreach (var item in data["Collections"]["PATJets_V1"])
+                {
+
+                    JetV2Data currentJet = new JetV2Data();
+                    var children = item.Children().Values<double>().ToArray();
+
+                    currentJet.id = idNumber;
+                    currentJet.et = children[0];
+                    currentJet.eta = children[1];
+                    currentJet.theta = children[2];
+                    currentJet.phi = children[3];
+                    currentJet.vertex = new[] { children[4], children[5], children[6] };
+
+                    idNumber++;
+                    datalist.Add(currentJet);
+                }
+
+                return datalist;
+            }
+
             static public void generateJetModels(List<JetV1Data> data, string eventTitle)
                 {
                     double maxZ = 2.25;
@@ -262,6 +310,31 @@ namespace VR_Spy_Companion
                     index++;
                 }
                 File.WriteAllLines($"{eventTitle}//PFJets_V2.obj", dataList);
+            }
+            static public void generatePATJetModels(List<JetV2Data> data, string eventTitle)
+            {
+                double maxZ = 2.25;
+                double maxR = 1.10;
+                double radius = 0.3 * (1.0 / (1 + 0.001));
+                int numSections = 64;
+                int iterNumber = 0;
+                int index = 0;
+                List<string> dataList = new List<string>();
+
+                foreach (var item in data)
+                {
+                    iterNumber++;
+                    double ct = Math.Cos(item.theta);
+                    double st = Math.Sin(item.theta);
+
+                    double length1 = (ct != 0.0) ? maxZ / Math.Abs(ct) : maxZ;
+                    double length2 = (st != 0.0) ? maxR / Math.Abs(st) : maxR;
+                    double length = length1 < length2 ? length1 : length2;
+
+                    dataList = jetGeometry(item, radius, length, numSections, index, dataList);
+                    index++;
+                }
+                File.WriteAllLines($"{eventTitle}//PATJets_V1.obj", dataList);
             }
             // Fix RPCRecHit Assignment
             static public List<RPCRecHit> RPCRecHitParse(JObject data)

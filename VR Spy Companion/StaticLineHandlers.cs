@@ -41,6 +41,33 @@ namespace IGtoOBJGen
             }
             return dataList;
         }
+        static public List<PhotonData> PATphotonParse(JObject data)
+        {
+            List<PhotonData> dataList = new List<PhotonData>();
+            int idNumber = 0;
+            var dataValues = data["Collections"]["PATPhotons_V1"];
+            if (dataValues == null || dataValues == null)
+            {
+                return dataList;
+            }
+            foreach (var igPhotonData in dataValues)
+            {
+                PhotonData currentPhotonItem = new PhotonData();
+
+                var children = igPhotonData.Children().Values<double>().ToArray();
+
+                currentPhotonItem.id = idNumber;
+                currentPhotonItem.energy = children[0];
+                currentPhotonItem.et = children[1];
+                currentPhotonItem.eta = children[2];
+                currentPhotonItem.phi = children[3];
+                currentPhotonItem.position = new Vector3((float)children[4], (float)children[5], (float)children[6]);
+
+                idNumber++;
+                dataList.Add(currentPhotonItem);
+            }
+            return dataList;
+        }
         static public string makePhoton(PhotonData inputData)
         {
             double lEB = 3.0; //half-length of ECAL barrel in meters
@@ -296,7 +323,7 @@ namespace IGtoOBJGen
         {
             List<GlobalMuonData> dataList = new List<GlobalMuonData>();
             int idNumber = 0;
-            
+
             foreach (var item in data["Collections"][$"GlobalMuons_V{version}"])
             {
                 GlobalMuonData muonData = new GlobalMuonData();
@@ -309,6 +336,29 @@ namespace IGtoOBJGen
                 muonData.phi = children[5];
                 muonData.eta = children[6];
                 muonData.caloEnergy = children[7];
+
+                idNumber++;
+                dataList.Add(muonData);
+            }
+
+            return dataList;
+        }
+        static public List<PATGlobalMuonData> PATglobalMuonParse(JObject data,int version)
+        {
+            List<PATGlobalMuonData> dataList = new List<PATGlobalMuonData>();
+            int idNumber = 0;
+
+            foreach (var item in data["Collections"][$"PATGlobalMuons_V{version}"])
+            {
+                PATGlobalMuonData muonData = new PATGlobalMuonData();
+                var children = item.Children().Values<double>().ToArray();
+
+                muonData.id = idNumber;
+                muonData.pt = children[0];
+                muonData.charge = (int)children[1];
+                muonData.position = new double[] { children[2], children[3], children[4] };
+                muonData.phi = children[5];
+                muonData.eta = children[6];
 
                 idNumber++;
                 dataList.Add(muonData);
@@ -373,6 +423,57 @@ namespace IGtoOBJGen
 
             return dataList;
         }
+        static public List<TrackerMuonData> PATtrackerMuonParse(JObject data,int version)
+        {
+            List<TrackerMuonData> dataList = new List<TrackerMuonData>();
+            int idNumber = 0;
+
+            // var assocsExtras = data["Associations"]["MuonTrackerExtras_V1"];
+            // var assocsPoints = data["Associations"]["MuonTrackerPoints_V1"];
+            // var datapoints = data["Collections"]["TrackerMuons_V1"];
+            /*if ((assocsExtras == null || assocsExtras.HasValues == false) && (assocsPoints == null || assocsPoints.HasValues == false))
+            {
+                trackerMuonExtras = new List<TrackExtrasData>();
+                return dataList;
+            }
+            if (datapoints == null)
+            {
+                trackerMuonExtras = new List<TrackExtrasData>();
+                return dataList;
+            }*/
+
+            foreach (var item in data["Collections"][$"PATTrackerMuons_V{version}"])
+            {
+                TrackerMuonData muonData = new TrackerMuonData();
+                var children = item.Children().Values<double>().ToArray();
+
+                muonData.id = idNumber;
+                muonData.pt = children[0];
+                muonData.charge = (int)children[1];
+                muonData.position = new double[] { children[2], children[3], children[4] };
+                muonData.phi = children[5];
+                muonData.eta = children[6];
+
+                idNumber++;
+                dataList.Add(muonData);
+            }
+            /*if (assocsExtras.Count() >= 1)
+            {
+                int firstassoc = assocsExtras[0][1][1].Value<int>();
+                trackerMuonExtras = trackExtrasData.GetRange(firstassoc, assocsExtras.Last()[1][1].Value<int>() - firstassoc + 1);
+            }
+            else
+            {
+                trackerMuonExtras = new List<TrackExtrasData>();
+                trackerMuonExtras.Clear();
+            }
+            if (assocsPoints.HasValues)
+            {
+                trackerMuonPoints = makeTrackPoints(assocsPoints);
+            }*/
+
+            return dataList;
+        }
         /*static public List<TrackExtrasData> trackerExtrasParse(JObject data)
         {
             var assocsExtras = data["Associations"]["MuonTrackerExtras_V1"];
@@ -399,6 +500,38 @@ namespace IGtoOBJGen
                 return dataList;
             }
             foreach (var item in data["Collections"][$"StandaloneMuons_V{version}"])
+            {
+                StandaloneMuonData muon = new StandaloneMuonData();
+                var children = item.Children().Values<double>().ToArray();
+                muon.id = idNumber;
+                muon.pt = children[0];
+                muon.charge = (int)children[1];
+                muon.position = new double[] { children[2], children[3], children[4] };
+                muon.phi = children[5];
+                muon.eta = children[6];
+                muon.caloEnergy = children[7];
+
+                idNumber++;
+                dataList.Add(muon);
+
+            }
+            //int firstassoc = assocs[0][1][1].Value<int>();
+            //standaloneMuonExtras = trackExtrasData.GetRange(firstassoc, assocs.Last()[1][1].Value<int>() - firstassoc + 1);
+            //try { standaloneMuonPoints = makeTrackPoints(assocsPoints); } catch (Exception ex) { }
+
+            return dataList;
+        }
+        static public List<StandaloneMuonData> PATstandaloneMuonParse(JObject data, int version)
+        {
+            List<StandaloneMuonData> dataList = new List<StandaloneMuonData>();
+            int idNumber = 0;
+            // var assocs = data["Associations"]["PATMuonTrackExtras_V1"];
+            // var assocsPoints = data["Associations"]["MuonStandalonePoints_V1"];
+            // if ((assocs == null || assocs.HasValues == false) && (assocsPoints == null || assocsPoints.HasValues == false))
+            // {
+            //     return dataList;
+            // }
+            foreach (var item in data["Collections"][$"PATStandaloneMuons_V{version}"])
             {
                 StandaloneMuonData muon = new StandaloneMuonData();
                 var children = item.Children().Values<double>().ToArray();
@@ -497,12 +630,75 @@ namespace IGtoOBJGen
 
             return dataList;
         }
+        static public List<PATElectron> PATelectronParse(JObject data)
+        {
+            List<PATElectron> dataList = new List<PATElectron>();
+            int idNumber = 0;
+
+            foreach (var item in data["Collections"]["PATElectrons_V1"])
+            {
+                PATElectron electron = new PATElectron();
+
+                var children = item.Children().Values<string>().ToArray();
+
+                if (children.Length != 11)
+                {
+                    Console.WriteLine($"BAD PATElectron length: {children.Length}");
+                    Console.WriteLine(item.ToString());
+                    continue;
+                }
+
+                electron.id = idNumber;
+                electron.pt = Double.Parse(children[0]);
+                electron.eta = Double.Parse(children[1]);
+                electron.phi = Double.Parse(children[2]);
+                electron.charge = (int)Double.Parse(children[3]);
+
+                electron.pos = new double[]
+                {
+                    Double.Parse(children[4]),
+                    Double.Parse(children[5]),
+                    Double.Parse(children[6])
+                };
+
+                electron.dir = new double[]
+                {
+                    Double.Parse(children[7]),
+                    Double.Parse(children[8]),
+                    Double.Parse(children[9])
+                };
+
+                electron.electronId = children[10];
+
+                idNumber++;
+                dataList.Add(electron);
+            }
+
+            return dataList;
+        }
+
         static public METData METParse(JObject data)
         {
             METData met = new METData();
             JToken metdata;
            
             metdata = data["Collections"]["PFMETs_V1"][0];
+           
+            var children = metdata.Values<double>().ToList();
+            met.phi = children[0];
+            met.pt = children[1];
+            met.px = children[2];
+            met.py = children[3];
+            met.pz = children[4];
+
+            return met;
+        }
+        static public METData PATMETParse(JObject data)
+        {
+            METData met = new METData();
+            JToken metdata;
+           
+            metdata = data["Collections"]["PATMETs_V1"][0];
            
             var children = metdata.Values<double>().ToList();
             met.phi = children[0];

@@ -11,7 +11,7 @@ namespace IGtoOBJGen
         protected DeviceData oculusDevice;
         protected string adbPath;
 
-        public Communicate(string _adbPath) 
+        public Communicate(string _adbPath)
         {
             server = new AdbServer();
             var result = server.StartServer(_adbPath,restartServerIfNewer:false);
