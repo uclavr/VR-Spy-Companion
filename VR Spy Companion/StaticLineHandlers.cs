@@ -142,7 +142,7 @@ namespace IGtoOBJGen
             {
                 testList.Clear();
                 dataList.Add($"o {objectName}_{num}");
-                string[] muonTypes = { "GlobalMuons_V1", "GlobalMuons_V2", "StandaloneMuons_V1", "StandaloneMuons_V2", "TrackerMuons_V1", "TrackerMuons_V2" };
+                string[] muonTypes = { "GlobalMuons_V1", "GlobalMuons_V2", "StandaloneMuons_V1", "StandaloneMuons_V2", "TrackerMuons_V1", "TrackerMuons_V2", "PATGlobalMuons_V1", "PATStandaloneMuons_V1", "PATTrackerMuons_V1", "PATTrackerMuons_V2" };
                 if (muonTypes.Contains(objectName))
                 {
                     for (int i = 0; i <= numVerts; i++)
@@ -795,7 +795,7 @@ namespace IGtoOBJGen
                 medi.Add($"o {name}_{counter}");
                 foreach (var item in subitem)
                 {
-                    string[] muonTypes = { "GlobalMuons_V1", "GlobalMuons_V2", "StandaloneMuons_V1", "StandaloneMuons_V2", "TrackerMuons_V1", "TrackerMuons_V2" };
+                    string[] muonTypes = { "GlobalMuons_V1", "GlobalMuons_V2", "StandaloneMuons_V1", "StandaloneMuons_V2", "TrackerMuons_V1", "TrackerMuons_V2", "PATGlobalMuons_V1", "PATStandaloneMuons_V1", "PATTrackerMuons_V1", "PATTrackerMuons_V2" };
                     if (muonTypes.Contains(name))
                     {
 
