@@ -102,6 +102,7 @@ namespace IGtoOBJGen
                 }
             });
         }
+
         public void InstantiateObjects()
         {
                 foreach (string t in TYPES) {
@@ -223,27 +224,27 @@ namespace IGtoOBJGen
                             break;
                         case "MatchingGEMS_V!":
                             break;
-                        case "GEMDigis_V2": 
+                        case "GEMDigis_V2":
                             break;
-                        case "GEMRecHits_V2": 
+                        case "GEMRecHits_V2":
                             break;
-                        case "GEMSegments_V1": 
+                        case "GEMSegments_V1":
                             break;
-                        case "GEMSegments_V2": 
+                        case "GEMSegments_V2":
                             break;
-                        case "GEMSegments_V3": 
+                        case "GEMSegments_V3":
                             break;
-                        case "CSCStripDigis_V1": 
+                        case "CSCStripDigis_V1":
                             break;
-                        case "CSCWireDigis_V1": 
+                        case "CSCWireDigis_V1":
                             break;
-                        case "CSCStripDigis_V2": 
+                        case "CSCStripDigis_V2":
                             break;
-                        case "CSCWireDigis_V2": 
+                        case "CSCWireDigis_V2":
                             break;
-                        case "CSCLCTDigis_V1": 
+                        case "CSCLCTDigis_V1":
                             break;
-                        case "CSCCorrelatedLCTDigis_V2": 
+                        case "CSCCorrelatedLCTDigis_V2":
                             break;
                         case "MatchingCSCs_V1":
                             MatchingCSCs_V1 matchingcsvsv1 = new MatchingCSCs_V1(INPUTJSON, EVENTPATH);
@@ -261,7 +262,7 @@ namespace IGtoOBJGen
                             CSCSegments_V2 cscsegmentsv2 = new CSCSegments_V2(INPUTJSON, EVENTPATH);
                             eventObjects.Add(cscsegmentsv2);
                             break;
-                        case "CSCSegments_V3": 
+                        case "CSCSegments_V3":
                             break;
                         case "MuonChambers_V1":
                             MuonChambers_V1 muonchambers = new MuonChambers_V1(INPUTJSON, EVENTPATH);
@@ -271,15 +272,17 @@ namespace IGtoOBJGen
                             CaloTowers_V2 calotowersv2 = new CaloTowers_V2(INPUTJSON, EVENTPATH);
                             eventObjects.Add(calotowersv2);
                             break;
-                        case "METs_V1": 
+                        case "METs_V1":
                             break;
                         case "PFMETs_V1":
                             PFMETs_V1 pfMets = new PFMETs_V1(INPUTJSON, EVENTPATH);
                             eventObjects.Add(pfMets);
                             break;
-                        case "PATMETs_V1": 
+                        case "PATMETs_V1": // miniAOD update
+                            PATMETs_V1 patMets = new PATMETs_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(patMets);
                             break;
-                        case "Jets_V1": 
+                        case "Jets_V1":
                             break;
                         case "PFJets_V1":
                             PFJets_V1 pfJets = new PFJets_V1(INPUTJSON, EVENTPATH);
@@ -290,12 +293,20 @@ namespace IGtoOBJGen
                             eventObjects.Add(pfJetsv2);
                             break;
                         case "GenJets_V1":
+                            GenJets_V1 genJetsV1 = new GenJets_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(genJetsV1);
                             break;
-                        case "PATJets_V1":
+                        case "PATJets_V1": // miniAOD update
+                            PATJets_V1 patJets = new PATJets_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(patJets);
                             break;
-                        case "Photons_V1":
+                        case "Photons_V1": // also added, unsure why excluded before
+                            Photons_V1 photonsV1 = new Photons_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(photonsV1);
                             break;
-                        case "PATPhotons_V1":
+                        case "PATPhotons_V1": // miniAOD update
+                            PATPhotons_V1 patPhotons = new PATPhotons_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(patPhotons);
                             break;
                         case "GlobalMuons_V1":
                             GlobalMuons_V1 globalMuons_v1 = new GlobalMuons_V1(INPUTJSON, EVENTPATH);
@@ -305,7 +316,9 @@ namespace IGtoOBJGen
                             GlobalMuons_V2 globalMuons_v2 = new GlobalMuons_V2(INPUTJSON, EVENTPATH);
                             eventObjects.Add(globalMuons_v2);
                             break;
-                        case "PATGlobalMuons_V1":
+                        case "PATGlobalMuons_V1": // miniAOD update
+                            PATGlobalMuons_V1 patGlobalMuons_V1 = new PATGlobalMuons_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(patGlobalMuons_V1);
                             break;
                         case "StandaloneMuons_V1":
                             StandaloneMuons_V1 standaloneMuons_V1 = new StandaloneMuons_V1(INPUTJSON, EVENTPATH);
@@ -315,13 +328,21 @@ namespace IGtoOBJGen
                             StandaloneMuons_V2 standaloneMuons_V2 = new StandaloneMuons_V2(INPUTJSON, EVENTPATH);
                             eventObjects.Add(standaloneMuons_V2);
                             break;
-                        case "PATStandaloneMuons_V1":
+                        case "PATStandaloneMuons_V1": // miniAOD update
+                            PATStandaloneMuons_V1 patStandaloneMuons_V1 = new PATStandaloneMuons_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(patStandaloneMuons_V1);
                             break;
-                        case "PATTrackerMuons_V1":
+                        case "PATTrackerMuons_V1": // miniAOD update
+                            PATTrackerMuons_V1 patTrackerMuons_V1 = new PATTrackerMuons_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(patTrackerMuons_V1);
                             break;
-                        case "PATTrackerMuons_V2":
+                        case "PATTrackerMuons_V2": // miniAOD update
+                            PATTrackerMuons_V2 patTrackerMuons_V2 = new PATTrackerMuons_V2(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(patTrackerMuons_V2);
                             break;
-                        case "PATElectrons_V1":
+                        case "PATElectrons_V1": // miniAOD update
+                            PATElectrons_V1 patElectrons_V1 = new PATElectrons_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(patElectrons_V1);
                             break;
                         case "ForwardProtons_V1":
                             break;

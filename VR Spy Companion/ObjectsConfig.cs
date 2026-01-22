@@ -951,8 +951,22 @@ namespace IGtoOBJGen {
             return ("\"PFMETs_V1\":" +JsonConvert.SerializeObject(met));
         }
     }
-    /*class PATMETs_V1 : TypeConfig { }
-    class Jets_V1 : TypeConfig { }*/
+    class PATMETs_V1 : TypeConfig
+    {
+        private METData met;
+        private string eventTitle;
+        public PATMETs_V1(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            met = StaticLineHandlers.PATMETParse(JSON);
+            return ("\"PATMETs_V1\":" + JsonConvert.SerializeObject(met));
+        }
+    }
+    // class Jets_V1 : TypeConfig { }
     class PFJets_V1 : TypeConfig
     {
         private List<JetV1Data> jetDatas;
@@ -989,9 +1003,42 @@ namespace IGtoOBJGen {
         }
     }
 
-    /* class GenJets_V1 : TypeConfig { }
-     class PATJets_V1 : TypeConfig { }*/
-     class Photons_V1 : TypeConfig {
+    class GenJets_V1 : TypeConfig
+    {
+        private List<JetV1Data> jetDatas;
+        private string eventTitle;
+        public GenJets_V1(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            jetDatas = StaticBoxHandlers.genjetV1Parse(JSON);
+            StaticBoxHandlers.generategenJetModels(jetDatas, eventTitle);
+            string data = JsonConvert.SerializeObject(jetDatas);
+            return ("\"jetDatas\":" + data);
+            //return JsonConvert.SerializeObject(jetDatas);
+        }
+    }
+    class PATJets_V1 : TypeConfig
+    {
+        private List<JetV2Data> jetDatas;
+        private string eventTitle;
+        public PATJets_V1(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            jetDatas = StaticBoxHandlers.jetPATV1Parse(JSON);
+            StaticBoxHandlers.generatePATJetModels(jetDatas, eventTitle);
+            string data = JsonConvert.SerializeObject(jetDatas);
+            return ("\"jetDatas\":" + data);
+        }
+    }
+    class Photons_V1 : TypeConfig {
         private List<PhotonData> photons;
         private string eventTitle;
         public Photons_V1(JObject args, string eventtitle)
@@ -1013,7 +1060,29 @@ namespace IGtoOBJGen {
             return ("\"photonDatas\":" + data);
         }
     }
-    //class PATPhotons_V1 : TypeConfig { }
+    class PATPhotons_V1 : TypeConfig
+    {
+        private List<PhotonData> photons;
+        private string eventTitle;
+        public PATPhotons_V1(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            photons = StaticLineHandlers.PATphotonParse(JSON);
+            List<string> dataList = new List<string>();
+            foreach (var item in photons)
+            {
+                dataList.Add(StaticLineHandlers.makePhoton(item));
+            }
+            File.WriteAllText($"{eventTitle}\\PATPhotons_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\PATPhotons_V1.obj", dataList);
+            string data = JsonConvert.SerializeObject(photons);
+            return ("\"photonDatas\":" + data);
+        }
+    }
     class GlobalMuons_V1 : TypeConfig
     {
         private List<GlobalMuonData> globalMuons;
@@ -1055,9 +1124,27 @@ namespace IGtoOBJGen {
             return ("\"globalMuonDatas\":" + data);
         }
     }
-    /*class PATGlobalMuons_V1 : TypeConfig {
-
-    }*/
+    class PATGlobalMuons_V1 : TypeConfig
+    {
+        private List<PATGlobalMuonData> globalMuons;
+        private List<List<double[]>> points;
+        private string eventTitle;
+        private string collection = "PATMuonGlobalPoints_V1";
+        public PATGlobalMuons_V1(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            globalMuons = StaticLineHandlers.PATglobalMuonParse(JSON, 1);
+            points = StaticLineHandlers.makeTrackPoints(collection, JSON);
+            StaticLineHandlers.makeGeometryFromPoints(points, "PATGlobalMuons_V1", "PATGlobalMuons_V1", eventTitle);
+            // string data = JsonConvert.SerializeObject(points);
+            string data = JsonConvert.SerializeObject(globalMuons);
+            return ("\"globalMuonDatas\":" + data);
+        }
+    }
     class StandaloneMuons_V1 : TypeConfig
     {
         private List<List<double[]>> points;
@@ -1106,9 +1193,103 @@ namespace IGtoOBJGen {
             File.WriteAllLines($"{eventTitle}\\StandaloneMuons_V2.obj", dataList);
         }
     }
-    /*class PATStandaloneMuons_V1 : TypeConfig { }
-    class PATTrackerMuons_V1 : TypeConfig { }
-    class PATTrackerMuons_V2 : TypeConfig { }*/
+    class PATStandaloneMuons_V1 : TypeConfig
+    {
+        private List<TrackExtrasData> extras;
+        private string eventTitle;
+        private List<StandaloneMuonData> standaloneMuons;
+        private string association = "PATMuonTrackExtras_V1";
+        public PATStandaloneMuons_V1(JObject arg, string eventtitle)
+        {
+            JSON = arg;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            standaloneMuons = StaticLineHandlers.PATstandaloneMuonParse(JSON, 1);
+            extras = StaticLineHandlers.setExtras(JSON, association);
+            GenerateStandaloneMuonOBJ();
+            string data = JsonConvert.SerializeObject(standaloneMuons);
+            return ("\"standaloneMuonDatas\":" + data);
+        }
+        public void GenerateStandaloneMuonOBJ()
+        {
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "PATStandaloneMuons_V1");
+            File.WriteAllText($"{eventTitle}\\PATStandaloneMuons_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\PATStandaloneMuons_V1.obj", dataList);
+        }
+    }
+    class PATTrackerMuons_V1 : TypeConfig
+    {
+        private List<List<double[]>> trackerMuonPoints;
+        private List<TrackerMuonData> trackerMuonData;
+        private string eventTitle;
+        private string name = "PATTrackerMuons_V1";
+
+        public PATTrackerMuons_V1(JObject arg, string eventtitle)
+        {
+            JSON = arg;
+            eventTitle = eventtitle;
+            SetPoints();
+        }
+        public void SetPoints()
+        {
+            var assocsPoints = JSON["Associations"]["PATMuonTrackerPoints_V1"];
+            trackerMuonPoints = StaticLineHandlers.makeTrackPoints("PATMuonTrackerPoints_V1", JSON);
+        }
+        public override string Execute()
+        {
+            /*Execution protocol
+
+              1. Parse trackerMuonPoints. DONE
+              2. Create OBJ vector string arrays from points DONE
+              3. Write to file ...eventtitle/trackermuons_v2.obj DONE
+              4. Parse trackerMuonData DONE
+              5. return JObject of relevant data, to be appended to master JObject DONE
+
+             */
+            trackerMuonData = StaticLineHandlers.PATtrackerMuonParse(JSON, 1);
+            StaticLineHandlers.makeGeometryFromPoints(trackerMuonPoints, "PATTrackerMuons_V1", "PATTrackerMuons_V1", eventTitle);
+            string data = JsonConvert.SerializeObject(trackerMuonData);
+            return ("\"trackerMuonDatas\": " + data);
+        }
+    }
+    class PATTrackerMuons_V2 : TypeConfig
+    {
+        private List<TrackExtrasData> trackerMuonExtras;
+        public JObject item;
+        private List<TrackerMuonData> trackerMuonData;
+        private string collection = "PATMuonTrackExtras_V1";
+        private string name = "PATTrackerMuons_V2";
+        private string eventTitle;
+
+        public PATTrackerMuons_V2(JObject arg, string eventtitle)
+        {
+            JSON = arg;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            /*Execution protocol        
+              1. Parse trackerMuonExtras. DONE
+              2. Create OBJ vector string arrays from extras DONE
+              3. Write to file ...eventtitle/trackermuons_v2.obj DONE
+              4. Parse trackerMuonData DONE
+              5. return JObject of relevant data, to be appended to master JObject DONE
+             */
+            trackerMuonExtras = StaticLineHandlers.setExtras(JSON, "PATMuonTrackExtras_V1");
+            trackerMuonData = StaticLineHandlers.PATtrackerMuonParse(JSON, 2);
+            GenerateTrackerMuonOBJ();
+            string data = JsonConvert.SerializeObject(trackerMuonData);
+            return ("\"trackerMuonDatas\": " + data);
+        }
+        public void GenerateTrackerMuonOBJ()
+        {
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(trackerMuonExtras, "PATTrackerMuons_V2");
+            File.WriteAllText($"{eventTitle}\\PATTrackerMuons_V2.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\PATTrackerMuons_V2.obj", dataList);
+        }
+    }
     class GsfElectrons_V1 : TypeConfig
     {
         private List<GsfElectron> gsfElectrons;
@@ -1187,8 +1368,34 @@ namespace IGtoOBJGen {
             File.WriteAllLines($"{eventTitle}\\GsfElectrons_V3.obj", dataList);
         }
     }
-    /*class PATElectrons_V1 : TypeConfig { }
-    class ForwardProtons_V1 : TypeConfig { }*/
+    class PATElectrons_V1 : TypeConfig
+    {
+        private List<PATElectron> patElectrons;
+        private List<TrackExtrasData> extras;
+        private string association = "PATElectronExtras_V1";
+        private string eventTitle;
+        public PATElectrons_V1(JObject args, string eventtitle)
+        {
+            JSON = args;
+            eventTitle = eventtitle;
+        }
+        public override string Execute()
+        {
+            patElectrons = StaticLineHandlers.PATelectronParse(JSON);
+            extras = StaticLineHandlers.setExtras(JSON, association);
+            GenerateElectronOBJ();
+            string data = JsonConvert.SerializeObject(patElectrons);
+            return ("\"electronDatas\":" + data);
+        }
+        public void GenerateElectronOBJ()
+        {
+            List<string> dataList = StaticLineHandlers.trackCubicBezierCurve(extras, "PATElectrons_V1");
+            File.WriteAllText($"{eventTitle}\\PATElectrons_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}\\PATElectrons_V1.obj", dataList);
+        }
+    }
+
+    // class ForwardProtons_V1 : TypeConfig { }
     class Vertices_V1 : TypeConfig
     {
         private List<Vertex> vertexDatas;
