@@ -103,7 +103,7 @@ namespace IGtoOBJGen
         {
             if (dataList == null || dataList.Count() == 0)
             {
-                File.WriteAllText($"{eventTitle}\\8_Photons_V1.obj", String.Empty);
+                File.WriteAllText($"{eventTitle}/Photons_V1.obj", String.Empty);
                 return;
             }
             //Write obj files for the photons
@@ -118,8 +118,8 @@ namespace IGtoOBJGen
                 counter += 4;
             }
 
-            File.WriteAllText($"{eventTitle}\\8_Photons_V1.obj", String.Empty);
-            File.WriteAllLines($"{eventTitle}\\8_Photons_V1.obj", dataStrings);
+            File.WriteAllText($"{eventTitle}/Photons_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}/Photons_V1.obj", dataStrings);
         }
         static public List<string> trackCubicBezierCurve(List<TrackExtrasData> inputData, string objectName)
         {
@@ -641,13 +641,6 @@ namespace IGtoOBJGen
 
                 var children = item.Children().Values<string>().ToArray();
 
-                if (children.Length != 11)
-                {
-                    Console.WriteLine($"BAD PATElectron length: {children.Length}");
-                    Console.WriteLine(item.ToString());
-                    continue;
-                }
-
                 electron.id = idNumber;
                 electron.pt = Double.Parse(children[0]);
                 electron.eta = Double.Parse(children[1]);
@@ -778,7 +771,6 @@ namespace IGtoOBJGen
         {
             return 1.55713089 - 0.02149809 * z - 0.02798209 * z * z;
         }
-
         static public void makeGeometryFromPoints(List<List<double[]>> points, string name, string path, string eventTitle)
         {
             List<List<string>> dataLists = new List<List<string>>();
