@@ -751,17 +751,19 @@ namespace IGtoOBJGen
                 return positions;
             }
 
-            int mi;
-            int pi;
-
             foreach (var item in assoc)
             {
-                mi = item[0][1].Value<int>();
-                pi = item[1][1].Value<int>();
-                if (positions.Count() <= mi) { List<double[]> blank = new List<double[]>(); positions.Add(blank); }
+                int mi = item[0][1].Value<int>();
+                int pi = item[1][1].Value<int>();
+
+                if (pi < 0 || pi >= extras.Count())
+                    continue;
+
+                while (positions.Count <= mi)
+                    positions.Add(new List<double[]>());
+
                 double[] point = extras[pi][0].ToObject<double[]>();
                 positions[mi].Add(point);
-                
             }
             return positions;
         }
