@@ -53,6 +53,14 @@ struct Vertex : ObjectData
     public double chi2;
     public double ndof;
 }
+
+struct CompositeVertex : ObjectData
+{
+    public double[] pos;
+    public double chi2;
+    public double ndof;
+    public double time;
+}
 struct CalorimetryTowers : ObjectData
 {
     public double energy;
@@ -345,4 +353,47 @@ struct CaloTowersV2 : ObjectData
     public double[] back_3;
     public double[] back_4;
     public double scale;
+}
+
+struct EcalTowersV1 : ObjectData
+{
+    public string name;
+    public double et;
+    public double eta;
+    public double phi;
+    public double ecal_energy;
+    public double energy;
+    public int pid;
+    public double[] front_1;
+    public double[] front_2;
+    public double[] front_3;
+    public double[] front_4;
+    public double[] back_1;
+    public double[] back_2;
+    public double[] back_3;
+    public double[] back_4;
+    public double scale;
+    public double deltaPhi;
+    public double deltaEta;
+}
+struct HcalTowersV1 : ObjectData
+{
+    public string name;
+    public double et;
+    public double eta;
+    public double phi;
+    public double hcal_energy;
+    public double energy;
+    public int pid;
+    public double[] front_1;
+    public double[] front_2;
+    public double[] front_3;
+    public double[] front_4;
+    public double[] back_1;
+    public double[] back_2;
+    public double[] back_3;
+    public double[] back_4;
+    public double scale;
+    public double deltaPhi;
+    public double deltaEta;
 }

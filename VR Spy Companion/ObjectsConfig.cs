@@ -1455,7 +1455,114 @@ namespace IGtoOBJGen {
         {
             StaticBoxHandlers.GenerateEllipsoidObj($@"{eventTitle}/SecondaryVertices_V1.obj", secondaryVertexDatas, 3.0); //change for windows?
         }
+
+    }
+
+    class SecondaryVertices_Composite : TypeConfig
+    {
+        private List<CompositeVertex> secondaryVertexCompositeDatas;
+        private string eventTitle;
+        public SecondaryVertices_Composite(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            secondaryVertexCompositeDatas = StaticBoxHandlers.compositeVertexParse(JSON, "SecondaryVertices_Composite");
+            GenerateVertexOBJ();
+            string data = JsonConvert.SerializeObject(secondaryVertexCompositeDatas);
+            return ("\"secondaryVertexCompositeDatas\":" + data);
+        }
+        private void GenerateVertexOBJ()
+        {
+            StaticBoxHandlers.GenerateCompositeVertexObj($@"{eventTitle}/SecondaryVertices_Composite.obj", secondaryVertexCompositeDatas);
+        }
+
+    }
+
+    class KShortVertices : TypeConfig
+    {
+        private List<CompositeVertex> kshortVertexDatas;
+        private string eventTitle;
+        public KShortVertices(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            kshortVertexDatas = StaticBoxHandlers.compositeVertexParse(JSON, "KShortVertices");
+            GenerateVertexOBJ();
+            string data = JsonConvert.SerializeObject(kshortVertexDatas);
+            return ("\"kshortVertexDatas\":" + data);
+        }
+        private void GenerateVertexOBJ()
+        {
+            StaticBoxHandlers.GenerateCompositeVertexObj($@"{eventTitle}/KShortVertices.obj", kshortVertexDatas);
+        }
+    }
+
+    class LambdaVertices : TypeConfig
+    {
+        private List<CompositeVertex> lambdaVertexDatas;
+        private string eventTitle;
+        public LambdaVertices(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            lambdaVertexDatas = StaticBoxHandlers.compositeVertexParse(JSON, "LambdaVertices");
+            GenerateVertexOBJ();
+            string data = JsonConvert.SerializeObject(lambdaVertexDatas);
+            return ("\"lambdaVertexDatas\":" + data);
+        }
+        private void GenerateVertexOBJ()
+        {
+            StaticBoxHandlers.GenerateCompositeVertexObj($@"{eventTitle}/LambdaVertices.obj", lambdaVertexDatas);
+        }
     }
     /*class VertexCompositeCandidates_V1 : TypeConfig { }
     class SimVertices_V1 : TypeConfig { }*/
+
+    class EcalTowers_V1 : TypeConfig
+    {
+        private List<EcalTowersV1> ecalTowerData;
+        private string eventTitle;
+        public EcalTowers_V1(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            ecalTowerData = StaticBoxHandlers.EcalTowerV1Parse(JSON, "EcalTowers_V1");
+            List<string> dataList = StaticBoxHandlers.generateEcalTowerV1(ecalTowerData);
+            File.WriteAllText($"{eventTitle}/EcalTowers_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}/EcalTowers_V1.obj", dataList);
+            string data = JsonConvert.SerializeObject(ecalTowerData);
+            return ("\"ecalTowerDatas\":" + data);
+        }
+    }
+    class HcalTowers_V1 : TypeConfig
+    {
+        private List<HcalTowersV1> hcalTowerData;
+        private string eventTitle;
+        public HcalTowers_V1(JObject args, string eventtitle)
+        {
+            eventTitle = eventtitle;
+            JSON = args;
+        }
+        public override string Execute()
+        {
+            hcalTowerData = StaticBoxHandlers.HcalTowerV1Parse(JSON, "HcalTowers_V1");
+            List<string> dataList = StaticBoxHandlers.generateHcalTowerV1(hcalTowerData);
+            File.WriteAllText($"{eventTitle}/HcalTowers_V1.obj", String.Empty);
+            File.WriteAllLines($"{eventTitle}/HcalTowers_V1.obj", dataList);
+            string data = JsonConvert.SerializeObject(hcalTowerData);
+            return ("\"hcalTowerDatas\":" + data);
+        }
+    }
 }

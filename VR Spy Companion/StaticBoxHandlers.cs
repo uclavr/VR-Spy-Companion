@@ -166,6 +166,83 @@ namespace VR_Spy_Companion
                 return dataList;
             }
             
+
+            static public List<EcalTowersV1> EcalTowerV1Parse(JObject data, string name)
+            {
+                List<EcalTowersV1> dataList = new List<EcalTowersV1>();
+                foreach (var item in data["Collections"][name])
+                {
+                    EcalTowersV1 caloItem = new EcalTowersV1();
+                    var children = item.Children().Values<double>().ToArray();
+                    caloItem.et = children[0];
+                    caloItem.eta = children[1];
+                    caloItem.phi = children[2];
+                    caloItem.ecal_energy = children[3];
+                    caloItem.energy = children[4];
+                    caloItem.pid = (int)children[5];
+                    caloItem.front_1 = new double[] { children[6], children[7], children[8] };
+                    caloItem.front_2 = new double[] { children[9], children[10], children[11] };
+                    caloItem.front_3 = new double[] { children[12], children[13], children[14] };
+                    caloItem.front_4 = new double[] { children[15], children[16], children[17] };
+                    caloItem.back_1 = new double[] { children[18], children[19], children[20] };
+                    caloItem.back_2 = new double[] { children[21], children[22], children[23] };
+                    caloItem.back_3 = new double[] { children[24], children[25], children[26] };
+                    caloItem.back_4 = new double[] { children[27], children[28], children[29] };
+
+                    if (children.Length >= 30)//deltaPhi and deltaEta present
+                    {
+                        caloItem.deltaEta = children[30];
+                        caloItem.deltaPhi = children[31];
+                    }
+                    else // old data
+                    {
+                        caloItem.deltaEta = 0;
+                        caloItem.deltaPhi = 0;
+                    }
+                    dataList.Add(caloItem);
+                }
+
+                return dataList;
+            }
+
+            static public List<HcalTowersV1> HcalTowerV1Parse(JObject data, string name)
+            {
+                List<HcalTowersV1> dataList = new List<HcalTowersV1>();
+                foreach (var item in data["Collections"][name])
+                {
+                    HcalTowersV1 caloItem = new HcalTowersV1();
+                    var children = item.Children().Values<double>().ToArray();
+                    caloItem.et = children[0];
+                    caloItem.eta = children[1];
+                    caloItem.phi = children[2];
+                    caloItem.hcal_energy = children[3];
+                    caloItem.energy = children[4];
+                    caloItem.pid = (int)children[5];
+                    caloItem.front_1 = new double[] { children[6], children[7], children[8] };
+                    caloItem.front_2 = new double[] { children[9], children[10], children[11] };
+                    caloItem.front_3 = new double[] { children[12], children[13], children[14] };
+                    caloItem.front_4 = new double[] { children[15], children[16], children[17] };
+                    caloItem.back_1 = new double[] { children[18], children[19], children[20] };
+                    caloItem.back_2 = new double[] { children[21], children[22], children[23] };
+                    caloItem.back_3 = new double[] { children[24], children[25], children[26] };
+                    caloItem.back_4 = new double[] { children[27], children[28], children[29] };
+
+                    if (children.Length >= 30)//deltaPhi and deltaEta present
+                    {
+                        caloItem.deltaEta = children[30];
+                        caloItem.deltaPhi = children[31];
+                    }
+                    else // old data
+                    {
+                        caloItem.deltaEta = 0;
+                        caloItem.deltaPhi = 0;
+                    }
+                    dataList.Add(caloItem);
+                    dataList.Add(caloItem);
+                }
+                return dataList;
+            }
+
             static public List<JetV1Data> jetV1Parse(JObject data)
             {
                 int idNumber = 0;
@@ -806,6 +883,7 @@ namespace VR_Spy_Companion
                 }
                 return (geometryData,deltas);
             }
+           
             static public List<RecHitFraction> recHitFractionsParse(JObject data)
             {
                 List<RecHitFraction> dataList = new List<RecHitFraction>();
@@ -994,6 +1072,81 @@ namespace VR_Spy_Companion
 
                 return dataList;
             }
+
+            public static List<CompositeVertex> compositeVertexParse(JObject data, string name)
+            {
+                List<CompositeVertex> dataList = new List<CompositeVertex>();
+
+                foreach (var item in data["Collections"][name])
+                {
+                    var children = item.Children().Values<double>().ToList();
+                    CompositeVertex vertex = new CompositeVertex();
+
+                    vertex.pos = new double[] { children[0], children[1], children[2] };
+                    vertex.chi2 = children[3];
+                    vertex.ndof = children[4];
+                    vertex.time = children[5];
+
+                    dataList.Add(vertex);
+                }
+
+                return dataList;
+            }
+
+            public static void GenerateCompositeVertexObj(string filePath, List<CompositeVertex> vertexList)
+            {
+                int vertexNumber = 0;
+                int indexer = 0;
+                using (StreamWriter writer = new StreamWriter(filePath))
+                {
+                    foreach (var item in vertexList)
+                    {
+                        writer.WriteLine($"o Vertex_{vertexNumber}");
+                        double[] pos = item.pos;
+
+                        int index = 0;
+                        int lonSegments = 100;       // longitude (around)
+                        int latSegments = 50;        // latitude (top→bottom)
+
+                        // --- Generate vertices ---
+                        for (int j = 0; j <= latSegments; j++)
+                        {
+                            double phi = Math.PI * j / latSegments;   // 0..π
+                            for (int i = 0; i < lonSegments; i++)
+                            {
+                                double theta = 2.0 * Math.PI * i / lonSegments; // 0..2π
+                                double x = pos[0] + Math.Sin(phi) * Math.Cos(theta);
+                                double y = pos[1] + Math.Sin(phi) * Math.Sin(theta);
+                                double z = pos[2] + Math.Cos(phi);
+                                writer.WriteLine($"v {x:F6} {y:F6} {z:F6}");
+                            }
+                        }
+
+                        // --- Faces ---
+                        int ringVerts = lonSegments;
+                        for (int j = 0; j < latSegments; j++)
+                        {
+                            for (int i = 0; i < lonSegments; i++)
+                            {
+                                int nextI = (i + 1) % lonSegments;
+
+                                int v1 = indexer + 1 + j * ringVerts + i;
+                                int v2 = indexer + 1 + (j + 1) * ringVerts + i;
+                                int v3 = indexer + 1 + (j + 1) * ringVerts + nextI;
+                                int v4 = indexer + 1 + j * ringVerts + nextI;
+
+                                writer.WriteLine($"f {v1} {v2} {v3} {v4}");
+                                index = v4;
+                            }
+                        }
+
+                        indexer += (latSegments + 1) * ringVerts;
+                        vertexNumber++;
+                    }
+                }
+            }
+
+
             public static void GenerateEllipsoidObj(string filePath, List<Vertex> vertexList, double sigmaFactor)
             {
                 int vertexNumber = 0;
@@ -1048,7 +1201,7 @@ namespace VR_Spy_Companion
             }
 
 
-        static public List<TrackerPieceData> trackerPieceParse(JObject data, string name)
+            static public List<TrackerPieceData> trackerPieceParse(JObject data, string name)
             {
                 List<TrackerPieceData> dataList = new List<TrackerPieceData>();
                 foreach (var item in data["Collections"][name])
@@ -1448,6 +1601,154 @@ namespace VR_Spy_Companion
                 return dataList;
             }
 
+            static public List<string> generateEcalTowerV1(List<EcalTowersV1> data)
+            {
+                var dataList = new List<string>();
+                int counter = 1;
+                double min_energy = 1.5;
+
+                data = setEcalV1Scale(data);
+
+                dataList.Add(
+                    "vn -1 0 0\n" +
+                    "vn 0 0 -1\n" +
+                    "vn 1 0 0\n" +
+                    "vn 0 0 1\n" +
+                    "vn 0 -1 0\n" +
+                    "vn 0 1 0"
+                );
+
+                int objIndex = 0;
+
+                foreach (var tower in data)
+                {
+                    if (tower.et <= min_energy) continue;
+
+                    double scale = tower.scale;
+
+                    var f1 = Vector<double>.Build.DenseOfArray(tower.front_1);
+                    var f2 = Vector<double>.Build.DenseOfArray(tower.front_2);
+                    var f3 = Vector<double>.Build.DenseOfArray(tower.front_3);
+                    var f4 = Vector<double>.Build.DenseOfArray(tower.front_4);
+
+                    var b1 = Vector<double>.Build.DenseOfArray(tower.back_1);
+                    var b2 = Vector<double>.Build.DenseOfArray(tower.back_2);
+                    var b3 = Vector<double>.Build.DenseOfArray(tower.back_3);
+                    var b4 = Vector<double>.Build.DenseOfArray(tower.back_4);
+
+                    b1 = f1 + scale * (b1 - f1) / (b1 - f1).L2Norm();
+                    b2 = f2 + scale * (b2 - f2) / (b2 - f2).L2Norm();
+                    b3 = f3 + scale * (b3 - f3) / (b3 - f3).L2Norm();
+                    b4 = f4 + scale * (b4 - f4) / (b4 - f4).L2Norm();
+
+                    dataList.Add($"o EcalTower_{objIndex++}");
+
+                    dataList.Add($"v {String.Join(' ', f1)}");
+                    dataList.Add($"v {String.Join(' ', f2)}");
+                    dataList.Add($"v {String.Join(' ', f3)}");
+                    dataList.Add($"v {String.Join(' ', f4)}");
+                    dataList.Add($"v {String.Join(' ', b1)}");
+                    dataList.Add($"v {String.Join(' ', b2)}");
+                    dataList.Add($"v {String.Join(' ', b3)}");
+                    dataList.Add($"v {String.Join(' ', b4)}");
+
+                    dataList.Add($"f {counter}//4 {counter+1}//4 {counter+2}//4 {counter+3}//4");
+                    dataList.Add($"f {counter+3}//4 {counter+2}//4 {counter+1}//4 {counter}//4");
+
+                    dataList.Add($"f {counter+4}//2 {counter+5}//2 {counter+6}//2 {counter+7}//2");
+                    dataList.Add($"f {counter+7}//2 {counter+6}//2 {counter+5}//2 {counter+4}//2");
+
+                    dataList.Add($"f {counter}//6 {counter+3}//6 {counter+7}//6 {counter+4}//6");
+                    dataList.Add($"f {counter+4}//6 {counter+7}//6 {counter+3}//6 {counter}//6");
+
+                    dataList.Add($"f {counter+1}//5 {counter+2}//5 {counter+6}//5 {counter+5}//5");
+                    dataList.Add($"f {counter+5}//5 {counter+6}//5 {counter+2}//5 {counter+1}//5");
+
+                    dataList.Add($"f {counter+3}//1 {counter+2}//1 {counter+6}//1 {counter+7}//1");
+                    dataList.Add($"f {counter+7}//1 {counter+6}//1 {counter+2}//1 {counter+3}//1");
+
+                    dataList.Add($"f {counter+1}//3 {counter}//3 {counter+4}//3 {counter+5}//3");
+                    dataList.Add($"f {counter+5}//3 {counter+4}//3 {counter}//3 {counter+1}//3");
+
+                    counter += 8;
+                }
+
+                return dataList;
+            }
+            static public List<string> generateHcalTowerV1(List<HcalTowersV1> data)
+            {
+                var dataList = new List<string>();
+                int counter = 1;
+                double min_energy = 1.5;
+
+                data = setHcalV1Scale(data);
+
+                dataList.Add(
+                    "vn -1 0 0\n" +
+                    "vn 0 0 -1\n" +
+                    "vn 1 0 0\n" +
+                    "vn 0 0 1\n" +
+                    "vn 0 -1 0\n" +
+                    "vn 0 1 0"
+                );
+
+                int objIndex = 0;
+
+                foreach (var tower in data)
+                {
+                    if (tower.et <= min_energy) continue;
+
+                    double scale = tower.scale;
+
+                    var f1 = Vector<double>.Build.DenseOfArray(tower.front_1);
+                    var f2 = Vector<double>.Build.DenseOfArray(tower.front_2);
+                    var f3 = Vector<double>.Build.DenseOfArray(tower.front_3);
+                    var f4 = Vector<double>.Build.DenseOfArray(tower.front_4);
+
+                    var b1 = Vector<double>.Build.DenseOfArray(tower.back_1);
+                    var b2 = Vector<double>.Build.DenseOfArray(tower.back_2);
+                    var b3 = Vector<double>.Build.DenseOfArray(tower.back_3);
+                    var b4 = Vector<double>.Build.DenseOfArray(tower.back_4);
+
+                    b1 = f1 + scale * (b1 - f1) / (b1 - f1).L2Norm();
+                    b2 = f2 + scale * (b2 - f2) / (b2 - f2).L2Norm();
+                    b3 = f3 + scale * (b3 - f3) / (b3 - f3).L2Norm();
+                    b4 = f4 + scale * (b4 - f4) / (b4 - f4).L2Norm();
+
+                    dataList.Add($"o HcalTower_{objIndex++}");
+
+                    dataList.Add($"v {String.Join(' ', f1)}");
+                    dataList.Add($"v {String.Join(' ', f2)}");
+                    dataList.Add($"v {String.Join(' ', f3)}");
+                    dataList.Add($"v {String.Join(' ', f4)}");
+                    dataList.Add($"v {String.Join(' ', b1)}");
+                    dataList.Add($"v {String.Join(' ', b2)}");
+                    dataList.Add($"v {String.Join(' ', b3)}");
+                    dataList.Add($"v {String.Join(' ', b4)}");
+
+                    dataList.Add($"f {counter}//4 {counter+1}//4 {counter+2}//4 {counter+3}//4");
+                    dataList.Add($"f {counter+3}//4 {counter+2}//4 {counter+1}//4 {counter}//4");
+
+                    dataList.Add($"f {counter+4}//2 {counter+5}//2 {counter+6}//2 {counter+7}//2");
+                    dataList.Add($"f {counter+7}//2 {counter+6}//2 {counter+5}//2 {counter+4}//2");
+
+                    dataList.Add($"f {counter}//6 {counter+3}//6 {counter+7}//6 {counter+4}//6");
+                    dataList.Add($"f {counter+4}//6 {counter+7}//6 {counter+3}//6 {counter}//6");
+
+                    dataList.Add($"f {counter+1}//5 {counter+2}//5 {counter+6}//5 {counter+5}//5");
+                    dataList.Add($"f {counter+5}//5 {counter+6}//5 {counter+2}//5 {counter+1}//5");
+
+                    dataList.Add($"f {counter+3}//1 {counter+2}//1 {counter+6}//1 {counter+7}//1");
+                    dataList.Add($"f {counter+7}//1 {counter+6}//1 {counter+2}//1 {counter+3}//1");
+
+                    dataList.Add($"f {counter+1}//3 {counter}//3 {counter+4}//3 {counter+5}//3");
+                    dataList.Add($"f {counter+5}//3 {counter+4}//3 {counter}//3 {counter+1}//3");
+
+                    counter += 8;
+                }
+
+                return dataList;
+            }
             static public List<CaloTowersV2> setCaloV2Scale(List<CaloTowersV2> towers)
             {
                 double scaler = towers.Select(x => x.et).Max();
@@ -1460,5 +1761,30 @@ namespace VR_Spy_Companion
                 }
                 return towers;
             }
-    }
+
+            static public List<EcalTowersV1> setEcalV1Scale(List<EcalTowersV1> towers)
+            {
+                double scaler = towers.Select(x => x.et).Max();
+                List<EcalTowersV1> result = towers;
+                for (int i = 0; i < towers.Count(); i++)
+                {
+                    EcalTowersV1 calo = towers[i];
+                    calo.scale = towers[i].et / scaler;
+                    towers[i] = calo;
+                }
+                return towers;
+            }
+            static public List<HcalTowersV1> setHcalV1Scale(List<HcalTowersV1> towers)
+            {
+                double scaler = towers.Select(x => x.et).Max();
+                List<HcalTowersV1> result = towers;
+                for (int i = 0; i < towers.Count(); i++)
+                {
+                    HcalTowersV1 calo = towers[i];
+                    calo.scale = towers[i].et / scaler;
+                    towers[i] = calo;
+                }
+                return towers;
+            }
+        }
 }
