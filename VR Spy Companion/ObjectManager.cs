@@ -362,6 +362,28 @@ namespace IGtoOBJGen
                             Event_V3 event_V3 = new Event_V3(INPUTJSON, EVENTPATH);
                             eventObjects.Add(event_V3);
                             break;
+                        case "EcalTowers_V1":
+                            EcalTowers_V1 ecalTowers_V1 = new EcalTowers_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(ecalTowers_V1);
+                            break;
+                        case "HcalTowers_V1":
+                            HcalTowers_V1 hcalTowers_V1 = new HcalTowers_V1(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(hcalTowers_V1);
+                            break;
+
+                        case "SecondaryVertices_Composite":
+                            SecondaryVertices_Composite secondaryVerticesComposite = new SecondaryVertices_Composite(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(secondaryVerticesComposite);
+                            break;
+                        case "KShortVertices":
+                            KShortVertices kShortVertices = new KShortVertices(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(kShortVertices);
+                            break;
+                        case "LambdaVertices":
+                            LambdaVertices lambdaVertices = new LambdaVertices(INPUTJSON, EVENTPATH);
+                            eventObjects.Add(lambdaVertices);
+                            break;
+
                         default:
                             break;
                     }
