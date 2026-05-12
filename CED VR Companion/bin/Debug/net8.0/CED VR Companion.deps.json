@@ -6,7 +6,7 @@
   "compilationOptions": {},
   "targets": {
     ".NETCoreApp,Version=v8.0": {
-      "VR Spy Companion/1.0.0": {
+      "CED VR Companion/1.0.0": {
         "dependencies": {
           "MathNet.Numerics": "5.0.0",
           "MathNet.Spatial": "0.6.0",
@@ -17,7 +17,7 @@
           "SharpAdbClient": "2.3.23"
         },
         "runtime": {
-          "VR Spy Companion.dll": {}
+          "CED VR Companion.dll": {}
         }
       },
       "MathNet.Numerics/5.0.0": {
@@ -232,7 +232,7 @@
     }
   },
   "libraries": {
-    "VR Spy Companion/1.0.0": {
+    "CED VR Companion/1.0.0": {
       "type": "project",
       "serviceable": false,
       "sha512": ""
