@@ -23,9 +23,11 @@ CED VR Companion accepts 1 argument (the path to your '.ig' file) when being cal
 ### Options
 - 's': Allows you to select a single event from the run
 - 'c': Allows you to select a range of events from the run
-### GUI Use
-
-GUI coming soon
+  
+### Example Usage with Sample Data
+```
+"CED VR Companion.exe" DoubleMuParked_Run2012C_0.ig
+```
 
 ## Common Issues
 
