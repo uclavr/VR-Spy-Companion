@@ -18,16 +18,16 @@ The master branch of this repository is designed to be used by macOS. If you are
 ```
 ./CED\ VR\ Companion path_to_ig_file [options]
 ```
-
 CED VR Companion accepts 2 arguments (the path to your '.ig' file and option flags) when being called from the command line. An interface will display allowing you to select your desired run. After execution, the event files will be automatically uploaded to your headset. 
 
 ### Options
 - 's': Allows you to select a single event from the run
 - 'c': Allows you to select a range of events from the run
-### GUI Use
-
-GUI coming soon
-
+  
+### Example Usage with Sample Data
+```
+./CED\ VR\ Companion DoubleMuParked_Run2012C_0.ig
+```
 ## Common Issues
 
 **Issue:** "Unhandled exception. System.ArgumentNullException: Value cannot be null. (Parameter 'device')"
